@@ -130,6 +130,11 @@ fn markdown_to_html(
     // (and if they want an actual <p> tag, they should probably edit the HTML output of Cohoard,
     // as most of the time, a raw <p> will look ugly).
     let html = html.replace("<p>", "").replace("</p>", "");
+    // Cohost doesn't accept <u>, so we need to replace it with a span that does the same thing.
+    let html = html
+        .replace("<u>", "<span style=\"text-decoration:underline\">")
+        .replace("</u>", "</span>");
+
     Ok(tera::Value::String(html))
 }
 

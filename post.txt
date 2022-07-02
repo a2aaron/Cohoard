@@ -19,5 +19,5 @@ CASSIE: While these lines
 are closer together
 since they're in the same message.
 AARON: oh yeah! you can also *use normal markdown* ~~like you do in discord~~ **and it should hopefully just work**
-CASSIE: (Right now, <u>underlines</u> don't quite work yet, but you can use normal HTML tags instead.)
+CASSIE: (Right now, <u>Discord-style underlines</u> don't quite work yet, but you can use normal HTML tags instead.)
 CASSIE: (The above line is written as `<u>underlines</u>`.)
