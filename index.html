@@ -13,22 +13,28 @@
     </h1>
     <f-col>
       <f-row>
-        <button>Preview</button>
-        <button>HTML</button>
+        <button id="preview-btn">Preview</button>
+        <button id="html-btn">HTML</button>
         <f-sp></f-sp>
       </f-row>
-      <div id="preview-output">big output area</div>
-      <textarea readonly id="html-output" class="hidden">html output area</textarea>
+      <div id="preview-output" class="output">big output area</div>
+      <textarea readonly id="html-output" class="output hidden">html output area</textarea>
     </f-col>
     <f-row class="gap-1">
-      <div id="script-column">
+      <div class="edit-column">
         <textarea id="script">AARON: nya
 CASSIE: chirp
         </textarea>
       </div>
-      <f-col>
+      <f-col class="edit-column gap-1">
         <div>
+          <label for="template-select">Template Preset:</label>
 
+          <select id="template-select">
+              <option value="https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/discord.html">Discord</option>
+              <option value="https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/twitter.html">Twitter</option>
+              <option value="">Custom</option>
+          </select>
         </div>
         <textarea id="config">people:
 - key: AARON

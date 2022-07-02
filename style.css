@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 f-row,
 .row {
     display: flex;
@@ -15,7 +19,20 @@ f-sp,
     flex: 1;
 }
 
+body {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+h1 {
+    margin-bottom: 0;
+}
+
 .gap-1 {
+    gap: 1em;
+}
+
+.gap-2 {
     gap: 2em;
 }
 
@@ -24,8 +41,14 @@ f-sp,
 }
 
 #preview-output {
-    overflow: hidden;
     padding: 16px 12px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+#html-output {
+    padding: 16px 12px;
+    height: 100%;
 }
 
 textarea {
@@ -33,7 +56,13 @@ textarea {
     height: 100%;
 }
 
-#script-column {
+.edit-column {
     width: 500px;
     height: 400px;
+}
+
+.output {
+    min-height: 40vh;
+    height: 40vh;
+    width: 100%;
 }

@@ -85,6 +85,10 @@ let script_textarea = document.getElementById("script");
 let config_textarea = document.getElementById("config");
 let preview_area = document.getElementById("preview-output");
 let html_area = document.getElementById("html-output");
+let template_dropdown = document.getElementById("template-select");
+
+let preview_button = document.getElementById("preview-btn");
+let html_button = document.getElementById("html-btn");
 
 let config = cohoard.load_config(config_textarea.value);
 
@@ -93,15 +97,25 @@ function render() {
 
    let rendered = cohoard.render("discord template", template, posts);
    preview_area.innerHTML = rendered;
-   html_area.innerText = rendered;
+   html_area.value = rendered;
+   console.log(rendered);
 }
-
 
 script_textarea.addEventListener("input", render)
 
 config_textarea.addEventListener("input", () => {
    config = cohoard.load_config(config_textarea.value);
    render();
+})
+
+preview_button.addEventListener("click", () => {
+   preview_area.classList.remove("hidden");
+   html_area.classList.add("hidden");
+})
+
+html_button.addEventListener("click", () => {
+   preview_area.classList.add("hidden");
+   html_area.classList.remove("hidden");
 })
 
 render();
