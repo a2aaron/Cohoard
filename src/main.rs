@@ -14,7 +14,7 @@ struct User {
 impl User {
     fn aaron() -> User {
         User {
-            name: "SCP 7C: Delta Runic Gnar - Skim".into(),
+            name: "Aaron".into(),
             color: "#FF8200".into(),
             avatar: "ralsei_cropped.png".into(),
         }
@@ -22,7 +22,7 @@ impl User {
 
     fn cassie() -> User {
         User {
-            name: "Cassie - 2%".into(),
+            name: "Cassie".into(),
             color: "#69C97A".into(),
             avatar: "cassie.webp".into(),
         }

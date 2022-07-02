@@ -1,3 +1,12 @@
+# Cohoard - Post formatted chatlogs to Cohost!
+
+Cohoard is a tool for turning chatlogs into formatted posts on Cohost. You can use Cohoard to easily format your silly conversations like a Discord channel, an MSPA chatlog, and so on.
+
+## Discord Template
+
+Currently the only option available is the Discord template, which stylizes conversation as Discord chatlogs.
+
+```
 @ Today at 4:13 PM
 AARON: you can write messages in play-script style
 AARON: each line is considered it's own "message"
@@ -18,3 +27,8 @@ CASSIE: since these are seperate messages
 CASSIE: While these lines
 are closer together
 since they're in the same message.
+```
+
+This produces the following result:
+
+![The rendered result of the above chatlog, which is stylized as a Discord conversation](readme-images/discord_template.png)
