@@ -21,7 +21,7 @@ margin: -16px -12px;
 
 <div class="poster-avatar"
     style="
-    background-image: url({{ post.user_avatar }});
+    background-image: url({{ post.user.avatar }});
     background-repeat: no-repeat;
     background-size: contain;
     border-radius: 50%;
@@ -32,9 +32,9 @@ margin: -16px -12px;
 <div class="post-body">
 <div class="post-headline">
 <span style="
-    color: {{ post.user_color }};
+    color: {{ post.user.color }};
     font-size: 100%;
-">{{ post.user }}</span>
+">{{ post.user.name }}</span>
 <span style="
     color: #A3A6AA;
     font-size: 0.75rem;

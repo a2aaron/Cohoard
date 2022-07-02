@@ -1,38 +1,53 @@
-use std::{
-    io::Read,
-    path::{Path, PathBuf},
-};
+use std::{io::Read, path::PathBuf};
 
 use clap::Parser;
 use serde::Serialize;
 use tera::{Context, Tera};
 
 #[derive(Debug, Clone, Serialize)]
+struct User {
+    name: String,
+    color: String,
+    avatar: String,
+}
+
+impl User {
+    fn aaron() -> User {
+        User {
+            name: "SCP 7C: Delta Runic Gnar - Skim".into(),
+            color: "#FF8200".into(),
+            avatar: "ralsei_cropped.png".into(),
+        }
+    }
+
+    fn cassie() -> User {
+        User {
+            name: "Cassie - 2%".into(),
+            color: "#69C97A".into(),
+            avatar: "cassie.webp".into(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
 struct Post {
-    user: String,
-    user_color: String,
-    user_avatar: String,
+    user: User,
     contents: String,
 }
 
 impl Post {
     fn new(user: String, contents: String) -> Post {
-        let (user, user_color, user_avatar) = match user.as_str() {
-            "AARON" => (
-                "SCP 7C: Delta Runic Gnar - Skim",
-                "#FF8200",
-                "ralsei_cropped.png",
-            ),
-            "CASSIE" => ("Cassie - 2%", "#69C97A", "cassie.webp"),
-            _ => (user.as_str(), "#FFFFFF", "nothing.png"),
+        let user = match user.as_str() {
+            "AARON" => User::aaron(),
+            "CASSIE" => User::cassie(),
+            _ => User {
+                name: user.into(),
+                color: "#FFFFFF".into(),
+                avatar: "nothing.png".into(),
+            },
         };
 
-        Post {
-            user: user.to_string(),
-            user_color: user_color.to_string(),
-            user_avatar: user_avatar.to_string(),
-            contents,
-        }
+        Post { user, contents }
     }
 }
 
