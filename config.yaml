@@ -2,9 +2,9 @@ people:
 - key: AARON
   name: Aaron
   color: "#FF8200"
-  avatar: ralsei_cropped.png
+  avatar: https://cdn.discordapp.com/attachments/637721012418510849/992630255946838126/ralsei_cropped.png
   # my friends are IN the config!
 - key: CASSIE
   name: Cassie
   color: "#69C97A"
-  avatar: cassie.webp
+  avatar: https://cdn.discordapp.com/attachments/637721012418510849/992630255665823744/cassie.webp

@@ -28,7 +28,7 @@ font-size: 1rem;">
    Cohost.-#}
 <div class="poster-avatar"
     style="
-    background-image: url({{ post.user.avatar }});
+    background-image: url({{ post.user.avatar | safe }});
     background-repeat: no-repeat;
     background-size: contain;
     border-radius: 50%;
