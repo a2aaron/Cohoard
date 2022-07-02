@@ -39,7 +39,7 @@ impl PostBlock {
 fn parse_posts(config: &Config, input: String) -> Vec<PostBlock> {
     let mut posts = vec![];
 
-    let mut timestamp = String::from("Today");
+    let mut timestamp = None;
 
     let mut name = String::new();
     let mut messages = vec![];
@@ -52,7 +52,7 @@ fn parse_posts(config: &Config, input: String) -> Vec<PostBlock> {
         config: &Config,
         posts: &mut Vec<PostBlock>,
         name: &str,
-        timestamp: &str,
+        timestamp: Option<String>,
         messages: &mut Vec<String>,
     ) {
         if messages.is_empty() {
@@ -67,7 +67,7 @@ fn parse_posts(config: &Config, input: String) -> Vec<PostBlock> {
             }
         });
 
-        let post = PostBlock::new(user, timestamp.to_string(), &messages);
+        let post = PostBlock::new(user, timestamp, &messages);
         posts.push(post);
 
         messages.clear();
@@ -78,11 +78,11 @@ fn parse_posts(config: &Config, input: String) -> Vec<PostBlock> {
         // These have the format "@ Today at 4:13 PM" and update the timestamp
         // (The timestamp is actually freeform text, allowing for Goofs)
         if line.starts_with("@") {
-            try_post(&config, &mut posts, &name, &timestamp, &mut messages);
+            try_post(&config, &mut posts, &name, timestamp.clone(), &mut messages);
 
             let new_timestamp = line[1..].trim();
             if !new_timestamp.is_empty() {
-                timestamp = new_timestamp.to_string();
+                timestamp = Some(new_timestamp.to_string());
             }
         } else {
             match line.split_once(": ") {
@@ -98,7 +98,7 @@ fn parse_posts(config: &Config, input: String) -> Vec<PostBlock> {
                         .all(|x| x.is_alphabetic() && x.is_uppercase())
                     {
                         if maybe_next_name != name && !name.is_empty() {
-                            try_post(&config, &mut posts, &name, &timestamp, &mut messages);
+                            try_post(&config, &mut posts, &name, timestamp.clone(), &mut messages);
                         }
                         name = maybe_next_name.into();
                         messages.push(maybe_message.into());
@@ -118,7 +118,7 @@ fn parse_posts(config: &Config, input: String) -> Vec<PostBlock> {
         }
     }
 
-    try_post(&config, &mut posts, &name, &timestamp, &mut messages);
+    try_post(&config, &mut posts, &name, timestamp.clone(), &mut messages);
 
     posts
 }

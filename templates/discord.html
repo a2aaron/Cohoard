@@ -49,7 +49,7 @@ font-size: 1rem;">
 {#- Post headline. This is the username + timestamp. -#}
 <div class="post-headline" style="white-space: nowrap;">
 <span style="color: {{ post.user.color | default(value="white") }}; font-size: 100%;">{{ post.user.name }}</span>
-<span style="color: #A3A6AA; font-size: 0.75rem; padding-left: 10px;">{{ post.timestamp }}</span>
+<span style="color: #A3A6AA; font-size: 0.75rem; padding-left: 10px;">{{ post.timestamp | default (value = "") }}</span>
 </div>
 
 {#- Message contents (multiple messages are collapsed into 
