@@ -6,37 +6,53 @@ padding: 16px;
 line-height: 1.375rem;
 margin: -16px -12px;
 ">
-    {% for post in posts %}
-    <div style="
-    background-image: url({{ post.user_avatar }});
-    background-position: 12px 0px;
-    background-repeat: no-repeat;
-    background-size: 48px;
+
+{% for post in posts %}
+<div class="single-post-wrapper" 
+    style="
     color: white;
-    padding-left: 72px;
+    padding-left: 16px;
     padding-right: 16px;
     padding-bottom: 8px;
-    ">
-        <span style="
-        color: {{ post.user_color }};
-        font-size: 100%;
-        ">{{ post.user }}</span>
-        <span style="
-        color: #A3A6AA;
-        font-size: 0.75rem;
-        padding-left: 10px;
-        ">Today at 4:20 PM</span>
-        <br>
-        <p style="
-        color: #DCDDDE;
-        font-size: 1rem;
-        word-wrap: break-word;
-        margin-top: 4px;
-        ">
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+">
+
+<div class="poster-avatar"
+    style="
+    background-image: url({{ post.user_avatar }});
+    background-repeat: no-repeat;
+    background-size: contain;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+"></div>
+
+<div class="post-body">
+<div class="post-headline">
+<span style="
+    color: {{ post.user_color }};
+    font-size: 100%;
+">{{ post.user }}</span>
+<span style="
+    color: #A3A6AA;
+    font-size: 0.75rem;
+    padding-left: 10px;
+">Today at 4:20 PM</span>
+</div>
+
+<p style="
+    color: #DCDDDE;
+    font-size: 1rem;
+    word-wrap: break-word;
+    margin-top: 4px;
+">
 
 {{ post.contents }}
 
-        </p>
-    </div>
-    {% endfor %}
+</p>
+</div>
+</div>
+{% endfor %}
 </div>
