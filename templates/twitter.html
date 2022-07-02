@@ -36,7 +36,7 @@
                     <div style="margin-left: 22px; display: flex; flex-direction: column; width: 100%;">
                         <div>
                             <span style="font-weight: bold; margin-right: 2px;">{{ post.user.name }}</span>
-                            <span style="color: #72767B; cursor: pointer;"><span>@</span>{{ post.user.handle }} · {{ post.timestamp }}</span>
+                            <span style="color: #72767B; cursor: pointer;"><span>@</span>{{ post.user.handle }} · {{ post.timestamp | default(value="0s") }}</span>
                         </div>
                         {%- for message in post.messages %}
                         <p style="margin: 0;">
