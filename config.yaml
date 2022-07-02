@@ -1,0 +1,9 @@
+people:
+- key: AARON
+  name: Aaron
+  color: "#FF8200"
+  avatar: ralsei_cropped.png
+- key: CASSIE
+  name: Cassie
+  color: "#69C97A"
+  avatar: cassie.webp

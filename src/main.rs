@@ -129,10 +129,14 @@ fn parse_posts(input: String) -> Vec<PostBlock> {
 }
 
 #[derive(Debug, clap::Parser)]
-#[clap(author, version, about, long_about = None)]
+#[clap(author, version, about = "a chatlog formatter for cohost", long_about = None)]
 struct Args {
-    #[clap(long = "in", short)]
+    /// The file containing the chatlog.
     in_file: Option<PathBuf>,
+    /// The configuration file to use.
+    #[clap(long, short, default_value = "config.yaml")]
+    config: PathBuf,
+    /// The file to write the HTML file to, if provided. Otherwise, prints to standard out.
     #[clap(long = "out", short)]
     out_file: Option<PathBuf>,
 }
