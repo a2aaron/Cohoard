@@ -32,11 +32,12 @@ impl User {
 #[derive(Debug, Clone, Serialize)]
 struct Post {
     user: User,
+    timestamp: String,
     contents: Vec<String>,
 }
 
 impl Post {
-    fn new(user: String, contents: Vec<String>) -> Post {
+    fn new(user: String, timestamp: String, contents: Vec<String>) -> Post {
         let user = match user.as_str() {
             "AARON" => User::aaron(),
             "CASSIE" => User::cassie(),
@@ -47,8 +48,35 @@ impl Post {
             },
         };
 
-        Post { user, contents }
+        Post {
+            user,
+            timestamp,
+            contents,
+        }
     }
+}
+
+fn parse_posts(input: String) -> Vec<Post> {
+    let mut posts = vec![];
+
+    let mut timestamp = String::from("Today");
+
+    for line in input.lines() {
+        let line = line.trim();
+        if line.is_empty() {
+            println!("new line not implemented");
+        } else if line.starts_with("@") {
+            timestamp = line[1..].trim().to_string();
+        } else {
+            let split = line.split(": ").collect::<Vec<_>>();
+            let user = split[0].to_string();
+            let contents = split[1].to_string();
+            let post = Post::new(user, timestamp.clone(), vec![contents]);
+
+            posts.push(post)
+        }
+    }
+    posts
 }
 
 #[derive(Debug, clap::Parser)]
@@ -71,15 +99,7 @@ fn main() {
         string
     };
 
-    let posts = input
-        .lines()
-        .map(|line| {
-            let split = line.split(": ").collect::<Vec<_>>();
-            let user = split[0].to_string();
-            let contents = split[1].to_string();
-            Post::new(user, vec![contents])
-        })
-        .collect::<Vec<_>>();
+    let posts = parse_posts(input);
 
     let tera = Tera::new("templates/**/*.html").unwrap();
 
