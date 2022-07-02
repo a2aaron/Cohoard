@@ -61,7 +61,7 @@ font-size: 1rem;">
    of HTML tags will end up rendered as actual HTML tags.
    If you want to type HTML tags (that aren't inside code
    blocks), you can escape it with &lt;. -#}
-{{ message | safe }}
+{{- message | safe -}}
 </p>
 
 {%- endfor -%}
