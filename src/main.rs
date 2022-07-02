@@ -11,20 +11,26 @@ use tera::{Context, Tera};
 struct Post {
     user: String,
     user_color: String,
+    user_avatar: String,
     contents: String,
 }
 
 impl Post {
     fn new(user: String, contents: String) -> Post {
-        let (user, user_color) = match user.as_str() {
-            "AARON" => ("SCP 7C: Delta Runic Gnar - Skim", "0xFF8200"),
-            "CASSIE" => ("Cassie - 2%", "0x69C97A"),
-            _ => (user.as_str(), "0xFFFFFF"),
+        let (user, user_color, user_avatar) = match user.as_str() {
+            "AARON" => (
+                "SCP 7C: Delta Runic Gnar - Skim",
+                "#FF8200",
+                "ralsei_cropped.png",
+            ),
+            "CASSIE" => ("Cassie - 2%", "#69C97A", "cassie.webp"),
+            _ => (user.as_str(), "#FFFFFF", "nothing.png"),
         };
 
         Post {
             user: user.to_string(),
             user_color: user_color.to_string(),
+            user_avatar: user_avatar.to_string(),
             contents,
         }
     }
