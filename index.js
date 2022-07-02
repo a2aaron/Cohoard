@@ -83,6 +83,8 @@ let template = `{#- The div for the background and global font styling.
 
 let script_textarea = document.getElementById("script");
 let config_textarea = document.getElementById("config");
+let preview_area = document.getElementById("preview-output");
+let html_area = document.getElementById("html-output");
 
 let config = cohoard.load_config(config_textarea.value);
 
@@ -90,8 +92,8 @@ function render() {
    let posts = cohoard.parse_posts(config, script_textarea.value);
 
    let rendered = cohoard.render("discord template", template, posts);
-   let output_area = document.getElementById("output");
-   output_area.innerHTML = rendered;
+   preview_area.innerHTML = rendered;
+   html_area.innerText = rendered;
 }
 
 

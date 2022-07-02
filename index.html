@@ -4,13 +4,33 @@
     <meta charset="utf-8">
     <title>Cohoard - Format Chatlogs for Cohost</title>
     <script src="./index.js" type="module"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <f-col class="gap-1">
     <h1>
         Cohoard - Format Chatlogs for Cohost
     </h1>
-    <textarea id="script">AARON: nya</textarea>
-    <textarea id="config">people:
+    <f-col>
+      <f-row>
+        <button>Preview</button>
+        <button>HTML</button>
+        <f-sp></f-sp>
+      </f-row>
+      <div id="preview-output">big output area</div>
+      <textarea readonly id="html-output" class="hidden">html output area</textarea>
+    </f-col>
+    <f-row class="gap-1">
+      <div id="script-column">
+        <textarea id="script">AARON: nya
+CASSIE: chirp
+        </textarea>
+      </div>
+      <f-col>
+        <div>
+
+        </div>
+        <textarea id="config">people:
 - key: AARON
   name: Aaron
   color: "#FF8200"
@@ -22,6 +42,8 @@
   color: "#69C97A"
   avatar: https://cdn.discordapp.com/attachments/637721012418510849/992630255665823744/cassie.webp
   handle: porglezomp</textarea>
-  <div id="output">output area</div>
+        </f-col>
+    </f-row>
+  </f-col>    
 </body>
 </html>
