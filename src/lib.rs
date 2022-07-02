@@ -1,13 +1,15 @@
 use std::{collections::HashMap, error::Error};
 
-use config::Config;
 use pulldown_cmark::html;
 use serde::{Deserialize, Serialize};
 use tera::{Context, Tera};
+use wasm_bindgen::prelude::*;
 
 pub mod config;
+use config::Config;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[wasm_bindgen]
 pub struct User {
     #[serde(flatten)]
     fields: HashMap<String, String>,
@@ -19,7 +21,8 @@ pub struct User {
 /// For the Discord template, a new PostBlock is usually issued whenever the following happens:
 /// - The timestamp would change
 /// - A message is sent by a different person than the previous person
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[wasm_bindgen]
 pub struct PostBlock {
     user: User,
     timestamp: Option<String>,
@@ -185,4 +188,38 @@ fn markdown_to_html(
         .replace("</u>", "</span>");
 
     Ok(tera::Value::String(html))
+}
+
+pub mod js {
+    use wasm_bindgen::prelude::*;
+
+    #[wasm_bindgen]
+    pub struct Config(JsValue);
+
+    #[wasm_bindgen]
+    pub struct PostBlockArray(JsValue);
+
+    #[wasm_bindgen]
+    pub fn parse_posts(config: &Config, input: String) -> Result<PostBlockArray, JsError> {
+        let config = config.0.into_serde()?;
+        let posts = super::parse_posts(&config, input);
+        Ok(PostBlockArray(JsValue::from_serde(&posts)?))
+    }
+
+    #[wasm_bindgen]
+    pub fn render(
+        template_name: &str,
+        template: &str,
+        posts: &PostBlockArray,
+    ) -> Result<String, JsError> {
+        let posts = posts.0.into_serde::<Vec<_>>()?;
+        super::render(template_name, template, &posts).map_err(|err| JsError::new(&err.to_string()))
+    }
+
+    #[wasm_bindgen]
+    pub fn load_config(config: &str) -> Result<Config, JsError> {
+        let config =
+            crate::config::load_config(config).map_err(|err| JsError::new(&err.to_string()))?;
+        Ok(Config(JsValue::from_serde(&config)?))
+    }
 }

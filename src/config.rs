@@ -1,6 +1,6 @@
 use std::{collections::HashMap, error::Error};
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::User;
 
@@ -16,11 +16,11 @@ struct ConfigSchema {
     people: Vec<UserSchema>,
 }
 
-#[derive(Debug, Clone)]
 /// A configuration struct detailing what properties each poster has.
 ///
 /// Each poster has a unique name (usually in all-caps) and can detail things like
 /// their avatar, display name, handle, and other common properies.
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Config {
     pub people: HashMap<String, User>,
 }

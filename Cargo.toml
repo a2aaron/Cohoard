@@ -17,4 +17,4 @@ pulldown-cmark = "0.9.1"
 serde = { version = "1.0.137", features = ["derive"] }
 serde_yaml = "0.8.24"
 tera = { version = "1.16.0", default-features = false }
-wasm-bindgen = "0.2.74"
+wasm-bindgen = { version = "0.2.74", features = ["serde-serialize"] }
