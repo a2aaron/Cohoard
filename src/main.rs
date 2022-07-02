@@ -29,15 +29,20 @@ impl User {
     }
 }
 
+// Represents a block of posts. Each PostBlock renders the user headline plus
+// some number of messages in the post body. A new PostBlock is usually issued
+// whenever the following happen:
+// - The time stamp would change
+// - A different person posted something
 #[derive(Debug, Clone, Serialize)]
-struct Post {
+struct PostBlock {
     user: User,
     timestamp: String,
     messages: Vec<String>,
 }
 
-impl Post {
-    fn new(user: &str, timestamp: &str, messages: &[String]) -> Post {
+impl PostBlock {
+    fn new(user: &str, timestamp: &str, messages: &[String]) -> PostBlock {
         let user = match user {
             "AARON" => User::aaron(),
             "CASSIE" => User::cassie(),
@@ -48,7 +53,7 @@ impl Post {
             },
         };
 
-        Post {
+        PostBlock {
             user,
             timestamp: timestamp.into(),
             messages: messages.into(),
@@ -56,7 +61,7 @@ impl Post {
     }
 }
 
-fn parse_posts(input: String) -> Vec<Post> {
+fn parse_posts(input: String) -> Vec<PostBlock> {
     let mut posts = vec![];
 
     let mut timestamp = String::from("Today");
@@ -67,12 +72,12 @@ fn parse_posts(input: String) -> Vec<Post> {
     for line in input.lines() {
         let line = line.trim();
         if line.is_empty() && !messages.is_empty() {
-            let post = Post::new(&name, &timestamp, &messages);
+            let post = PostBlock::new(&name, &timestamp, &messages);
             posts.push(post);
             messages.clear();
         } else if line.starts_with("@") {
             if !messages.is_empty() {
-                let post = Post::new(&name, &timestamp, &messages);
+                let post = PostBlock::new(&name, &timestamp, &messages);
                 posts.push(post);
                 messages.clear();
             }
@@ -82,7 +87,7 @@ fn parse_posts(input: String) -> Vec<Post> {
             let next_name = split[0].to_string();
             let message = split[1].to_string();
             if next_name != name && !name.is_empty() {
-                let post = Post::new(&name, &timestamp, &messages);
+                let post = PostBlock::new(&name, &timestamp, &messages);
                 posts.push(post);
                 messages.clear();
             }
@@ -92,7 +97,7 @@ fn parse_posts(input: String) -> Vec<Post> {
     }
 
     if !messages.is_empty() {
-        let post = Post::new(&name, &timestamp, &messages);
+        let post = PostBlock::new(&name, &timestamp, &messages);
         posts.push(post);
         messages.clear();
     }
