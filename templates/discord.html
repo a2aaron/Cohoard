@@ -48,8 +48,7 @@ font-size: 1rem;">
 
 {#- Message contents (multiple messages are collapsed into 
    a single post body) -#}
-{%- for message in post.messages -%}
-
+{%- for message in post.messages %}
 <p style="word-wrap: break-word; margin: 4px 0 8px 0;">
 {#- "safe" keyword is required here, because messages will
    sometimes contain newlines, which we add <br>s to. 
@@ -61,7 +60,7 @@ font-size: 1rem;">
    of HTML tags will end up rendered as actual HTML tags.
    If you want to type HTML tags (that aren't inside code
    blocks), you can escape it with &lt;. -#}
-{{- message | safe -}}
+{{- message | markdown | trim | safe -}}
 </p>
 
 {%- endfor -%}

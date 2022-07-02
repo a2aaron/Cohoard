@@ -1,7 +1,8 @@
-use std::{error::Error, io::Read, path::PathBuf};
+use std::{collections::HashMap, error::Error, io::Read, path::PathBuf};
 
-use clap::Parser;
+use clap::Parser as _;
 use config::Config;
+use pulldown_cmark::html;
 use serde::{Deserialize, Serialize};
 use tera::{Context, Tera};
 
@@ -110,6 +111,28 @@ fn parse_posts(config: &Config, input: String) -> Vec<PostBlock> {
     posts
 }
 
+fn markdown_to_html(
+    value: &tera::Value,
+    _: &HashMap<String, tera::Value>,
+) -> tera::Result<tera::Value> {
+    let value = value.as_str().ok_or(tera::Error::msg(
+        "non-string value passed to markdown filter",
+    ))?;
+    let options = pulldown_cmark::Options::ENABLE_STRIKETHROUGH;
+    let parser = pulldown_cmark::Parser::new_ext(value, options);
+
+    let mut html = String::new();
+    html::push_html(&mut html, parser);
+    // pulldown-cmark adds <p> tags to the HTMLified text, which is undesirable since
+    // this also adds a large margin to all the text contained within it. We can fix this
+    // by simply removing all the <p> tags. This is safe and won't cause problems with
+    // literal textual tags in the message, since those will already be escaped.
+    // (and if they want an actual <p> tag, they should probably edit the HTML output of Cohoard,
+    // as most of the time, a raw <p> will look ugly).
+    let html = html.replace("<p>", "").replace("</p>", "");
+    Ok(tera::Value::String(html))
+}
+
 #[derive(Debug, clap::Parser)]
 #[clap(author, version, about = "a chatlog formatter for cohost", long_about = None)]
 struct Args {
@@ -138,7 +161,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let posts = parse_posts(&config, input);
 
-    let tera = Tera::new("templates/**/*.html")?;
+    let mut tera = Tera::new("templates/**/*.html")?;
+    tera.register_filter("markdown", markdown_to_html);
 
     let mut context = Context::new();
     context.insert("posts", &posts);
