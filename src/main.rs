@@ -1,32 +1,17 @@
-use std::{io::Read, path::PathBuf};
+use std::{error::Error, io::Read, path::PathBuf};
 
 use clap::Parser;
-use serde::Serialize;
+use config::Config;
+use serde::{Deserialize, Serialize};
 use tera::{Context, Tera};
 
-#[derive(Debug, Clone, Serialize)]
-struct User {
+mod config;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct User {
     name: String,
     color: String,
     avatar: String,
-}
-
-impl User {
-    fn aaron() -> User {
-        User {
-            name: "Aaron".into(),
-            color: "#FF8200".into(),
-            avatar: "ralsei_cropped.png".into(),
-        }
-    }
-
-    fn cassie() -> User {
-        User {
-            name: "Cassie".into(),
-            color: "#69C97A".into(),
-            avatar: "cassie.webp".into(),
-        }
-    }
 }
 
 // Represents a block of posts. Each PostBlock renders the user headline plus
@@ -51,7 +36,7 @@ impl PostBlock {
     }
 }
 
-fn parse_posts(input: String) -> Vec<PostBlock> {
+fn parse_posts(config: &Config, input: String) -> Vec<PostBlock> {
     let mut posts = vec![];
 
     let mut timestamp = String::from("Today");
@@ -59,16 +44,13 @@ fn parse_posts(input: String) -> Vec<PostBlock> {
     let mut name = String::new();
     let mut messages = vec![];
 
-    fn post(name: &str, timestamp: &str, messages: &mut Vec<String>) -> PostBlock {
-        let user = match name {
-            "AARON" => User::aaron(),
-            "CASSIE" => User::cassie(),
-            _ => User {
-                name: name.into(),
-                color: "#FFFFFF".into(),
-                avatar: "nothing.png".into(),
-            },
-        };
+    fn post(config: &Config, name: &str, timestamp: &str, messages: &mut Vec<String>) -> PostBlock {
+        let user = config.people.get(name).cloned().unwrap_or(User {
+            name: name.into(),
+            color: "#FFFFFF".into(),
+            // TODO: Allow the avatar to be optional.
+            avatar: "nothing.png".into(),
+        });
 
         let post = PostBlock::new(user, &timestamp, &messages);
         messages.clear();
@@ -81,7 +63,7 @@ fn parse_posts(input: String) -> Vec<PostBlock> {
         // (The timestamp is actually freeform text, allowing for Goofs)
         if line.starts_with("@") {
             if !messages.is_empty() {
-                posts.push(post(&name, &timestamp, &mut messages));
+                posts.push(post(&config, &name, &timestamp, &mut messages));
             }
 
             let new_timestamp = line[1..].trim();
@@ -102,7 +84,7 @@ fn parse_posts(input: String) -> Vec<PostBlock> {
                         .all(|x| x.is_alphabetic() && x.is_uppercase())
                     {
                         if maybe_next_name != name && !name.is_empty() {
-                            posts.push(post(&name, &timestamp, &mut messages));
+                            posts.push(post(&config, &name, &timestamp, &mut messages));
                         }
                         name = maybe_next_name.into();
                         messages.push(maybe_message.into());
@@ -123,7 +105,7 @@ fn parse_posts(input: String) -> Vec<PostBlock> {
     }
 
     if !messages.is_empty() {
-        posts.push(post(&name, &timestamp, &mut messages));
+        posts.push(post(&config, &name, &timestamp, &mut messages));
     }
     posts
 }
@@ -141,29 +123,33 @@ struct Args {
     out_file: Option<PathBuf>,
 }
 
-fn main() {
+fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
 
+    let config = config::load_config(args.config)?;
+
     let input = if let Some(path) = args.in_file {
-        std::fs::read_to_string(path).unwrap()
+        std::fs::read_to_string(path)?
     } else {
         let mut string = String::new();
-        std::io::stdin().read_to_string(&mut string).unwrap();
+        std::io::stdin().read_to_string(&mut string)?;
         string
     };
 
-    let posts = parse_posts(input);
+    let posts = parse_posts(&config, input);
 
-    let tera = Tera::new("templates/**/*.html").unwrap();
+    let tera = Tera::new("templates/**/*.html")?;
 
     let mut context = Context::new();
     context.insert("posts", &posts);
 
-    let html = tera.render("discord.html", &context).unwrap();
+    let html = tera.render("discord.html", &context)?;
 
     if let Some(out_path) = args.out_file {
-        std::fs::write(out_path, html).unwrap();
+        std::fs::write(out_path, html)?;
     } else {
         println!("{}", html);
     }
+
+    Ok(())
 }

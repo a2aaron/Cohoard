@@ -3,6 +3,7 @@ people:
   name: Aaron
   color: "#FF8200"
   avatar: ralsei_cropped.png
+  # my friends are IN the config!
 - key: CASSIE
   name: Cassie
   color: "#69C97A"
