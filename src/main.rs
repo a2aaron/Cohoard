@@ -161,6 +161,9 @@ struct Args {
     /// The file to write the HTML file to, if provided. Otherwise, prints to standard out.
     #[clap(long = "out", short)]
     out_file: Option<PathBuf>,
+    /// The template file to use.
+    #[clap(long, short, default_value = "discord.html")]
+    template: String,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -184,7 +187,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut context = Context::new();
     context.insert("posts", &posts);
 
-    let html = tera.render("discord.html", &context)?;
+    let html = tera.render(&args.template, &context)?;
 
     if let Some(out_path) = args.out_file {
         std::fs::write(out_path, html)?;
