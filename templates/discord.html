@@ -72,7 +72,17 @@ margin: -16px -12px;
     margin-bottom: 8px;
 ">
 
-{{ message }}
+{# "safe" keyword is required here, because messages will
+   sometimes contain newlines, which we add <br>s to. 
+   By default, Tera will escape these tags into literal 
+   text, but we don't want this (we want actual html tags
+   for the newline), so we need to tell Tera that this is
+   safe to not escape (even though, technically, it is not.
+   This also means that messages that contain literal text
+   of HTML tags will end up rendered as actual HTML tags.
+   If you want to type HTML tags (that aren't inside code
+   blocks), you can escape it with &lt;.#}
+{{ message | safe }}
 
 </p>
 

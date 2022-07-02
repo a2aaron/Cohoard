@@ -42,17 +42,7 @@ struct PostBlock {
 }
 
 impl PostBlock {
-    fn new(user: &str, timestamp: &str, messages: &[String]) -> PostBlock {
-        let user = match user {
-            "AARON" => User::aaron(),
-            "CASSIE" => User::cassie(),
-            _ => User {
-                name: user.into(),
-                color: "#FFFFFF".into(),
-                avatar: "nothing.png".into(),
-            },
-        };
-
+    fn new(user: User, timestamp: &str, messages: &[String]) -> PostBlock {
         PostBlock {
             user,
             timestamp: timestamp.into(),
@@ -69,37 +59,71 @@ fn parse_posts(input: String) -> Vec<PostBlock> {
     let mut name = String::new();
     let mut messages = vec![];
 
+    fn post(name: &str, timestamp: &str, messages: &mut Vec<String>) -> PostBlock {
+        let user = match name {
+            "AARON" => User::aaron(),
+            "CASSIE" => User::cassie(),
+            _ => User {
+                name: name.into(),
+                color: "#FFFFFF".into(),
+                avatar: "nothing.png".into(),
+            },
+        };
+
+        let post = PostBlock::new(user, &timestamp, &messages);
+        messages.clear();
+        post
+    }
+
     for line in input.lines() {
-        let line = line.trim();
-        if line.is_empty() && !messages.is_empty() {
-            let post = PostBlock::new(&name, &timestamp, &messages);
-            posts.push(post);
-            messages.clear();
-        } else if line.starts_with("@") {
+        // Lines starting with @ are timestamp messages
+        // These have the format "@ Today at 4:13 PM" and update the timestamp
+        // (The timestamp is actually freeform text, allowing for Goofs)
+        if line.starts_with("@") {
             if !messages.is_empty() {
-                let post = PostBlock::new(&name, &timestamp, &messages);
-                posts.push(post);
-                messages.clear();
+                posts.push(post(&name, &timestamp, &mut messages));
             }
-            timestamp = line[1..].trim().to_string();
+
+            let new_timestamp = line[1..].trim();
+            if !new_timestamp.is_empty() {
+                timestamp = new_timestamp.to_string();
+            }
         } else {
-            let split = line.split(": ").collect::<Vec<_>>();
-            let next_name = split[0].to_string();
-            let message = split[1].to_string();
-            if next_name != name && !name.is_empty() {
-                let post = PostBlock::new(&name, &timestamp, &messages);
-                posts.push(post);
-                messages.clear();
-            }
-            name = next_name;
-            messages.push(message);
+            match line.split_once(": ") {
+                Some((maybe_next_name, maybe_message)) => {
+                    // Check if this is a line that looks like it starts with a name
+                    // Ex: "AARON: bee removal"
+                    // if it is, treat it as a new message. Otherwise, treat it
+                    // as a multiline message.
+                    // Note that multiline messages have slightly closer spacing
+                    // compared to lines across different messages
+                    if maybe_next_name
+                        .chars()
+                        .all(|x| x.is_alphabetic() && x.is_uppercase())
+                    {
+                        if maybe_next_name != name && !name.is_empty() {
+                            posts.push(post(&name, &timestamp, &mut messages));
+                        }
+                        name = maybe_next_name.into();
+                        messages.push(maybe_message.into());
+                    } else {
+                        messages.push(line.into());
+                    }
+                }
+                None => {
+                    if let Some(last_msg) = messages.last_mut() {
+                        *last_msg += "<br>\n";
+                        *last_msg += line;
+                    } else {
+                        messages.push(line.into())
+                    }
+                }
+            };
         }
     }
 
     if !messages.is_empty() {
-        let post = PostBlock::new(&name, &timestamp, &messages);
-        posts.push(post);
-        messages.clear();
+        posts.push(post(&name, &timestamp, &mut messages));
     }
     posts
 }
