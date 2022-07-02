@@ -1,0 +1,58 @@
+<div style="display: grid; grid-template-areas: 'sidebar tweets'; grid-template-columns: 68px 1fr; width: calc(100% + 2em); height: 500px; margin: -1em; background-color: black; color: white;">
+    <div style="display: flex; grid-area: sidebar; flex-direction: column; align-items: center; border-right: 1px solid #333; padding: 16px 0;">
+        <img src="https://staging.cohostcdn.org/attachment/87582302-03a4-476f-bf85-eb7927ec3b24/tw-bird-Artboard%201@3x.png" alt="twitter" style="width: 24px; margin: 0; margin-bottom: 32px; cursor: pointer;"/>
+        <img src="https://staging.cohostcdn.org/attachment/6d895790-8cbd-425e-bf5a-14c8a9deacd3/tw-home-Artboard%201@3x.png" alt="home" style="width: 24px; margin: 0; margin-bottom: 32px; cursor: pointer;" />
+        <img src="https://staging.cohostcdn.org/attachment/e6db220d-65db-4a62-b233-1073087c3e9c/tw-search-Artboard%201@3x.png" alt="search" style="width: 24px; margin: 0; margin-bottom: 32px; cursor: pointer;" />
+        <img src="https://staging.cohostcdn.org/attachment/8070edf5-61be-498f-96b4-c6970be4e67e/tw-bell-Artboard%201@3x.png" alt="notifications" style="width: 24px; margin: 0; margin-bottom: 32px; cursor: pointer;" /> 
+        <img src="https://staging.cohostcdn.org/attachment/86d887ce-e71e-4b83-b449-39b7d8eb8e23/tw-more-Artboard%201@3x.png" alt="more" style="width: 24px; margin: 0; margin-bottom: 32px; cursor: pointer;" /> 
+        <div style="width: 52px; height: 52px; background-color: rgb(29, 155, 240); display: flex; justify-content: center; align-items: center; border-radius: 9999px; cursor: pointer; margin-top: auto;">
+            <img src="https://staging.cohostcdn.org/attachment/05bfc8a7-6bb9-45b8-8842-49ede893f9b3/tw-feather-Artboard%201@3x.png" alt="new post" style="width: 24px; margin: 0;" />
+        </div>
+    </div>
+    <div style="display: flex; grid-area: tweets; flex-direction: column; padding: 16px 0 0 0; max-height: 500px;">
+        <div style="display: flex; flex-direction: row; justify-content: space-between; margin-bottom: 20px; padding: 0 16px;">
+            <h2 style="margin: 0; color: white; margin-top: -5px;">Latest Tweets</h2>
+            <img src="https://staging.cohostcdn.org/attachment/57d36841-c954-4e4c-88b0-185be6ca0df0/tw-stars-Artboard%201@3x.png" style="width: 24px; cursor: pointer; margin: 0;" />
+        </div>
+        <div style="overflow-y: scroll;">
+            <div style="display: grid; grid-template-areas: 'avatar input' 'avatar post'; grid-template-columns: 60px 1fr; grid-template-rows: 1fr 48px; border-bottom: 1px solid #333; padding: 0 16px 8px 16px;">
+                <div style="display: flex; grid-area: avatar; align-items: center; flex-direction: column; justify-content: flex-start; margin-right: 12px;">
+                    <img src="https://staging.cohostcdn.org/avatar/266-1bb8ccae-655b-44b6-830d-3d15e7467a9d-profile.png" alt="it's eggbug!" style="width: 48px; border-radius: 9999px; margin: 0;"/>
+                </div>
+                <div style="display: flex; grid-area: input;">
+                    <span style="color: #72767B; font-size: 20px; padding: 6px 12px;">What's happening?</span>
+                </div>
+                <div style="display: flex; grid-area: post; flex-direction: row; align-items: center; justify-content: flex-start; padding: 12px;">
+                    <img src="https://staging.cohostcdn.org/attachment/4981aa61-69e8-489a-8ebc-49102ccd659c/tw-pic-Artboard%201@3x.png" alt="image icon" style="width: 20px; margin-right: 8px; cursor: pointer;" />
+                    <img src="https://staging.cohostcdn.org/attachment/f589b01e-2892-4fec-8740-84752dd6702d/tw-gif-Artboard%201@3x.png" alt="gif icon" style="width: 20px; margin-right: 8px; cursor: pointer;" />
+                    <img src="https://staging.cohostcdn.org/attachment/d4ed0fb0-a78b-42e7-954a-801a379c4c74/tw-smile-Artboard%201@3x.png" alt="smile icon" style="width: 20px; margin-right: 8px; cursor: pointer;" />
+                    <div style="cursor: pointer; background-color: rgb(29, 155, 240); border-radius: 9999px; display: flex; justify-content: center; align-items: center; padding: 0 16px; height: 36px; margin-left: auto; font-weight: bold;">Tweet</div>
+                </div>
+            </div>
+            {%- for post in posts -%}
+            <div style="display: flex; flex-direction: row; justify-content: flex-start; padding: 16px; border-bottom: 1px solid #333;">
+                <div style="display: flex; flex-direction: row; align-items: flex-start;">
+                    <img src="{{ post.user.avatar | safe }}" alt="user avatar" style="width: 48px; border-radius: 9999px; margin: 0;"/>
+                    <div style="margin-left: 22px; display: flex; flex-direction: column;">
+                        <div>
+                            <span style="font-weight: bold; margin-right: 2px;">{{ post.user.name }}</span>
+                            <span style="color: #72767B; cursor: pointer;"><span>@</span>{{ post.user.handle }} · {{ post.timestamp }}</span>
+                        </div>
+                        {%- for message in post.messages %}
+                        <p style="margin: 0; width: 400px;">
+                           {{- message | markdown | trim | safe -}}
+                        </p>
+                        {%- endfor -%}
+                        <div style="display: flex; justify-content: space-between; margin-top: 12px;">
+                            <img src="https://staging.cohostcdn.org/attachment/f527bcd8-d35e-430d-a0ad-efb07cce0bfd/tw-chat-Artboard%201@3x.png" alt="reply icon" style="width: 22px; height: 22px; margin: 0; cursor: pointer;" />
+                            <img src="https://staging.cohostcdn.org/attachment/7b9e088a-021c-4323-9a21-09617a9df964/tw-like-Artboard%201@3x.png" alt="reply icon" style="width: 22px; height: 22px; margin: 0; cursor: pointer;" />
+                            <img src="https://staging.cohostcdn.org/attachment/408a7a6a-eb54-4887-822a-e8dfd60549e8/tw-rt-Artboard%201@3x.png" alt="reply icon" style="width: 22px; height: 22px; margin: 0; cursor: pointer;" />
+                            <img src="https://staging.cohostcdn.org/attachment/5e0d4a8a-d6a9-4728-9079-98d1d148ca60/tw-share-Artboard%201@3x.png" alt="reply icon" style="width: 22px; height: 22px; margin: 0; cursor: pointer;" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {%- endfor -%}
+        </div>
+    </div>
+</div>
