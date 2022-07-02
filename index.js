@@ -1,4 +1,4 @@
-import init, * as cohoard from "./pkg/cohoard.js";
+import init, * as cohoard from "https://static.witchoflight.com/~a2aaron/cohoard-0.1.0/cohoard.js";
 
 await init();
 
