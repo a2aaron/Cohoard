@@ -33,12 +33,12 @@ impl User {
 struct Post {
     user: User,
     timestamp: String,
-    contents: Vec<String>,
+    messages: Vec<String>,
 }
 
 impl Post {
-    fn new(user: String, timestamp: String, contents: Vec<String>) -> Post {
-        let user = match user.as_str() {
+    fn new(user: &str, timestamp: &str, messages: &[String]) -> Post {
+        let user = match user {
             "AARON" => User::aaron(),
             "CASSIE" => User::cassie(),
             _ => User {
@@ -50,8 +50,8 @@ impl Post {
 
         Post {
             user,
-            timestamp,
-            contents,
+            timestamp: timestamp.into(),
+            messages: messages.into(),
         }
     }
 }
@@ -61,20 +61,40 @@ fn parse_posts(input: String) -> Vec<Post> {
 
     let mut timestamp = String::from("Today");
 
+    let mut name = String::new();
+    let mut messages = vec![];
+
     for line in input.lines() {
         let line = line.trim();
-        if line.is_empty() {
-            println!("new line not implemented");
+        if line.is_empty() && !messages.is_empty() {
+            let post = Post::new(&name, &timestamp, &messages);
+            posts.push(post);
+            messages.clear();
         } else if line.starts_with("@") {
+            if !messages.is_empty() {
+                let post = Post::new(&name, &timestamp, &messages);
+                posts.push(post);
+                messages.clear();
+            }
             timestamp = line[1..].trim().to_string();
         } else {
             let split = line.split(": ").collect::<Vec<_>>();
-            let user = split[0].to_string();
-            let contents = split[1].to_string();
-            let post = Post::new(user, timestamp.clone(), vec![contents]);
-
-            posts.push(post)
+            let next_name = split[0].to_string();
+            let message = split[1].to_string();
+            if next_name != name && !name.is_empty() {
+                let post = Post::new(&name, &timestamp, &messages);
+                posts.push(post);
+                messages.clear();
+            }
+            name = next_name;
+            messages.push(message);
         }
+    }
+
+    if !messages.is_empty() {
+        let post = Post::new(&name, &timestamp, &messages);
+        posts.push(post);
+        messages.clear();
     }
     posts
 }

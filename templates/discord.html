@@ -53,9 +53,9 @@ margin: -16px -12px;
 ">{{ post.timestamp }}</span>
 </div>
 
-{# Post Contents (multiple messages are collapsed into 
+{# Message contents (multiple messages are collapsed into 
    a single post body) #}
-{% for content in post.contents %}
+{% for message in post.messages %}
 
 <p style="
     color: #DCDDDE;
@@ -64,7 +64,7 @@ margin: -16px -12px;
     margin-top: 4px;
 ">
 
-{{ content }}
+{{ message }}
 
 </p>
 
