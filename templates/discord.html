@@ -1,5 +1,9 @@
+{# The div for the background and global font styling.
+   The actual font Discord uses is Uni Sans Heavy, but
+   most people probably don't have that font installed.
+   Hence we use some fallback fonts that look sort of like it.#}
 <div style="
-font-family: Arial, Helvetica, sans-serif;
+font-family: Uni Sans Heavy, Verdana, Helvetica, Arial, sans-serif;
 background-color: #36393E;
 min-height: 128px;
 padding: 16px;
@@ -7,6 +11,9 @@ line-height: 1.375rem;
 margin: -16px -12px;
 ">
 
+{# Begin the list of posts. This first div ensures correct
+   spacing and also ensures the avatar appears next to the 
+   post body. #}
 {% for post in posts %}
 <div class="single-post-wrapper" 
     style="
@@ -19,6 +26,9 @@ margin: -16px -12px;
     gap: 16px;
 ">
 
+{# The profile picture for the post. The user avatar URL can 
+   point to local files, but this will break when uploading to
+   Cohost.#}
 <div class="poster-avatar"
     style="
     background-image: url({{ post.user.avatar }});
@@ -30,6 +40,7 @@ margin: -16px -12px;
 "></div>
 
 <div class="post-body">
+{# Post headline. This is the username + timestamp. #}
 <div class="post-headline">
 <span style="
     color: {{ post.user.color }};
@@ -42,6 +53,10 @@ margin: -16px -12px;
 ">Today at 4:20 PM</span>
 </div>
 
+{# Post Contents (multiple messages are collapsed into 
+   a single post body) #}
+{% for content in post.contents %}
+
 <p style="
     color: #DCDDDE;
     font-size: 1rem;
@@ -49,9 +64,12 @@ margin: -16px -12px;
     margin-top: 4px;
 ">
 
-{{ post.contents }}
+{{ content }}
 
 </p>
+
+{% endfor %}
+
 </div>
 </div>
 {% endfor %}

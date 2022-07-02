@@ -32,11 +32,11 @@ impl User {
 #[derive(Debug, Clone, Serialize)]
 struct Post {
     user: User,
-    contents: String,
+    contents: Vec<String>,
 }
 
 impl Post {
-    fn new(user: String, contents: String) -> Post {
+    fn new(user: String, contents: Vec<String>) -> Post {
         let user = match user.as_str() {
             "AARON" => User::aaron(),
             "CASSIE" => User::cassie(),
@@ -77,7 +77,7 @@ fn main() {
             let split = line.split(": ").collect::<Vec<_>>();
             let user = split[0].to_string();
             let contents = split[1].to_string();
-            Post::new(user, contents)
+            Post::new(user, vec![contents])
         })
         .collect::<Vec<_>>();
 
