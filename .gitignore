@@ -1,6 +1,7 @@
 /target
 **/*.rs.bk
-Cargo.lock
-.DS_Store
 choost.html
 choost.md
+index.html
+index.js
+style.css
