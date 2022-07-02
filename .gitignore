@@ -1,0 +1,7 @@
+/target
+**/*.rs.bk
+choost.html
+choost.md
+
+src/
+readme-images/
