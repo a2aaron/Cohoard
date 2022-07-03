@@ -20,6 +20,10 @@ main {
 }
 #preview-column { overflow-y: hidden; }
 
+@media (max-width: 850px) {
+    main { grid-template-columns: 1fr; }   
+}
+
 #script { height: 400px; }
 #config { height: 300px; }
 
