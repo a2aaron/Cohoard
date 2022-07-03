@@ -18,25 +18,46 @@ let template_dropdown = document.getElementById("template-select");
 let preview_button = document.getElementById("preview-btn");
 let html_button = document.getElementById("html-btn");
 
-let config = cohoard.load_config(config_textarea.value);
+let config_error_msg = document.getElementById("config-error-msg");
+let render_error_msg = document.getElementById("render-error-msg");
+
+let config;
 
 let response = await fetch(template_dropdown.value);
 let template = await response.text();
 
+function load_config() {
+   try {
+      config = cohoard.load_config(config_textarea.value);
+      config_error_msg.innerText = "";
+   } catch (err) {
+      config_error_msg.innerText = err;
+   }
+}
+
 // Render the chat log to the preview/HTML areas using the
 // currently selected template.
 function render() {
+   if (config == null) {
+      return;
+   }
    let posts = cohoard.parse_posts(config, script_textarea.value);
 
-   let rendered = cohoard.render("discord template", template, posts);
-   preview_area.innerHTML = rendered;
-   html_area.value = rendered;
+   try {
+      let rendered = cohoard.render("discord template", template, posts);
+      preview_area.innerHTML = rendered;
+      html_area.value = rendered;
+
+      render_error_msg.innerText = "";
+   } catch (err) {
+      render_error_msg.innerText = err;
+   }
 }
 
 script_textarea.addEventListener("input", render)
 
 config_textarea.addEventListener("input", () => {
-   config = cohoard.load_config(config_textarea.value);
+   load_config();
    render();
 })
 
@@ -55,4 +76,5 @@ template_dropdown.addEventListener("input", async () => {
    render();
 })
 
+load_config();
 render();
