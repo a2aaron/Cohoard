@@ -11,32 +11,22 @@
     <h1>
         Cohoard - Format Chatlogs for Cohost
     </h1>
-    <f-col>
-      <f-row>
-        <button id="preview-btn">Preview</button>
-        <button id="html-btn">HTML</button>
-        <f-sp></f-sp>
-      </f-row>
-      <div id="preview-output" class="output">big output area</div>
-      <textarea readonly id="html-output" class="output hidden">html output area</textarea>
-    </f-col>
-    <f-row class="gap-1">
-      <div class="edit-column">
-        <textarea id="script">AARON: nya
-CASSIE: chirp
-        </textarea>
-      </div>
-      <f-col class="edit-column gap-1">
-        <div>
-          <label for="template-select">Template Preset:</label>
-
-          <select id="template-select">
-              <option value="https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/discord.html">Discord</option>
-              <option value="https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/twitter.html">Twitter</option>
-              <option value="">Custom</option>
-          </select>
+    <main class="gap-1">
+      <f-col id="editing-colum" class="gap-1">
+        <div class="editible-textarea">
+          <textarea id="script">AARON: nya
+CASSIE: chirp</textarea>
         </div>
-        <textarea id="config">people:
+        <f-col class="editible-textarea gap-1">
+          <div>
+            <label for="template-select">Template Preset:</label>
+            <select id="template-select">
+                <option value="https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/discord.html">Discord</option>
+                <option value="https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/twitter.html">Twitter</option>
+                <option value="">Custom</option>
+            </select>
+          </div>
+          <textarea id="config">people:
 - key: AARON
   name: Aaron
   color: "#FF8200"
@@ -49,7 +39,17 @@ CASSIE: chirp
   avatar: https://cdn.discordapp.com/attachments/637721012418510849/992630255665823744/cassie.webp
   handle: porglezomp</textarea>
         </f-col>
-    </f-row>
+      </f-col>
+      <f-col id="preview-column">
+        <f-row>
+          <button id="preview-btn">Preview</button>
+          <button id="html-btn">HTML</button>
+          <f-sp></f-sp>
+        </f-row>
+        <div id="preview-output" class="output">big output area</div>
+        <textarea readonly id="html-output" class="output hidden">html output area</textarea>
+      </f-col>
+    </main>
   </f-col>    
 </body>
 </html>

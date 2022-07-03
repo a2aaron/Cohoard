@@ -28,12 +28,26 @@ h1 {
     margin-bottom: 0;
 }
 
+main {
+    display: grid;
+    grid-template-columns: 4fr 6fr;
+    grid-template-rows: fit-content(0);
+}
+
 .gap-1 {
     gap: 1em;
 }
 
 .gap-2 {
     gap: 2em;
+}
+
+.flex-4 {
+    flex: 4
+}
+
+.flex-6 {
+    flex: 6
 }
 
 .hidden {
@@ -56,13 +70,22 @@ textarea {
     height: 100%;
 }
 
-.edit-column {
-    width: 500px;
+#script {
     height: 400px;
 }
 
+#config {
+    height: 300px;
+}
+
 .output {
-    min-height: 40vh;
-    height: 40vh;
     width: 100%;
+    height: 100%;
+    max-height: 100%;
+}
+
+#editing-column {}
+
+#preview-column {
+    overflow-y: hidden;
 }

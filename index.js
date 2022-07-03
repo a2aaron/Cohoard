@@ -31,7 +31,6 @@ function render() {
    let rendered = cohoard.render("discord template", template, posts);
    preview_area.innerHTML = rendered;
    html_area.value = rendered;
-   console.log(rendered);
 }
 
 script_textarea.addEventListener("input", render)
