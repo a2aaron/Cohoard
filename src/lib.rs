@@ -1,5 +1,6 @@
 use std::{collections::HashMap, error::Error};
 
+use css_inline::{CSSInliner, InlineError};
 use pulldown_cmark::html;
 use serde::{Deserialize, Serialize};
 use tera::{Context, Tera};
@@ -160,9 +161,26 @@ pub fn render(
     context.insert("posts", &posts);
 
     let html = tera.render(template_name, &context)?;
+
+    // Cohost does not allow <style> tags in posts. Therefore, we need to make anything in
+    // a style tag become an inline `style=""` attribute.
+    let html = inline_style_tags(&html)?;
+
     Ok(html)
 }
 
+// Inline the `<style>` tags of a string containing HTML. This will also remove the `<style>` tags
+// from the string.
+fn inline_style_tags(html: &str) -> Result<String, InlineError> {
+    let inliner = CSSInliner::options()
+        .inline_style_tags(true)
+        .remove_style_tags(true)
+        .build();
+    inliner.inline(html)
+}
+
+// Convert a string-like tera::Value containing Markdown syntax into
+// HTML containing tags that correctly render the syntax.
 fn markdown_to_html(
     value: &tera::Value,
     _: &HashMap<String, tera::Value>,
