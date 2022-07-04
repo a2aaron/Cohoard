@@ -177,33 +177,38 @@ function config_from_table(table) {
 function load_config() {
    try {
       let config_object = config_from_table(config_div.firstChild);
-      console.log(config_object);
-      config = cohoard.load_config(JSON.stringify(config_object));
+      CONFIG = cohoard.load_config(JSON.stringify(config_object));
       config_error_msg.innerText = "";
    } catch (err) {
       config_error_msg.innerText = err;
-      console.log(err);
+      console.error(err);
    }
 }
 
 // Render the chat log to the preview/HTML areas using the
 // currently selected template.
 function render() {
-   if (config == null) {
+   if (CONFIG == null) {
       return;
    }
-   let posts = cohoard.parse_posts(config, script_textarea.value);
+   let posts = cohoard.parse_posts(CONFIG, script_textarea.value);
 
    try {
-      let rendered = cohoard.render("discord template", template, posts);
+      let rendered = cohoard.render("template", template, posts);
       preview_area.innerHTML = rendered;
       html_area.value = rendered;
 
       render_error_msg.innerText = "";
    } catch (err) {
       render_error_msg.innerText = err;
+      console.error(err);
    }
 }
+
+// The config object that the Rust library uses.
+let CONFIG;
+
+// Get HTML elements that are part of the UI.
 
 let script_textarea = document.getElementById("script");
 let config_div = document.getElementById("config-wrapper");
@@ -219,10 +224,10 @@ let html_button = document.getElementById("html-btn");
 let config_error_msg = document.getElementById("config-error-msg");
 let render_error_msg = document.getElementById("render-error-msg");
 
-let config;
-
 let response = await fetch(template_dropdown.value);
 let template = await response.text();
+
+// Set up event listeners.
 
 script_textarea.addEventListener("input", render)
 
@@ -246,5 +251,6 @@ template_dropdown.addEventListener("input", async () => {
    render();
 })
 
+// Initial load -- load the config and render the script
 load_config();
 render();
