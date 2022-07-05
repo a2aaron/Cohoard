@@ -49,7 +49,12 @@ pub fn load_config(config: &str) -> Result<Config, Box<dyn Error>> {
     let config: ConfigSchema = serde_yaml::from_str(config)?;
     let mut people = HashMap::new();
 
-    for person in config.people {
+    for mut person in config.people {
+        // Ensure that the User always has access to its own key.
+        person
+            .user
+            .fields
+            .insert("key".to_string(), person.key.clone());
         people.insert(person.key, person.user);
     }
 
