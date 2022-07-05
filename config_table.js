@@ -6,11 +6,17 @@ import { Config } from "./pkg/cohoard.js";
  * Manages the `<table>` which contains the UI for editing the Config data.
  */
 export class ConfigTable {
+    /**
+     * Construct a ConfigTable, appending a `<table>` to the given element.
+     * @param {HTMLElement} element The element to mount the table to.
+     * @param {Array<string>} columns The column headers.
+     * @param {Array<Array<string>>} body The initial value of the body cells.
+     */
     constructor(element, columns, body) {
         this.element = element;
         this.columns = columns;
         this.body = body;
-        this.table = make_table_node(columns, body.length);
+        this.table = make_table_node(columns, body);
         element.appendChild(this.table);
     }
 
@@ -48,21 +54,28 @@ export class ConfigTable {
 
 /**
  * Generates a `<table>` of the config data
- * @param {Array<string>} keys The columns headers that will be generated
- * @param {int} num_people The number of rows to generate
+ * @param {Array<string>} cols The columns headers that will be generated
+ * @param {Array<Array<string>>} body The initial table body vaues that will be generated
+ * If a row of the body has less cells than cols, then empty cells will be generated.
+ * If a row of the body has more cells than cols, then blank columns will be generated.
  * @returns {HTMLTableElement} The generated `table`.
  */
-function make_table_node(keys, num_people) {
+function make_table_node(cols, body) {
+    let max_body_length = Math.max(body.map((row) => row.length));
+    if (max_body_length > cols.length) {
+        cols = cols.concat(Array(max_body_length - cols.length).fill(""));
+    }
+
     let table = document.createElement("table");
 
     let header_row = document.createElement("tr");
     header_row.setAttribute("class", "config-row-header");
-    for (const key of keys) {
+    for (const col of cols) {
         let cell;
-        if (key == "key") {
-            cell = h("th", {}, key);
+        if (col == "key") {
+            cell = h("th", {}, col);
         } else {
-            cell = td_input("th", key, "key name");
+            cell = td_input("th", col, "key name");
         }
 
         header_row.appendChild(cell);
@@ -70,12 +83,16 @@ function make_table_node(keys, num_people) {
 
     table.appendChild(header_row);
 
-    for (const x of Array(num_people).keys()) {
-        let row = document.createElement("tr");
-        for (const key of keys) {
-            row.appendChild(td_input("td", "", key));
+    for (const row of body) {
+        let row_node = document.createElement("tr");
+        for (let i = 0; i < cols.length; i += 1) {
+            let init_value = "";
+            if (row[i] != undefined) {
+                init_value = row[i];
+            }
+            row_node.appendChild(td_input("td", init_value, cols[i]));
         }
-        table.appendChild(row);
+        table.appendChild(row_node);
     }
 
     return table;
@@ -157,7 +174,7 @@ function cohoard_config_from_table(table) {
 * </div>
 * ```
 */
-function h(tag, attrs, body) {
+function h(tag, attrs, body = []) {
     const element = document.createElement(tag);
     for (const [k, v] of Object.entries(attrs)) {
         // Special-case the value and have it set the actual node value
@@ -168,9 +185,7 @@ function h(tag, attrs, body) {
         }
     }
 
-    if (body == undefined) {
-
-    } else if (Array.isArray(body)) {
+    if (Array.isArray(body)) {
         element.append(...body);
     } else {
         element.append(body);
