@@ -25,6 +25,14 @@ EGGBUG: when you're happy with how everything looks, click the "HTML" button abo
           </textarea>
         </div>
         <f-col class="gap-1">
+          <div id="config-wrapper"></div>
+        </f-col>
+      </f-col>
+      <f-col id="preview-column">
+        <f-row class="gap-1">
+          <button id="preview-btn">Preview</button>
+          <button id="html-btn">HTML</button>
+          <f-sp></f-sp>
           <div>
             <label for="template-select">Template Preset:</label>
             <select id="template-select">
@@ -32,18 +40,10 @@ EGGBUG: when you're happy with how everything looks, click the "HTML" button abo
                 <option value="https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/twitter.html">Twitter</option>
                 <option value="">Custom</option>
             </select>
-          </div>
-          <div id="config-wrapper"></div>
-        </f-col>
-      </f-col>
-      <f-col id="preview-column">
-        <f-row>
-          <button id="preview-btn">Preview</button>
-          <button id="html-btn">HTML</button>
-          <f-sp></f-sp>
+          </div>  
         </f-row>
-        <div id="preview-output">big output area</div>
-        <textarea readonly id="html-output" class="hidden">html output area</textarea>
+        <div id="preview-output">This is where the preview output will go. If you can see this text, the page is probably still loading!</div>
+        <textarea readonly id="html-output" class="hidden">This where the HTML output will go. If you can see this text, something broke!</textarea>
       </f-col>
     </main>
   </f-col>
