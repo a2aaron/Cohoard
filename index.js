@@ -46,7 +46,7 @@ function render() {
    let posts = cohoard.parse_posts(COHOARD_CONFIG, script_textarea.value);
 
    try {
-      let rendered = cohoard.render("template", template, posts);
+      let rendered = cohoard.render("template", template_area.value, posts);
       preview_area.innerHTML = rendered;
       html_area.value = rendered;
 
@@ -108,20 +108,17 @@ edit_template_button.addEventListener("click", () => {
 })
 
 template_dropdown.addEventListener("input", async () => {
-   template = await get_template(template_dropdown.value);
-   template_area.value = template;
+   template_area.value = await get_template(template_dropdown.value);;
    render();
 })
 
 template_area.addEventListener("input", async () => {
    template_dropdown.value = "custom";
-   template = await get_template(template_dropdown.value);
    render();
 })
 
 // Initial load -- load the config and render the script
-let template = await get_template(template_dropdown.value);
-template_area.value = template;
+template_area.value = await get_template(template_dropdown.value);
 
 load_config();
 render();
