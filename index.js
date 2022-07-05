@@ -1,6 +1,7 @@
 import init, * as cohoard from "https://static.witchoflight.com/~a2aaron/cohoard/0.2.0/cohoard.js";
 
 import { ConfigTable } from "./config_table.js"
+import { TemplateControls } from "./template_controls.js";
 
 await init();
 
@@ -39,7 +40,7 @@ function load_config() {
 
 // Render the chat log to the preview/HTML areas using the
 // currently selected template.
-function render() {
+export function render() {
    if (COHOARD_CONFIG == null) {
       return;
    }
@@ -72,6 +73,8 @@ let html_area = document.getElementById("html-output");
 
 let template_area = document.getElementById("template-editor");
 let template_dropdown = document.getElementById("template-select");
+let template_controls = await TemplateControls.mount(template_dropdown, template_area);
+
 
 let preview_button = document.getElementById("preview-btn");
 let html_button = document.getElementById("html-btn");
@@ -107,18 +110,18 @@ edit_template_button.addEventListener("click", () => {
    template_area.classList.remove("hidden");
 })
 
-template_dropdown.addEventListener("input", async () => {
-   template_area.value = await get_template(template_dropdown.value);;
-   render();
-})
+// template_dropdown.addEventListener("input", async () => {
+//    template_area.value = await get_template(template_dropdown.value);;
+//    render();
+// })
 
-template_area.addEventListener("input", async () => {
-   template_dropdown.value = "custom";
-   render();
-})
+// template_area.addEventListener("input", async () => {
+//    template_dropdown.value = "custom";
+//    render();
+// })
 
 // Initial load -- load the config and render the script
-template_area.value = await get_template(template_dropdown.value);
+// template_area.value = await get_template(template_dropdown.value);
 
 load_config();
 render();
