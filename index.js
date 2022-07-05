@@ -1,6 +1,6 @@
 import init, * as cohoard from "https://static.witchoflight.com/~a2aaron/cohoard-0.2.0/cohoard.js";
 
-import { make_config_table, config_from_table } from "./config_table.js"
+import { ConfigTable } from "./config_table.js"
 
 await init();
 
@@ -15,9 +15,9 @@ async function get_template(url) {
  * Load and set the current config 
  */
 function load_config() {
+   config_table.save_table();
    try {
-      let config_object = config_from_table(config_div.firstChild);
-      CONFIG = cohoard.load_config(JSON.stringify(config_object));
+      COHOARD_CONFIG = config_table.cohoard_config;
       config_error_msg.innerText = "";
    } catch (err) {
       config_error_msg.innerText = err;
@@ -28,10 +28,10 @@ function load_config() {
 // Render the chat log to the preview/HTML areas using the
 // currently selected template.
 function render() {
-   if (CONFIG == null) {
+   if (COHOARD_CONFIG == null) {
       return;
    }
-   let posts = cohoard.parse_posts(CONFIG, script_textarea.value);
+   let posts = cohoard.parse_posts(COHOARD_CONFIG, script_textarea.value);
 
    try {
       let rendered = cohoard.render("template", template, posts);
@@ -45,14 +45,15 @@ function render() {
    }
 }
 
-// The config object that the Rust library uses.
-let CONFIG;
+// The config object that the Cohoard Rust library uses.
+let COHOARD_CONFIG;
 
 // Get HTML elements that are part of the UI.
 
 let script_textarea = document.getElementById("script");
+
 let config_div = document.getElementById("config-wrapper");
-config_div.appendChild(make_config_table(["key", "name", "handle", "color", "avatar", "email"], 10));
+let config_table = ConfigTable.mount(config_div, ["key", "name", "color", "avatar", "handle"], 10);
 
 let preview_area = document.getElementById("preview-output");
 let html_area = document.getElementById("html-output");
