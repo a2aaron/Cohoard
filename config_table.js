@@ -34,6 +34,8 @@ export class ConfigTable {
         // JS has some slightly annoying behavior with arrays. See below link.
         // https://stackoverflow.com/questions/41121982/strange-behavior-of-an-array-filled-by-array-prototype-fill
         let fallback_body = Array.from(Array(num_rows), () => Array(init_cols.length).fill(""));
+        let eggbug_row = ["EGGBUG", "egg bug!", "#83254f", "https://i.imgur.com/BBaogem.png", "eggbug"]
+        fallback_body[0] = eggbug_row;
         let body = localStorageOrDefault("configTableBody", fallback_body);
         let cols = localStorageOrDefault("configTableCols", init_cols);
 
