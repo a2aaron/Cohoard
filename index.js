@@ -1,4 +1,4 @@
-import init, * as cohoard from "https://static.witchoflight.com/~a2aaron/cohoard-0.2.0/cohoard.js";
+import init, * as cohoard from "https://static.witchoflight.com/~a2aaron/cohoard/0.2.0/cohoard.js";
 
 import { ConfigTable } from "./config_table.js"
 

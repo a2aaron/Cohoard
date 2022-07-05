@@ -1,6 +1,6 @@
-import * as cohoard from "./pkg/cohoard.js";
+import * as cohoard from "https://static.witchoflight.com/~a2aaron/cohoard/0.2.0/cohoard.js";
 
-import { Config } from "./pkg/cohoard.js";
+import { Config } from "https://static.witchoflight.com/~a2aaron/cohoard/0.2.0/cohoard.js";
 
 /**
  * Manages the `<table>` which contains the UI for editing the Config data.
