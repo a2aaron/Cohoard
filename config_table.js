@@ -14,8 +14,6 @@ export class ConfigTable {
      */
     constructor(element, columns, body) {
         this.element = element;
-        this.columns = columns;
-        this.body = body;
         this.table = make_table_node(columns, body);
         element.appendChild(this.table);
     }
@@ -78,13 +76,7 @@ function make_table_node(cols, body) {
     let header_row = document.createElement("tr");
     header_row.setAttribute("class", "config-row-header");
     for (const col of cols) {
-        let cell;
-        if (col == "key") {
-            cell = h("th", {}, col);
-        } else {
-            cell = td_input("th", col, "key name");
-        }
-
+        let cell = header_cell(col);
         header_row.appendChild(cell);
     }
 
@@ -97,7 +89,7 @@ function make_table_node(cols, body) {
             if (row[i] != undefined) {
                 init_value = row[i];
             }
-            row_node.appendChild(td_input("td", init_value, cols[i]));
+            row_node.appendChild(body_cell(init_value, cols[i]));
         }
         table.appendChild(row_node);
     }
@@ -196,6 +188,34 @@ function get_columns(table) {
     return cols;
 }
 
+
+/**
+ * Return a header cell for the table.
+ * @param {string} key The key for the table. if equal to `key`, then the table cell doesn't have a textinput.
+ * @returns {HTMLTableCellElement} - The table cell
+ */
+function header_cell(key) {
+    if (key == "key") {
+        return h("th", {}, "key");
+    } else {
+        return h("th", {},
+            h("input", { type: "text", placeholder: "key name", value: key })
+        );
+    }
+}
+
+/**
+ * Return a body cell for the table.
+ * @param {string} value - The initial text of the text input
+ * @param {string} placeholder - The placeholder text for the text input
+ * @returns {HTMLTableCellElement} - The table cell containing the text input
+ */
+function body_cell(value, placeholder) {
+    return h("td", {},
+        h("input", { type: "text", placeholder, value })
+    );
+}
+
 /** Constructs HTML elements
 * @param {string} tag - The tag of the HTML element
 * @param {object} attrs -A dictionary of the attributes of the element
@@ -237,25 +257,6 @@ function h(tag, attrs, body = []) {
         element.append(body);
     }
     return element;
-}
-
-/**
- * Return a `td` or `th` cell containing a text input.
- * @param {"td" | "th"} cell_type - Determines whether if the cell is a data or header cell.
- * @param {string} value - The initial text of the text input
- * @param {string} placeholder - The placeholder text for the text input
- * @returns {HTMLTableCellElement} - The table cell containing the text input
- * The specific HTML returned looks like this:
- * ```html
- * <td>
- *     <input type="text">value</input>
- * </td>
- * ```
- */
-function td_input(cell_type, value, placeholder) {
-    return h(cell_type, {},
-        h("input", { type: "text", placeholder, value })
-    );
 }
 
 /**
