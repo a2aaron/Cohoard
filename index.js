@@ -154,17 +154,31 @@ function config_from_table(table) {
    }
 
    let people = [];
-   for (let row of table.rows) {
+   row_loop: for (let row of table.rows) {
+      // Skip the header rows
       if (row.rowIndex == 0) {
          continue;
       }
       let person = {}
-      for (let cell of row.cells) {
+      cell_loop: for (let cell of row.cells) {
          assert_html_node(cell, "td");
          assert_html_node(cell.firstChild, "input");
          let cell_key = keys[cell.cellIndex];
          let cell_value = cell.firstChild.value;
-         person[cell_key] = cell_value;
+         if (cell_value == "") {
+            if (cell_key == "key") {
+               // If the key doesn't exist, don't create a person at all
+               // (Cohoard requires the key to be set)
+               continue row_loop;
+            } else {
+               // Don't set the property if the input is blank.
+               // This allows Cohoard to use a default value instead of thinking
+               // the property is set to the empty string.
+               continue cell_loop;
+            }
+         } else {
+            person[cell_key] = cell_value;
+         }
       }
       people.push(person);
    }
