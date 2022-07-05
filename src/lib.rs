@@ -128,7 +128,7 @@ pub fn parse_posts(config: &Config, input: String) -> Vec<PostBlock> {
                 }
                 None => {
                     if let Some(last_msg) = messages.last_mut() {
-                        *last_msg += "<br>\n";
+                        *last_msg += "\n";
                         *last_msg += line;
                     } else {
                         messages.push(line.into())
@@ -200,10 +200,17 @@ fn markdown_to_html(
     // (and if they want an actual <p> tag, they should probably edit the HTML output of Cohoard,
     // as most of the time, a raw <p> will look ugly).
     let html = html.replace("<p>", "").replace("</p>", "");
-    // Cohost doesn't accept <u>, so we need to replace it with a span that does the same thing.
+
+    // TODO: pulldown_cmark only understands __underscore__ as **bold**, so underline can only
+    // be done currently by using <u> tags.
+    // Cohost doesn't accept <u>, so we need to replace it with a span that can be manually styled.
     let html = html
-        .replace("<u>", "<span style=\"text-decoration:underline\">")
-        .replace("</u>", "</span>");
+        .replace("<u>", "<span class=\"cohoard-underline\">")
+        .replace("</u>", "</span>")
+        // Cohost attaches pseudo-elements to <code>, which can't be overriden with inline styling
+        // to get around this, we replace it with a span that we can manually style in a template.
+        .replace("<code>", "<span class=\"cohoard-code\">")
+        .replace("</code>", "</span>");
 
     Ok(tera::Value::String(html))
 }

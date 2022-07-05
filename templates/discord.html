@@ -1,6 +1,38 @@
-{#- The CSS styling rules for the whole page. This is removed
-    by `css_inline`. All the CSS here will end up as inline
-    `style` attributes. -#}
+{#- Note that style tags are inlined by `css_inline`. All the CSS here will end up as 
+    inline `style` attributes and the style tags will be removed. -#}
+
+{#- The styling rules for converted Markdown text.
+    The following classes are added when converting Markdown to HTML:
+    __underline__ - cohoard-underline
+    `inline code` - cohoard-code -#}
+<style>
+   strong {
+      font-weight: 700;
+      /* This is necessary because Cohost adjusts the color of bold text, which messes up the 
+         off-white coloring of our text. */
+      color: #DCDDDE;
+   }
+
+   .cohoard-underline {
+      text-decoration: underline;
+   }
+
+   .cohoard-code {
+      border-radius: 3px;
+      padding: .2em;
+      margin: -.2em 0;
+      font-size: 85%;
+      font-family: Consolas,Andale Mono WT,Andale Mono,Lucida Console,Lucida Sans Typewriter,DejaVu Sans Mono,Bitstream Vera Sans Mono,Liberation Mono,Nimbus Mono L,Monaco,Courier New,Courier,monospace;
+      text-indent: 0;
+      /* Avoid stripping white space */
+      white-space: pre-wrap;
+      background: #2f3136;
+      line-height: 18px;
+   }
+</style>
+
+
+{#- The styling rules for the sections of the template. -#}
 <style>
    #post-wrapper {
       /* The actual font Discord uses is Uni Sans Heavy, but
@@ -14,6 +46,7 @@
       padding: 16px;
       line-height: 1.375rem;
       margin: -16px -12px;
+      /* Message body text color */
       color: #DCDDDE;
       font-size: 1rem;
    }
@@ -42,7 +75,6 @@
    }
 
    .headline {
-      /*  */
       white-space: nowrap;
    }
 
@@ -54,7 +86,9 @@
 
    .message-content {
       word-wrap: break-word;
+      white-space: break-spaces;
       margin: 4px 0 8px 0;
+      line-height: 22px;
    }
 </style>
 
@@ -104,7 +138,7 @@
    of HTML tags will end up rendered as actual HTML tags.
    If you want to type HTML tags (that aren't inside code
    blocks), you can escape it with &lt;. -#}
-{{- message | markdown | trim | safe -}}
+{{- message | markdown | trim | safe }}
 </p>
 
 {%- endfor -%} {#- end message contents for -#}
