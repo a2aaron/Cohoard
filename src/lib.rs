@@ -203,13 +203,33 @@ fn markdown_to_html(
 
     // TODO: pulldown_cmark only understands __underscore__ as **bold**, so underline can only
     // be done currently by using <u> tags.
+    // TODO: This find-and-replace nonsense should really be replaced by an actual HTML parser that
+    // can do actual replaces.
+
     // Cohost doesn't accept <u>, so we need to replace it with a span that can be manually styled.
     let html = html
-        .replace("<u>", "<span class=\"cohoard-underline\">")
+        .replace("<u>", r#"<span class="cohoard-underline">"#)
         .replace("</u>", "</span>")
+        // pulldown_cmark encodes code blocks like this:
+        //  ```rust
+        //  my code block
+        //  ```
+        // as
+        // `<pre><code class=language-rust>my code block</code></pre>
+        // We will transform this into `<div class="cohoard-codeblock language-rust>my code block</div>`
+        // Note that if the language specifier is left off (ex: `rust` is left off in the example above)
+        // then pulldown_cmark does not add the `class=language-rust` attribute.
+        .replace(r#"<pre><code>"#, r#"<div class="cohoard-codeblock">"#)
+        // Note that the missing angle bracket in the transform below is a bit of a hack to allow us
+        // to not use a regex.
+        .replace(
+            r#"<pre><code class="language-"#,
+            r#"<div class="cohoard-codeblock language-"#,
+        )
+        .replace("</code></pre>", "</div>")
         // Cohost attaches pseudo-elements to <code>, which can't be overriden with inline styling
         // to get around this, we replace it with a span that we can manually style in a template.
-        .replace("<code>", "<span class=\"cohoard-code\">")
+        .replace("<code>", r#"<span class="cohoard-code">"#)
         .replace("</code>", "</span>");
 
     Ok(tera::Value::String(html))

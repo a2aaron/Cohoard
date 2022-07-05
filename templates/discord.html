@@ -18,16 +18,37 @@
    }
 
    .cohoard-code {
-      border-radius: 3px;
-      padding: .2em;
-      margin: -.2em 0;
       font-size: 85%;
       font-family: Consolas,Andale Mono WT,Andale Mono,Lucida Console,Lucida Sans Typewriter,DejaVu Sans Mono,Bitstream Vera Sans Mono,Liberation Mono,Nimbus Mono L,Monaco,Courier New,Courier,monospace;
-      text-indent: 0;
       /* Avoid stripping white space */
       white-space: pre-wrap;
-      background: #2f3136;
+      text-indent: 0;
       line-height: 18px;
+
+      padding: .2em;
+      margin: -.2em 0;
+
+      background: #2f3136;
+      border-radius: 3px;
+   }
+
+   .cohoard-codeblock {
+      font-size: 0.75rem;
+      font-family: Consolas,Andale Mono WT,Andale Mono,Lucida Console,Lucida Sans Typewriter,DejaVu Sans Mono,Bitstream Vera Sans Mono,Liberation Mono,Nimbus Mono L,Monaco,Courier New,Courier,monospace;
+      /* Avoid stripping white space */
+      white-space: pre-wrap;
+      max-width: 90%;
+      line-height: 1rem;
+
+      padding: .5em;
+      margin-top: 6px;
+      box-sizing: border-box;
+      
+      background-clip: border-box;
+      background: #2f3136;
+      
+      border: 1px solid #202225;
+      border-radius: 4px;
    }
 </style>
 
@@ -59,7 +80,11 @@
    }
 
    .message-wrapper {
+      /* This clips the timestamp when it would go off-screen */
       overflow-x: hidden;
+      /* Make the post always take up the whole width. This is needed so code-block backgrounds
+         will be the right size */
+      width: 100%;
    }
 
    .avatar {
@@ -75,6 +100,7 @@
    }
 
    .headline {
+      /* Prevent the username + timestamp from wrapping like the message contents do. */
       white-space: nowrap;
    }
 
@@ -114,9 +140,6 @@
                background: #43b581;
             {% endif %}"></div>
 
-{#- We use white-space: nowrap is used to ensures that the timestamp
-   doesn't wrap to the next line. and we use overflow-x: hidden to
-   clip the timestamp when it would go off-screen.-#}
 <div class="message-wrapper">
 {#- Post headline. This is the username + timestamp. -#}
 <div class="headline">

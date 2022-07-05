@@ -23,3 +23,9 @@ nya
 AARON: `               very very           long        `
 CASSIE: hello `world`
 CASSIE: *italics*
+CASSIE: ```rust
+fn main() {
+    println!("Hello, world!");
+}
+```
+AARON: i hope this doesnt break!
