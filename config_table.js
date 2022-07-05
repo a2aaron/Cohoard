@@ -75,8 +75,15 @@ function make_table_node(cols, body) {
 
     let header_row = document.createElement("tr");
     header_row.setAttribute("class", "config-row-header");
-    for (const col of cols) {
+    for (let i = 0; i < cols.length; i++) {
+        const col = cols[i];
         let cell = header_cell(col);
+
+        // Update the placeholder text whenever the header cell is edited.
+        if (col != "key") {
+            cell.addEventListener("input", () => update_placeholders(table, i, cell.firstChild.value));
+        }
+
         header_row.appendChild(cell);
     }
 
@@ -95,6 +102,29 @@ function make_table_node(cols, body) {
     }
 
     return table;
+}
+
+/**
+ * Update the placeholder text of the cells in a specified column.
+ * @param {HTMLTableElement} table The table to update the placeholders in
+ * @param {int} col_i The index of column to update. If this is 0, then nothing happens.
+ * @param {string} new_placeholder The new placeholder text to use
+ */
+function update_placeholders(table, col_i, new_placeholder) {
+    // The first col is always the "key" column, so we can ignore it.
+    if (col_i == 0) {
+        return;
+    }
+    for (let row of table.rows) {
+        // Skip the header row
+        if (row.rowIndex == 0) {
+            continue;
+        }
+        let cell = row.cells[col_i];
+        assert_html_node(cell, "td");
+        assert_html_node(cell.firstChild, "input");
+        cell.firstChild.placeholder = new_placeholder;
+    }
 }
 
 /**
