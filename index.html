@@ -51,5 +51,62 @@ EGGBUG: when you're happy with how everything looks, click the "HTML" button abo
     <div id="config-error-msg"></div>
     <div id="render-error-msg"></div>
   </div>
+
+  <div id="instructions">
+    <h2>Quick Start Guide</h2>
+    <p>Cohoard is a tool for quickly and easily formatting chatlogs for posting on <a href="www.cohost.org">Cohost</a>.</p>
+    <h3>The Script</h3>
+    <p>The Script contains the main content of your post. You can write messages in playscript format--that is,
+      something like <code>EGGBUG: i'm eggbug!</code>. The name before the colon is called the <em>key</em> and is used
+      in the Config Table.</p>
+    <p>Messages are collected into <em>PostBlocks</em>, which are posts which should be grouped "together"
+      in some way. For example, in the Discord template, we group all messages in the same PostBlock under
+      the same headline (the avatar + username that is displayed in Discord). This helps mimic the feel of
+      Discord more accurately. Other templates may use PostBlocks differently.</p>
+    <p>A new PostBlock is issued whenever the current speaker changes. For example, in the conversation below, there are three PostBlocks</p>
+    <pre id="discord-example-script">
+EGGBUG: hi!
+EGGBUG: these three messages are part of the same PostBlock
+EGGBUG: because they are all from me!
+BUGEGG: i am a new speaker,
+BUGEGG: so my messages are in a new PostBlock
+EGGBUG: yeah! and now this message will appear in its own PostBlock
+    </pre>
+    <p>The above conversation renders in the Discord template like so:</p>
+    <div id="discord-example-render"></div>
+    <p>You can add extra styling to posts. For example, writing <code>@ Some Time Here</code> on
+      its own line will set a timestamp for the posts. You can also use most Markdown features, like
+      bolding, italices, codeblocks, and so on.</p>
+    <h3>Config Table</h3>
+    <p>The Config Table is a table of keys and values. Each row of the table describes how a person
+       in the Script should be styled, and typically includes information like their username or avatar.
+       The first column of the table is the "<code>key</code>", which should match with the keys in the script. This
+       is typically an ALL CAPS name (like "<code>EGGBUG</code>") but does not have to be. The rest of the columns
+       can be renamed to whatever keys that the template is expecting to have. Currently the two preset 
+       templates take the following keys.
+    </p>
+    <h4>Discord Template</h4>
+      <ul>
+        <li><strong>name</strong> - The username displayed in the headline. If not provided, defaults to the key</li>
+        <li><strong>color</strong> - The color of the username. This can be any CSS color value, for example "<code>red</code>" or "<code>#FF0000</code>" both work.</li>
+        <li><strong>avatar</strong> - A URL pointing to the avatar of the poster. If not provided, then the avatar will be blank.</li>
+      </ul>
+    <h4>Twitter Template</h4>
+      <ul>
+        <li><strong>name</strong> - The display name of the Tweeter</li>
+        <li><strong>handle</strong> - The handle of the Tweeter. The template automatically prepends the "@" symbol for you</li>
+        <li><strong>avatar</strong> - A URL pointing to the avatar of the poster. If not provided, then the avatar will be blank.</li>
+      </ul>
+    <h3>The Preview Window</h3>
+    <p>On the right side is the preview window. Any changes you make to the Script will automatically
+       update the preview window. You can click on the button labeled "HTML" to switch to a raw HTML
+       view of your post--this is the text that can be copy-pasted directly into a Cohost post.</p>
+    <p>You can use the Template Preset dropdown to switch between stored Templates, including custom Tepmlates you have made.
+       To make a custom Template, choose "<code>Create New Preset...</code>" from the dropdown.
+       Custom Templates can be edited using the "Edit Template" button and are saved in the browser's localStorage.
+       You can also rename and delete custom templates.
+    </p>
+    <h3></h3>
+  </div>
 </body>
 </html>

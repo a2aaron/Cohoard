@@ -1,7 +1,7 @@
 import init, * as cohoard from "https://static.witchoflight.com/~a2aaron/cohoard/0.2.0/cohoard.js";
 
 import { ConfigTable } from "./config_table.js"
-import { TemplateControls } from "./template_controls.js";
+import { TemplateControls, DISCORD_BUILTIN } from "./template_controls.js";
 import { getTypedElementById } from "./util.js";
 
 await init();
@@ -100,3 +100,35 @@ edit_template_button.addEventListener("click", () => {
 // Initial load -- load the config and render the script
 load_config();
 render();
+
+// Render the examples in the quick start guide
+function render_examples() {
+   let discord_example_script = getTypedElementById(HTMLPreElement, "discord-example-script");
+   let discord_example_div = getTypedElementById(HTMLDivElement, "discord-example-render");
+
+   let config_json = JSON.stringify({
+      people: [{
+         key: "EGGBUG",
+         name: "egg bug!",
+         color: "#83254f",
+         avatar: "https://i.imgur.com/BBaogem.png"
+      },
+      {
+         key: "BUGEGG",
+         name: "bug egg!",
+         color: "#258359",
+         avatar: "https://i.imgur.com/BAFNmyY.png",
+      }]
+   });
+
+   let cohoard_config = cohoard.load_config(config_json);
+
+   let posts = cohoard.parse_posts(cohoard_config, discord_example_script.innerText);
+   let rendered = cohoard.render("template", DISCORD_BUILTIN.content, posts);
+   discord_example_div.innerHTML = rendered;
+   // Remove the negative margin on the rendered post.
+   // @ts-ignore
+   discord_example_div.firstChild.style.margin = "auto";
+}
+
+render_examples()
