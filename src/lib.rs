@@ -163,17 +163,24 @@ pub fn render(
 
     let html = tera.render(template_name, &context)?;
 
-    // Cohost does not allow <style> tags in posts. Therefore, we need to make anything in
+    // Cohost ignores <style> tags in posts. Therefore, we need to make anything in
     // a style tag become an inline `style=""` attribute.
     let html = inline_style_tags(&html)?;
 
     let mut document = kuchiki::parse_html().one(html);
-    // Cohost also does not allow `class` and `id` attributes. Hence, we can strip to make the
+
+    // Cohost also ignores `class` and `id` attributes. Hence, we can strip to make the
     // post somewhat smaller.
     remove_class_and_id_attributes(&mut document)
         .map_err(|()| "Couldn't remove class and id attributes!")?;
 
-    let html = document.to_string();
+    // css_inline adds <html>, <head>, and <body> tags to our post, which are all ignored by
+    // Cohost and wouldn't even make sense to add. We remove them here.
+    let inner = document.select_first("body").unwrap().as_node().children();
+    let html = inner
+        .map(|node| node.to_string())
+        .collect::<Vec<String>>()
+        .join("\n");
     Ok(html)
 }
 
