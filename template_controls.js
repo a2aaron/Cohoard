@@ -41,7 +41,28 @@ export class TemplateControls {
 
         // Event listener for the delete button
         this.delete_template_button.addEventListener("click", () => {
-            // this.custom_templates.remo
+            let dropdown_value = this.dropdown.value;
+            if (dropdown_value.startsWith("custom-")) {
+                // remove the value from the dropdown
+                let dropdown_index = this.dropdown.selectedIndex;
+                this.dropdown.remove(dropdown_index);
+
+                // remove the value from the custom templates list
+                let index = Number(dropdown_value.replace("custom-", ""));
+                this.custom_templates.splice(index, 1);
+
+                this.renegerate_dropdown();
+                if (index < this.custom_templates.length) {
+                    this.set_current_template(custom_i(index));
+                } else if (this.custom_templates.length != 0 && index != 0) {
+                    this.set_current_template(custom_i(index - 1));
+                } else if (is_dropdown_value(this.dropdown.value)) {
+                    this.set_current_template(this.dropdown.value);
+                } else {
+                    this.set_current_template(builtin_i(0));
+                }
+                render();
+            }
         });
 
         // Event listener to save custom templates when leaving the page + every 5 seconds.
