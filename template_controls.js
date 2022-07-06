@@ -7,13 +7,15 @@ export class TemplateControls {
     /**
      * @param {HTMLSelectElement} dropdown_element 
      * @param {HTMLTextAreaElement} template_area 
+     * @param {HTMLButtonElement} edit_template_button
      * @param {Array<string>} custom_templates 
      * @param {Array<Template>} builtin_templates
      * @param {Array<Template>} custom_templates
      */
-    constructor(dropdown_element, template_area, builtin_templates, custom_templates) {
+    constructor(dropdown_element, template_area, edit_template_button, builtin_templates, custom_templates) {
         this.dropdown = dropdown_element;
         this.template_area = template_area;
+        this.edit_template_button = edit_template_button;
         this.builtin_templates = builtin_templates;
         this.custom_templates = custom_templates;
 
@@ -38,17 +40,18 @@ export class TemplateControls {
 
     /**
      * 
-     * @param {HTMLSelectElement} dropdown_element the dropdown that presets will be located in.
+     * @param {HTMLSelectElement} template_dropdown the dropdown that presets will be located in.
      * @param {HTMLTextAreaElement} template_area the editable template window
+     * @param {HTMLButtonElement} edit_template_button the "Edit Template" button
      * @returns {TemplateControls}
      */
-    static async mount(dropdown_element, template_area) {
+    static async mount(template_dropdown, template_area, edit_template_button) {
         let builtin_templates = [
             await Template.builtin("Discord", "builtin-0", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/discord.html"),
             await Template.builtin("Twitter", "builtin-1", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/twitter.html")
         ];
         let custom_templates = localStorageOrDefault("customTemplates", []);
-        let template_controls = new TemplateControls(dropdown_element, template_area, builtin_templates, custom_templates);
+        let template_controls = new TemplateControls(template_dropdown, template_area, edit_template_button, builtin_templates, custom_templates);
 
         template_controls.set_current_template(builtin_templates[0]);
 
@@ -61,7 +64,7 @@ export class TemplateControls {
     add_new_preset() {
         let i = this.custom_templates.length;
 
-        let new_template = Template.custom("Custom Template " + i, "custom-" + i);
+        let new_template = Template.custom("Custom Template " + i, "custom-" + i, this.template_area.value);
         this.custom_templates.push(new_template);
 
         this.dropdown.insertBefore(new_template.get_html_node(), this.dropdown.lastElementChild)
@@ -92,6 +95,12 @@ export class TemplateControls {
 
         this.template_area.readOnly = template.is_builtin;
         this.template_area.value = template.content;
+
+        if (template.is_builtin) {
+            this.edit_template_button.innerText = "View Template";
+        } else {
+            this.edit_template_button.innerText = "Edit Template";
+        }
     }
 }
 
@@ -132,11 +141,11 @@ class Template {
     /**
      * @param {string} displayed_name the displayed name of the template
      * @param {string} internal_name the internal name of the template
-     * @param {string} url the url to get the template from
+     * @param {string} content the initial contents of the template
      * @returns {Template} 
      */
-    static custom(displayed_name, internal_name) {
-        return new Template(displayed_name, internal_name, "");
+    static custom(displayed_name, internal_name, content) {
+        return new Template(displayed_name, internal_name, content);
     }
 }
 

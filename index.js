@@ -73,12 +73,11 @@ let html_area = document.getElementById("html-output");
 
 let template_area = document.getElementById("template-editor");
 let template_dropdown = document.getElementById("template-select");
-let template_controls = await TemplateControls.mount(template_dropdown, template_area);
-
+let edit_template_button = document.getElementById("edit-template-btn");
+let template_controls = await TemplateControls.mount(template_dropdown, template_area, edit_template_button);
 
 let preview_button = document.getElementById("preview-btn");
 let html_button = document.getElementById("html-btn");
-let edit_template_button = document.getElementById("edit-template-btn");
 
 let config_error_msg = document.getElementById("config-error-msg");
 let render_error_msg = document.getElementById("render-error-msg");
@@ -110,18 +109,6 @@ edit_template_button.addEventListener("click", () => {
    template_area.classList.remove("hidden");
 })
 
-// template_dropdown.addEventListener("input", async () => {
-//    template_area.value = await get_template(template_dropdown.value);;
-//    render();
-// })
-
-// template_area.addEventListener("input", async () => {
-//    template_dropdown.value = "custom";
-//    render();
-// })
-
 // Initial load -- load the config and render the script
-// template_area.value = await get_template(template_dropdown.value);
-
 load_config();
 render();
