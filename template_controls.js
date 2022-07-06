@@ -43,6 +43,10 @@ export class TemplateControls {
         this.delete_template_button.addEventListener("click", () => {
             let dropdown_value = this.dropdown.value;
             if (dropdown_value.startsWith("custom-")) {
+                if (!confirm(`Are you sure you want to delete ${this.dropdown.selectedOptions[0].textContent}?`)) {
+                    return;
+                }
+
                 // remove the value from the dropdown
                 let dropdown_index = this.dropdown.selectedIndex;
                 this.dropdown.remove(dropdown_index);
