@@ -14,6 +14,9 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 clap = { version = "3.2.8", features = ["derive"] }
 css-inline = "0.8.1"
+# We use specifically version 0.8.1 of kuchiki because css-inline uses the same version. Hopefully
+# this means we won't need to compile two version of kuchiki + it's dependents into the crate.
+kuchiki = "0.8.1"
 pulldown-cmark = "0.9.1"
 serde = { version = "1.0.137", features = ["derive"] }
 serde_yaml = "0.8.24"

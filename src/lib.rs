@@ -1,6 +1,7 @@
 use std::{collections::HashMap, error::Error};
 
 use css_inline::{CSSInliner, InlineError};
+use kuchiki::{traits::TendrilSink, NodeRef};
 use pulldown_cmark::html;
 use serde::{Deserialize, Serialize};
 use tera::{Context, Tera};
@@ -166,7 +167,22 @@ pub fn render(
     // a style tag become an inline `style=""` attribute.
     let html = inline_style_tags(&html)?;
 
+    let mut document = kuchiki::parse_html().one(html);
+    // Cohost also does not allow `class` and `id` attributes. Hence, we can strip to make the
+    // post somewhat smaller.
+    remove_class_and_id_attributes(&mut document)
+        .map_err(|()| "Couldn't remove class and id attributes!")?;
+
+    let html = document.to_string();
     Ok(html)
+}
+
+fn remove_class_and_id_attributes(document: &mut NodeRef) -> Result<(), ()> {
+    for node in document.select("*")? {
+        node.attributes.borrow_mut().remove("class");
+        node.attributes.borrow_mut().remove("id");
+    }
+    Ok(())
 }
 
 // Inline the `<style>` tags of a string containing HTML. This will also remove the `<style>` tags
