@@ -1,0 +1,92 @@
+{#- Welcome to the basic template. This template contains just enough code to render posts to the screen and is a good starting point to make your own template. -#}
+
+{#- First, note Cohoard templates mainly use Tera. 
+    Check out https://tera.netlify.app/docs/ for more info. -#}
+
+{#- Markdown text is converted to certain tags. The styling rules for converted Markdown text are as
+    follows:
+    markdown text            -> html tag 
+    **bold**                 -> <strong>bold</strong>
+    *italic*                 -> <em>italic</em>
+    ~strikethru~             -> <del>strikethru</del>
+    <u>underlined</u>        -> <span class="cohoard-underline">underlined</span>
+    `inline code`            -> <span class="cohoard-code">inline code</span>
+    ```
+    code block               -> <span class="cohoard-codeblock">code block</span>
+    ```
+    ```rust
+    code block with language -> <span class="cohoard-codeblock language-rust">code block with language</span>
+    ```
+
+    Currently, Discord style __underlining__ is not yet supported, which is why you must use <u> tags
+    instead.
+    
+    You might notice that underline, inline code, and code blocks are converted to <span> tags. This is because Cohost does not render <u> tags and encases <code> tags with pseudo-elements. Both of these mess up formatting by default, so we need to manually style them. -#}
+
+{#- Note that any CSS inside of a style tag will be inlined. -#}
+<style>
+   .cohoard-underline { text-decoration: underline; }
+
+   .cohoard-code { 
+      font-family: monospace;
+      /* Avoid stripping white space */
+      white-space: pre-wrap;
+   }
+
+   .cohoard-codeblock {
+      font-family: monospace;
+      /* Avoid stripping white space */
+      white-space: pre-wrap;
+   }
+
+   #post-wrapper {
+      padding: 16px;
+      /* Cohost adds padding around the post, which usually looks weird. This negative margin undoes
+         that padding. */
+      margin: -16px -12px;
+   }
+
+   .message-content {
+      white-space: break-spaces;
+      word-wrap: break-word;
+   }
+</style>
+
+{#- The main post body begins below. Note that the id and class attributes aren't special--you can alter them freely. #-}
+    
+<div id="post-wrapper">
+   
+{#- In Tera, we store the messages inside of a variable called `posts`. `posts` is an array of PostBlocks. A PostBlock is an array of individual messages--usually these are messages which should appear "together" in some way. This can be used to more finely control how posts will look when rendered. For example, in the Discord template, we group all messages in the same PostBlock under the same headline, while spacing messages within a PostBlock slightly apart from each other. This mimics how Discord typically renders messages. -#}
+
+{%- for postblock in posts -%}
+<div class="post-block" >
+
+{#- A PostBlock struct contains two fields:
+    - messages - the list of messages this PostBlock contains
+    - user     - the user posting the message.
+
+    A user's fields are whatever the keys in the Config Table are, and typically contain information like the display name of the user, links to avatars, and other information that can be used to style the post. Note that try to access a key that does not exist will result in errors. -#}
+
+<h2>PostBlock: {% if postblock.user.key -%}
+      {{- postblock.user.key -}}
+    {%- else -%}
+      [key missing]
+    {%- endif -%}</h2>
+
+{%- for message in postblock.messages %}
+
+<p class="message-content">
+
+{#- Here, we finally render our message, first passing it through some filters. The first filter converts Markdown into the HTML tags listed above. This can be removed if you do not want text to be treated as Markdown, but note that Cohost does still attempt to style text containing Markdown, which could mess up formatting.
+    
+    The trim filter will remove trailing and leading whitespace in the message.
+
+    Finally, the safe filter allows you to insert HTML tags directly into text. Without it, Tera will escape HTML tags in the script using &lt; and &gt; (This also makes it impossible to use <u> tags in the script). -#}
+
+message: {{ message | markdown | trim | safe }}
+</p>
+
+{%- endfor -%}
+</div>
+{%- endfor -%}
+</div>
