@@ -2,6 +2,7 @@ import init, * as cohoard from "https://static.witchoflight.com/~a2aaron/cohoard
 
 import { ConfigTable } from "./config_table.js"
 import { TemplateControls } from "./template_controls.js";
+import { getTypedElementById } from "./util.js";
 
 await init();
 
@@ -14,6 +15,7 @@ function load_config() {
       COHOARD_CONFIG = config_table.cohoard_config;
       config_error_msg.innerText = "";
    } catch (err) {
+      // @ts-ignore
       config_error_msg.innerText = err;
       console.error(err);
    }
@@ -35,34 +37,37 @@ export function render() {
 
       render_error_msg.innerText = "";
    } catch (err) {
+      // @ts-ignore
       render_error_msg.innerText = err;
       console.error(err);
    }
 }
 
 // The config object that the Cohoard Rust library uses.
+/** @type {cohoard.Config} */
 let COHOARD_CONFIG;
 
 // Get HTML elements that are part of the UI.
 
-let script_textarea = document.getElementById("script");
+let script_textarea = getTypedElementById(HTMLTextAreaElement, "script");
 
-let config_div = document.getElementById("config-wrapper");
+let config_div = getTypedElementById(HTMLDivElement, "config-wrapper");
 let config_table = ConfigTable.mount(config_div, ["key", "name", "color", "avatar", "handle"], 10);
 
-let preview_area = document.getElementById("preview-output");
-let html_area = document.getElementById("html-output");
+let preview_area = getTypedElementById(HTMLDivElement, "preview-output");
+let html_area = getTypedElementById(HTMLTextAreaElement, "html-output");
 
-let template_area = document.getElementById("template-editor");
-let template_dropdown = document.getElementById("template-select");
-let edit_template_button = document.getElementById("edit-template-btn");
-let template_controls = await TemplateControls.mount(template_dropdown, template_area, edit_template_button);
+let template_area = getTypedElementById(HTMLTextAreaElement, "template-editor");
+let template_dropdown = getTypedElementById(HTMLSelectElement, "template-select");
+let edit_template_button = getTypedElementById(HTMLButtonElement, "edit-template-btn");
+let delete_template_button = getTypedElementById(HTMLButtonElement, "delete-template-btn");
+let template_controls = await TemplateControls.mount(template_dropdown, template_area, edit_template_button, delete_template_button);
 
-let preview_button = document.getElementById("preview-btn");
-let html_button = document.getElementById("html-btn");
+let preview_button = getTypedElementById(HTMLButtonElement, "preview-btn");
+let html_button = getTypedElementById(HTMLButtonElement, "html-btn");
 
-let config_error_msg = document.getElementById("config-error-msg");
-let render_error_msg = document.getElementById("render-error-msg");
+let config_error_msg = getTypedElementById(HTMLDivElement, "config-error-msg");
+let render_error_msg = getTypedElementById(HTMLDivElement, "render-error-msg");
 
 // Set up event listeners.
 

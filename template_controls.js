@@ -1,4 +1,4 @@
-import { assert_html_node, h, localStorageOrDefault } from "./util.js";
+import { h, localStorageOrDefault, enumerate } from "./util.js";
 import { render } from "./index.js";
 /**
  * Manages the template preset UI
@@ -8,13 +8,15 @@ export class TemplateControls {
      * @param {HTMLSelectElement} dropdown_element 
      * @param {HTMLTextAreaElement} template_area 
      * @param {HTMLButtonElement} edit_template_button
+     * @param {HTMLButtonElement} delete_template_button
      * @param {Array<Template>} builtin_templates
      * @param {Array<Template>} custom_templates
      */
-    constructor(dropdown_element, template_area, edit_template_button, builtin_templates, custom_templates) {
+    constructor(dropdown_element, template_area, edit_template_button, delete_template_button, builtin_templates, custom_templates) {
         this.dropdown = dropdown_element;
         this.template_area = template_area;
         this.edit_template_button = edit_template_button;
+        this.delete_template_button = delete_template_button;
         this.builtin_templates = builtin_templates;
         this.custom_templates = custom_templates;
 
@@ -24,19 +26,25 @@ export class TemplateControls {
                 return;
             } else if (this.dropdown.value == "new-preset") {
                 this.add_new_preset()
-            } else {
-                let template = this.get_template(this.dropdown.value);
-                this.set_current_template(template);
+            } else if (is_dropdown_value(this.dropdown.value)) {
+                this.set_current_template(this.dropdown.value);
             }
             render();
         });
 
         // Event listener for re-rendering when editing the template
         this.template_area.addEventListener("input", async () => {
-            let template = this.get_template(this.dropdown.value);
-            template.content = template_area.value;
-            render();
+            if (is_dropdown_value(this.dropdown.value)) {
+                let template = this.get_template(this.dropdown.value);
+                template.content = template_area.value;
+                render();
+            }
         })
+
+        // Event listener for the delete button
+        this.delete_template_button.addEventListener("click", () => {
+            // this.custom_templates.remo
+        });
 
         // Event listener to save custom templates when leaving the page + every 5 seconds.
         window.addEventListener("beforeunload", () => save_custom_templates(this.custom_templates));
@@ -44,21 +52,10 @@ export class TemplateControls {
 
 
         // Set up the dropdown nodes.
-        let nodes = [];
-        nodes.push(option("none-1", "--- Builtin Templates ---"));
-        for (let template of this.builtin_templates) {
-            nodes.push(template.get_html_node());
-        }
-        nodes.push(option("none-2", "--- Your Templates ---"));
-        for (let template of this.custom_templates) {
-            nodes.push(template.get_html_node());
-        }
-        nodes.push(option("new-preset", "Create New Preset..."));
-
-        this.dropdown.replaceChildren(...nodes);
+        this.renegerate_dropdown();
 
         // Set the current template to the first builtin template.
-        this.set_current_template(builtin_templates[0]);
+        this.set_current_template("builtin-0");
     }
 
     /**
@@ -66,15 +63,16 @@ export class TemplateControls {
      * @param {HTMLSelectElement} template_dropdown the dropdown that presets will be located in.
      * @param {HTMLTextAreaElement} template_area the editable template window
      * @param {HTMLButtonElement} edit_template_button the "Edit Template" button
-     * @returns {TemplateControls}
+     * @param {HTMLButtonElement} delete_template_button the "Delete Template" button
+     * @returns {Promise<TemplateControls>}
      */
-    static async mount(template_dropdown, template_area, edit_template_button) {
+    static async mount(template_dropdown, template_area, edit_template_button, delete_template_button) {
         let builtin_templates = [
-            await Template.builtin("Discord", "builtin-0", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/discord.html"),
-            await Template.builtin("Twitter", "builtin-1", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/twitter.html")
+            await Template.builtin("Discord", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/discord.html"),
+            await Template.builtin("Twitter", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/twitter.html")
         ];
         let custom_templates = get_custom_templates();
-        let template_controls = new TemplateControls(template_dropdown, template_area, edit_template_button, builtin_templates, custom_templates);
+        let template_controls = new TemplateControls(template_dropdown, template_area, edit_template_button, delete_template_button, builtin_templates, custom_templates);
 
         return template_controls;
     }
@@ -85,42 +83,73 @@ export class TemplateControls {
     add_new_preset() {
         let i = this.custom_templates.length;
 
-        let new_template = Template.custom("Custom Template " + i, "custom-" + i, this.template_area.value);
+        let new_template = Template.custom("Custom Template " + i, this.template_area.value);
         this.custom_templates.push(new_template);
 
-        this.dropdown.insertBefore(new_template.get_html_node(), this.dropdown.lastElementChild)
-        this.set_current_template(new_template);
+        this.renegerate_dropdown();
+        this.set_current_template(custom_i(i));
     }
 
     /**
-     * @param {string} the internal name of the tepmlate
+     * @typedef {`builtin-${number}` | `custom-${number}`} DropdownName
+     */
+
+    /**
+     * @param {DropdownName} dropdown_name the name of the template used by the dropdown selector
      * @returns {Template} the Template that has the given name
      */
-    get_template(internal_name) {
-        if (internal_name.startsWith("builtin")) {
-            let index = Number(internal_name.replace("builtin-", ""));
+    get_template(dropdown_name) {
+        if (dropdown_name.startsWith("builtin")) {
+            let index = Number(dropdown_name.replace("builtin-", ""));
             return this.builtin_templates[index];
-        } else if (internal_name.startsWith("custom")) {
-            let index = Number(internal_name.replace("custom-", ""));
+        } else if (dropdown_name.startsWith("custom")) {
+            let index = Number(dropdown_name.replace("custom-", ""));
             return this.custom_templates[index];
+        } else {
+            throw new Error(`expected dropdown_name to start with "builtin-" or "custom-", got ${dropdown_name}`);
         }
     }
 
     /**
-     * Sets the given template as the current template.
-     * @param {Template} template the name of the custom template to set to current
+     * Sets the given template as the current template
+     * @param {DropdownName} dropdown_name the name of the template used by the dropdown selector
      */
-    set_current_template(template) {
-        this.dropdown.value = template.internal_name;
+    set_current_template(dropdown_name) {
+        this.dropdown.value = dropdown_name;
+        let template = this.get_template(dropdown_name);
 
         this.template_area.readOnly = template.is_builtin;
-        this.template_area.value = template.content;
+        if (template.content == null) {
+            console.warn(`template for ${dropdown_name} has null content!`, template);
+            this.template_area.value = "Couldn't load template!";
+        } else {
+            this.template_area.value = template.content;
+        }
 
         if (template.is_builtin) {
             this.edit_template_button.innerText = "View Template";
+            this.delete_template_button.classList.add("hidden");
         } else {
             this.edit_template_button.innerText = "Edit Template";
+            this.delete_template_button.classList.remove("hidden");
         }
+    }
+
+    renegerate_dropdown() {
+        let nodes = [];
+        nodes.push(option("none-1", "--- Builtin Templates ---"));
+        for (let [i, template] of enumerate(this.builtin_templates)) {
+            nodes.push(template.get_html_node(builtin_i(i)));
+        }
+
+        nodes.push(option("none-2", "--- Your Templates ---"));
+        for (let [i, template] of enumerate(this.custom_templates)) {
+            nodes.push(template.get_html_node(custom_i(i)));
+        }
+
+        nodes.push(option("new-preset", "Create New Preset..."));
+
+        this.dropdown.replaceChildren(...nodes);
     }
 }
 
@@ -138,10 +167,14 @@ function save_custom_templates(templates) {
 function get_custom_templates() {
     try {
         let stored_templates = localStorageOrDefault("customTemplates", []);
+        if (!(Array.isArray(stored_templates))) {
+            console.warn("stored template data wasn't an array!", stored_templates);
+            return [];
+        }
 
         let templates = [];
-        for (let template of stored_templates) {
-            let real_template = Template.custom(template.displayed_name, template.internal_name, template.content);
+        for (let [i, template] of enumerate(stored_templates)) {
+            let real_template = Template.custom(template.displayed_name, template.content);
             templates.push(real_template);
         }
         return templates;
@@ -151,48 +184,68 @@ function get_custom_templates() {
     }
 }
 
-class Template {
+/**
+ * @param {string} dropdown_value
+ * @returns {dropdown_value is DropdownName}
+ */
+function is_dropdown_value(dropdown_value) {
+    return dropdown_value.startsWith("builtin-") || dropdown_value.startsWith("custom-");
+}
 
+/**
+ * @param {number} i the index of the template
+ * @returns {DropdownName}
+ */
+function builtin_i(i) {
+    return `builtin-${i}`;
+}
+
+/**
+ * @param {number} i the index of the template
+ * @returns {DropdownName}
+ */
+function custom_i(i) {
+    return `custom-${i}`;
+}
+
+class Template {
     /**
      * @param {string} displayed_name the displayed name of the template
-     * @param {string} internal_name the internal name of the template
-     * @param {bool} is_builtin true if the template is builtin
+     * @param {boolean} is_builtin true if the template is builtin
      * @param {string | null} content the contents of the template (if not builtin)
      */
-    constructor(displayed_name, internal_name, content, is_builtin) {
+    constructor(displayed_name, content, is_builtin) {
         this.displayed_name = displayed_name;
-        this.internal_name = internal_name;
         this.is_builtin = is_builtin;
         this.content = content;
     }
 
     /**
      * Return a dropdown selection with the information of the template.
+     * @param {string} value the value for the dropdown selection.
      * @returns {HTMLOptionElement}
      */
-    get_html_node() {
-        return option(this.internal_name, this.displayed_name, false);
+    get_html_node(value) {
+        return option(value, this.displayed_name);
     }
 
     /**
      * @param {string} displayed_name the displayed name of the template
-     * @param {string} internal_name the internal name of the template
      * @param {string} url the url to get the template from
-     * @returns {Template}
+     * @returns {Promise<Template>}
      */
-    static async builtin(displayed_name, internal_name, url) {
+    static async builtin(displayed_name, url) {
         let content = await get_template_from_url(url);
-        return new Template(displayed_name, internal_name, content, true);
+        return new Template(displayed_name, content, true);
     }
 
     /**
      * @param {string} displayed_name the displayed name of the template
-     * @param {string} internal_name the internal name of the template
      * @param {string} content the initial contents of the template
      * @returns {Template} 
      */
-    static custom(displayed_name, internal_name, content) {
-        return new Template(displayed_name, internal_name, content);
+    static custom(displayed_name, content) {
+        return new Template(displayed_name, content, false);
     }
 }
 
@@ -203,13 +256,14 @@ class Template {
  * @returns {HTMLOptionElement}
  */
 function option(value, body) {
-    return h("option", { value }, body);
+    let element = h("option", { value }, body);
+    return /** @type {HTMLOptionElement} */ (element);
 }
 
 /**
  * Returns a Tera template from the given URL.
  * @param {string} url the URL to fetch from
- * @returns {Promise<string | void>} the contents of the template 
+ * @returns {Promise<string | null>} the contents of the template 
  */
 async function get_template_from_url(url) {
     let text = await fetch(url).then(response => {
@@ -217,6 +271,7 @@ async function get_template_from_url(url) {
     }).catch(err => {
         console.warn(`Couldn't fetch from ${url}`);
         console.warn(err);
+        return null;
     });
     return text;
 }

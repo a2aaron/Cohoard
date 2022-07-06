@@ -2,7 +2,7 @@ import * as cohoard from "https://static.witchoflight.com/~a2aaron/cohoard/0.2.0
 
 import { Config } from "https://static.witchoflight.com/~a2aaron/cohoard/0.2.0/cohoard.js";
 
-import { h, localStorageOrDefault, assert_html_node, is_html_node } from "./util.js";
+import { h, localStorageOrDefault, assert_html_node } from "./util.js";
 
 /**
  * Manages the `<table>` which contains the UI for editing the Config data.
@@ -26,7 +26,7 @@ export class ConfigTable {
      * @param {HTMLElement} element The element to mount the table to
      * @param {Array<string>} init_cols The initial column headers to generate.
      * May generate more columns if localStorage has more columns saved
-     * @param {int} num_rows The minimum number of rows to generate
+     * @param {number} num_rows The minimum number of rows to generate
      * May generate more rows if localStore has more rows saved.
      * @returns {ConfigTable}
     */
@@ -68,7 +68,7 @@ export class ConfigTable {
  * @returns {HTMLTableElement} The generated `table`.
  */
 function make_table_node(cols, body) {
-    let max_body_length = Math.max(body.map((row) => row.length));
+    let max_body_length = Math.max(...body.map((row) => row.length));
     if (max_body_length > cols.length) {
         cols = cols.concat(Array(max_body_length - cols.length).fill(""));
     }
@@ -79,14 +79,17 @@ function make_table_node(cols, body) {
     header_row.setAttribute("class", "config-row-header");
     for (let i = 0; i < cols.length; i++) {
         const col = cols[i];
-        let cell = header_cell(col);
-
-        // Update the placeholder text whenever the header cell is edited.
-        if (col != "key") {
-            cell.addEventListener("input", () => update_placeholders(table, i, cell.firstChild.value));
+        if (col == "key") {
+            let cell = h("th", {}, "key");
+            header_row.appendChild(cell);
+        } else {
+            let textarea = /** @type { HTMLInputElement } */ (h("input", { type: "text", placeholder: "key name", value: col }));
+            // Update the placeholder text whenever the header cell is edited.
+            let cell = h("th", {}, textarea);
+            cell.addEventListener("input", () => update_placeholders(table, i, textarea.value));
+            header_row.appendChild(cell);
         }
 
-        header_row.appendChild(cell);
     }
 
     table.appendChild(header_row);
@@ -109,7 +112,7 @@ function make_table_node(cols, body) {
 /**
  * Update the placeholder text of the cells in a specified column.
  * @param {HTMLTableElement} table The table to update the placeholders in
- * @param {int} col_i The index of column to update. If this is 0, then nothing happens.
+ * @param {number} col_i The index of column to update. If this is 0, then nothing happens.
  * @param {string} new_placeholder The new placeholder text to use
  */
 function update_placeholders(table, col_i, new_placeholder) {
@@ -117,14 +120,14 @@ function update_placeholders(table, col_i, new_placeholder) {
     if (col_i == 0) {
         return;
     }
+
     for (let row of table.rows) {
         // Skip the header row
         if (row.rowIndex == 0) {
             continue;
         }
         let cell = row.cells[col_i];
-        assert_html_node(cell, "td");
-        assert_html_node(cell.firstChild, "input");
+        assert_html_node(cell.firstChild, HTMLInputElement);
         cell.firstChild.placeholder = new_placeholder;
     }
 }
@@ -136,7 +139,6 @@ function update_placeholders(table, col_i, new_placeholder) {
  * @returns {[Array<string>, Array<Array<string>>]} A tuple of the header columns and the body rows
  */
 function array_from_table(table) {
-    assert_html_node(table, "table");
     let cols = get_columns(table);
 
     let body = [];
@@ -147,8 +149,7 @@ function array_from_table(table) {
         }
         let body_row = []
         for (let cell of row.cells) {
-            assert_html_node(cell, "td");
-            assert_html_node(cell.firstChild, "input");
+            assert_html_node(cell.firstChild, HTMLInputElement);
             let cell_value = cell.firstChild.value;
             body_row.push(cell_value);
         }
@@ -164,7 +165,6 @@ function array_from_table(table) {
  * @returns {Config} the config specified by the table.
  */
 function cohoard_config_from_table(table) {
-    assert_html_node(table, "table");
     let cols = get_columns(table);
 
     let people = [];
@@ -173,10 +173,10 @@ function cohoard_config_from_table(table) {
         if (row.rowIndex == 0) {
             continue;
         }
+        /** @type {{[key: string]: string}} */
         let person = {}
         cell_loop: for (let cell of row.cells) {
-            assert_html_node(cell, "td");
-            assert_html_node(cell.firstChild, "input");
+            assert_html_node(cell.firstChild, HTMLInputElement);
             let cell_key = cols[cell.cellIndex];
             let cell_value = cell.firstChild.value;
             if (cell_value == "") {
@@ -202,16 +202,14 @@ function cohoard_config_from_table(table) {
 
 /**
  * Gets the values in the header row.
- * @param {HTMLElement} table 
+ * @param {HTMLTableElement} table 
  * @returns {Array<string>} the values of the header row.
  */
 function get_columns(table) {
-    assert_html_node(table, "table");
     let cols = [];
     let first_row = table.rows[0];
     for (let cell of first_row.cells) {
-        assert_html_node(cell, "th");
-        if (is_html_node(cell.firstChild, "input")) {
+        if (cell.firstChild instanceof HTMLInputElement) {
             cols.push(cell.firstChild.value);
         } else {
             cols.push("key");
@@ -222,28 +220,14 @@ function get_columns(table) {
 
 
 /**
- * Return a header cell for the table.
- * @param {string} key The key for the table. if equal to `key`, then the table cell doesn't have a textinput.
- * @returns {HTMLTableCellElement} - The table cell
- */
-function header_cell(key) {
-    if (key == "key") {
-        return h("th", {}, "key");
-    } else {
-        return h("th", {},
-            h("input", { type: "text", placeholder: "key name", value: key })
-        );
-    }
-}
-
-/**
  * Return a body cell for the table.
  * @param {string} value - The initial text of the text input
  * @param {string} placeholder - The placeholder text for the text input
  * @returns {HTMLTableCellElement} - The table cell containing the text input
  */
 function body_cell(value, placeholder) {
-    return h("td", {},
+    let cell = h("td", {},
         h("input", { type: "text", placeholder, value })
     );
+    return /** @type {HTMLTableCellElement} */ (cell);
 }

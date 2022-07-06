@@ -1,10 +1,25 @@
 /**
+ * Yields pairs of (index, item) from an array.
+ * @param {Array<T>} items An array of items
+ * @returns {Generator<[number, T]>} a tuple of (index, item)
+ * @template T
+ */
+export function* enumerate(items) {
+    let i = 0;
+    for (const item of items) {
+        yield [i, item];
+        i += 1;
+    }
+}
+
+
+/**
  * Attempts to get an object from localStorage and parse it as JSON, falling back to a default value
  * if this fails.
+ * @template T
  * @param {string} key the key in localStorage to look up
  * @param {T} fallback the fallback item to fall back to.
- * @returns {T} The parsed object from localStorage, or the fallback if that fails
- * @template T
+ * @returns {any | T} The parsed object from localStorage, or the fallback if that fails
  */
 export function localStorageOrDefault(key, fallback) {
     let obj = localStorage.getItem(key);
@@ -48,7 +63,8 @@ export function h(tag, attrs, body = []) {
     for (const [k, v] of Object.entries(attrs)) {
         // Special-case the value and have it set the actual node value
         if (k == "value") {
-            element.value = v;
+            // @ts-ignore
+            element["value"] = v;
         } else {
             element.setAttribute(k, v);
         }
@@ -63,28 +79,33 @@ export function h(tag, attrs, body = []) {
 }
 
 /**
+ * @template ElementType
  * @param {any} object 
- * @param {string} name The HTML element name to check for
- * @returns {bool} Returns true if `object` is an HTML element of type `name`.
+ * @param {Constructor<ElementType>} type The HTML element name to check for
+ * @returns {asserts object is ElementType}
  */
-export function is_html_node(object, name) {
-    console.assert(name);
-    if (object.tagName == undefined) {
-        return false;
+export function assert_html_node(object, type) {
+    if (!(object instanceof type)) {
+        throw new Error(`expected ${object} to be HTML node of type ${type.name}. Got ${object.constructor.name} instead.`);
     }
-    return object.tagName.toLowerCase() == name.toLowerCase();
 }
 
 /**
- * @param {any} object 
- * @param {string} name The HTML element name to check for
+ * @template T
+ * @typedef {new (...args: any[]) => T} Constructor
  */
-export function assert_html_node(object, name) {
-    console.assert(name);
-    if (!is_html_node(object, name)) {
-        let tagName = object.tagName.toLowerCase();
-        console.warn(`object ${object} expected to be HTML node of type ${name}. Got ${tagName} instead.`);
-        console.warn(object.outerHTML);
-    }
-}
 
+/**
+ * @template ElementType
+ * @param {Constructor<ElementType>} ty
+ * @param {string} id
+ * @returns {ElementType}
+ */
+export function getTypedElementById(ty, id) {
+    let element = document.getElementById(id);
+    if (element == null) { throw new Error(`Element with id ${id} not found!`); }
+    if (!(element instanceof ty)) {
+        throw new Error(`Element with id ${id} is type ${element.constructor.name}, wanted ${ty}`);
+    }
+    return element;
+}
