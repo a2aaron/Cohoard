@@ -8,7 +8,6 @@ export class TemplateControls {
      * @param {HTMLSelectElement} dropdown_element 
      * @param {HTMLTextAreaElement} template_area 
      * @param {HTMLButtonElement} edit_template_button
-     * @param {Array<string>} custom_templates 
      * @param {Array<Template>} builtin_templates
      * @param {Array<Template>} custom_templates
      */
@@ -19,6 +18,7 @@ export class TemplateControls {
         this.builtin_templates = builtin_templates;
         this.custom_templates = custom_templates;
 
+        // Event listener for re-rendering when changing the dropdown
         this.dropdown.addEventListener("input", async () => {
             if (this.dropdown.value.startsWith("none")) {
                 return;
@@ -31,11 +31,34 @@ export class TemplateControls {
             render();
         });
 
+        // Event listener for re-rendering when editing the template
         this.template_area.addEventListener("input", async () => {
             let template = this.get_template(this.dropdown.value);
             template.content = template_area.value;
             render();
         })
+
+        // Event listener to save custom templates when leaving the page + every 5 seconds.
+        window.addEventListener("beforeunload", () => save_custom_templates(this.custom_templates));
+        window.setInterval(() => save_custom_templates(this.custom_templates), 5000);
+
+
+        // Set up the dropdown nodes.
+        let nodes = [];
+        nodes.push(option("none-1", "--- Builtin Templates ---"));
+        for (let template of this.builtin_templates) {
+            nodes.push(template.get_html_node());
+        }
+        nodes.push(option("none-2", "--- Your Templates ---"));
+        for (let template of this.custom_templates) {
+            nodes.push(template.get_html_node());
+        }
+        nodes.push(option("new-preset", "Create New Preset..."));
+
+        this.dropdown.replaceChildren(...nodes);
+
+        // Set the current template to the first builtin template.
+        this.set_current_template(builtin_templates[0]);
     }
 
     /**
@@ -50,10 +73,8 @@ export class TemplateControls {
             await Template.builtin("Discord", "builtin-0", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/discord.html"),
             await Template.builtin("Twitter", "builtin-1", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/twitter.html")
         ];
-        let custom_templates = localStorageOrDefault("customTemplates", []);
+        let custom_templates = get_custom_templates();
         let template_controls = new TemplateControls(template_dropdown, template_area, edit_template_button, builtin_templates, custom_templates);
-
-        template_controls.set_current_template(builtin_templates[0]);
 
         return template_controls;
     }
@@ -68,7 +89,6 @@ export class TemplateControls {
         this.custom_templates.push(new_template);
 
         this.dropdown.insertBefore(new_template.get_html_node(), this.dropdown.lastElementChild)
-
         this.set_current_template(new_template);
     }
 
@@ -101,6 +121,33 @@ export class TemplateControls {
         } else {
             this.edit_template_button.innerText = "Edit Template";
         }
+    }
+}
+
+/**
+ * @param {Array<Template>} templates the templates to save
+ */
+function save_custom_templates(templates) {
+    console.info("Saving custom templates.");
+    localStorage.setItem("customTemplates", JSON.stringify(templates));
+}
+
+/**
+ * @returns {Array<Template>} the saved custom templates
+ */
+function get_custom_templates() {
+    try {
+        let stored_templates = localStorageOrDefault("customTemplates", []);
+
+        let templates = [];
+        for (let template of stored_templates) {
+            let real_template = Template.custom(template.displayed_name, template.internal_name, template.content);
+            templates.push(real_template);
+        }
+        return templates;
+    } catch (err) {
+        console.warn("Couldn't load saved templates! Reason: ", err);
+        return [];
     }
 }
 
@@ -169,7 +216,7 @@ async function get_template_from_url(url) {
         return response.text()
     }).catch(err => {
         console.warn(`Couldn't fetch from ${url}`);
-        console.log(err);
+        console.warn(err);
     });
     return text;
 }

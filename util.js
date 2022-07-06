@@ -83,8 +83,8 @@ export function assert_html_node(object, name) {
     console.assert(name);
     if (!is_html_node(object, name)) {
         let tagName = object.tagName.toLowerCase();
-        console.error(`object ${object} expected to be HTML node of type ${name}. Got ${tagName} instead.`);
-        console.log(object.outerHTML);
+        console.warn(`object ${object} expected to be HTML node of type ${name}. Got ${tagName} instead.`);
+        console.warn(object.outerHTML);
     }
 }
 

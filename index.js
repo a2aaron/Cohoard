@@ -6,25 +6,6 @@ import { TemplateControls } from "./template_controls.js";
 await init();
 
 /**
- * Returns a Tera template from the given URL.
- * @param {string | "custom"} url the URL to fetch from. If "custom", then this function reads the template editor area
- * @returns {Promise<string>} the contents of the template 
- */
-async function get_template(url) {
-   if (url == "custom") {
-      return template_area.value;
-   } else {
-      let text = fetch(url).then(response => {
-         return response.text()
-      }).catch(err => {
-         console.warn(`Couldn't fetch from ${url}`);
-         console.log(err);
-      });
-      return text;
-   }
-}
-
-/**
  * Load and set the current config 
  */
 function load_config() {
@@ -44,6 +25,7 @@ export function render() {
    if (COHOARD_CONFIG == null) {
       return;
    }
+   console.info("rendering...");
    let posts = cohoard.parse_posts(COHOARD_CONFIG, script_textarea.value);
 
    try {
