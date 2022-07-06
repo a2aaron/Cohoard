@@ -1,5 +1,6 @@
 import { h, localStorageOrDefault, enumerate } from "./util.js";
 import { render } from "./index.js";
+
 /**
  * Manages the template preset UI
  */
@@ -119,10 +120,7 @@ export class TemplateControls {
      * @returns {Promise<TemplateControls>} 
      */
     static async mount(template_dropdown, template_area, edit_template_button, delete_template_button, rename_template_button) {
-        let builtin_templates = [
-            await Template.builtin("Discord", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/discord.html"),
-            await Template.builtin("Twitter", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/twitter.html")
-        ];
+        let builtin_templates = [DISCORD_BUILTIN, TWITTER_BUILTIN];
         let custom_templates = get_custom_templates();
         let template_controls = new TemplateControls(template_dropdown, template_area, edit_template_button, delete_template_button, rename_template_button, builtin_templates, custom_templates);
 
@@ -135,7 +133,7 @@ export class TemplateControls {
     add_new_preset() {
         let i = this.custom_templates.length;
 
-        let new_template = Template.custom("Custom Template " + i, this.template_area.value);
+        let new_template = Template.custom("Custom Template " + i, BASIC_TEMPLATE);
         this.custom_templates.push(new_template);
 
         this.renegerate_dropdown();
@@ -307,7 +305,7 @@ class Template {
      * @returns {Promise<Template>}
      */
     static async builtin(displayed_name, url) {
-        let content = await get_template_from_url(url);
+        let content = await get_template_from_url(url) ?? "Couldn't fetch template!";
         return new Template(displayed_name, content, true);
     }
 
@@ -320,6 +318,10 @@ class Template {
         return new Template(displayed_name, content, false);
     }
 }
+
+const DISCORD_BUILTIN = await Template.builtin("Discord", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/discord.html");
+const TWITTER_BUILTIN = await Template.builtin("Twitter", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/twitter.html");
+const BASIC_TEMPLATE = await get_template_from_url("https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/basic.html") ?? "Couldn't fetch template!";
 
 /**
  * Returns an `<option>` tag
