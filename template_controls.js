@@ -22,9 +22,7 @@ export class TemplateControls {
 
         // Event listener for re-rendering when changing the dropdown
         this.dropdown.addEventListener("input", async () => {
-            if (this.dropdown.value.startsWith("none")) {
-                return;
-            } else if (this.dropdown.value == "new-preset") {
+            if (this.dropdown.value == "new-preset") {
                 this.add_new_preset()
             } else if (is_dropdown_value(this.dropdown.value)) {
                 this.set_current_template(this.dropdown.value);
@@ -136,20 +134,19 @@ export class TemplateControls {
     }
 
     renegerate_dropdown() {
-        let nodes = [];
-        nodes.push(option("none-1", "--- Builtin Templates ---"));
+        let builtin_group = h("optgroup", { label: "Builtin Templates" });
         for (let [i, template] of enumerate(this.builtin_templates)) {
-            nodes.push(template.get_html_node(builtin_i(i)));
+            builtin_group.appendChild(template.get_html_node(builtin_i(i)));
         }
 
-        nodes.push(option("none-2", "--- Your Templates ---"));
+        let custom_group = h("optgroup", { label: "Custom Templates" });
         for (let [i, template] of enumerate(this.custom_templates)) {
-            nodes.push(template.get_html_node(custom_i(i)));
+            custom_group.appendChild(template.get_html_node(custom_i(i)));
         }
 
-        nodes.push(option("new-preset", "Create New Preset..."));
+        let new_preset = option("new-preset", "Create New Preset...");
 
-        this.dropdown.replaceChildren(...nodes);
+        this.dropdown.replaceChildren(builtin_group, custom_group, new_preset);
     }
 }
 
