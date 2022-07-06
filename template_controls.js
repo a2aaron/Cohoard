@@ -9,14 +9,16 @@ export class TemplateControls {
      * @param {HTMLTextAreaElement} template_area 
      * @param {HTMLButtonElement} edit_template_button
      * @param {HTMLButtonElement} delete_template_button
+     * @param {HTMLButtonElement} rename_template_button
      * @param {Array<Template>} builtin_templates
      * @param {Array<Template>} custom_templates
      */
-    constructor(dropdown_element, template_area, edit_template_button, delete_template_button, builtin_templates, custom_templates) {
+    constructor(dropdown_element, template_area, edit_template_button, delete_template_button, rename_template_button, builtin_templates, custom_templates) {
         this.dropdown = dropdown_element;
         this.template_area = template_area;
         this.edit_template_button = edit_template_button;
         this.delete_template_button = delete_template_button;
+        this.rename_template_button = rename_template_button;
         this.builtin_templates = builtin_templates;
         this.custom_templates = custom_templates;
 
@@ -34,7 +36,11 @@ export class TemplateControls {
         this.template_area.addEventListener("input", async () => {
             if (is_dropdown_value(this.dropdown.value)) {
                 let template = this.get_template(this.dropdown.value);
-                template.content = template_area.value;
+                if (template == null) {
+                    console.warn(`couldn't get template ${this.dropdown.value}`);
+                } else {
+                    template.content = template_area.value;
+                }
                 render();
             }
         })
@@ -42,7 +48,7 @@ export class TemplateControls {
         // Event listener for the delete button
         this.delete_template_button.addEventListener("click", () => {
             let dropdown_value = this.dropdown.value;
-            if (dropdown_value.startsWith("custom-")) {
+            if (is_custom(dropdown_value)) {
                 if (!confirm(`Are you sure you want to delete ${this.dropdown.selectedOptions[0].textContent}?`)) {
                     return;
                 }
@@ -69,6 +75,28 @@ export class TemplateControls {
             }
         });
 
+        // Event listener for the rename button
+        this.rename_template_button.addEventListener("click", () => {
+            let dropdown_value = this.dropdown.value;
+            if (is_custom(dropdown_value)) {
+                let old_name = this.dropdown.selectedOptions[0].textContent ?? "";
+                let new_name = prompt(`Enter the new name for ${old_name}`, old_name);
+                if (new_name == null || new_name.trim() == "") {
+                    return;
+                }
+                new_name = new_name.trim();
+                let template = this.get_template(dropdown_value);
+                if (template == null) {
+                    console.warn(`couldn't get template ${dropdown_value}`);
+                } else {
+                    template.displayed_name = new_name;
+                }
+
+                this.renegerate_dropdown();
+                save_custom_templates(this.custom_templates);
+            }
+        });
+
         // Event listener to save custom templates when leaving the page + every 5 seconds.
         window.addEventListener("beforeunload", () => save_custom_templates(this.custom_templates));
         window.setInterval(() => save_custom_templates(this.custom_templates), 5000);
@@ -87,15 +115,16 @@ export class TemplateControls {
      * @param {HTMLTextAreaElement} template_area the editable template window
      * @param {HTMLButtonElement} edit_template_button the "Edit Template" button
      * @param {HTMLButtonElement} delete_template_button the "Delete Template" button
-     * @returns {Promise<TemplateControls>}
+     * @param {HTMLButtonElement} rename_template_button the "Rename Template" button
+     * @returns {Promise<TemplateControls>} 
      */
-    static async mount(template_dropdown, template_area, edit_template_button, delete_template_button) {
+    static async mount(template_dropdown, template_area, edit_template_button, delete_template_button, rename_template_button) {
         let builtin_templates = [
             await Template.builtin("Discord", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/discord.html"),
             await Template.builtin("Twitter", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/twitter.html")
         ];
         let custom_templates = get_custom_templates();
-        let template_controls = new TemplateControls(template_dropdown, template_area, edit_template_button, delete_template_button, builtin_templates, custom_templates);
+        let template_controls = new TemplateControls(template_dropdown, template_area, edit_template_button, delete_template_button, rename_template_button, builtin_templates, custom_templates);
 
         return template_controls;
     }
@@ -119,15 +148,15 @@ export class TemplateControls {
 
     /**
      * @param {DropdownName} dropdown_name the name of the template used by the dropdown selector
-     * @returns {Template} the Template that has the given name
+     * @returns {Template?} the Template that has the given name
      */
     get_template(dropdown_name) {
         if (dropdown_name.startsWith("builtin")) {
             let index = Number(dropdown_name.replace("builtin-", ""));
-            return this.builtin_templates[index];
+            return this.builtin_templates[index] ?? null;
         } else if (dropdown_name.startsWith("custom")) {
             let index = Number(dropdown_name.replace("custom-", ""));
-            return this.custom_templates[index];
+            return this.custom_templates[index] ?? null;
         } else {
             throw new Error(`expected dropdown_name to start with "builtin-" or "custom-", got ${dropdown_name}`);
         }
@@ -140,6 +169,9 @@ export class TemplateControls {
     set_current_template(dropdown_name) {
         this.dropdown.value = dropdown_name;
         let template = this.get_template(dropdown_name);
+        if (template == null) {
+            template = this.builtin_templates[0];
+        }
 
         this.template_area.readOnly = template.is_builtin;
         if (template.content == null) {
@@ -152,13 +184,18 @@ export class TemplateControls {
         if (template.is_builtin) {
             this.edit_template_button.innerText = "View Template";
             this.delete_template_button.classList.add("hidden");
+            this.rename_template_button.classList.add("hidden");
+
         } else {
             this.edit_template_button.innerText = "Edit Template";
             this.delete_template_button.classList.remove("hidden");
+            this.rename_template_button.classList.remove("hidden");
         }
     }
 
     renegerate_dropdown() {
+        let last_dropdown_value = this.dropdown.value;
+
         let builtin_group = h("optgroup", { label: "Builtin Templates" });
         for (let [i, template] of enumerate(this.builtin_templates)) {
             builtin_group.appendChild(template.get_html_node(builtin_i(i)));
@@ -172,6 +209,10 @@ export class TemplateControls {
         let new_preset = option("new-preset", "Create New Preset...");
 
         this.dropdown.replaceChildren(builtin_group, custom_group, new_preset);
+
+        if (is_dropdown_value(last_dropdown_value)) {
+            this.set_current_template(last_dropdown_value);
+        }
     }
 }
 
@@ -213,6 +254,15 @@ function get_custom_templates() {
 function is_dropdown_value(dropdown_value) {
     return dropdown_value.startsWith("builtin-") || dropdown_value.startsWith("custom-");
 }
+
+/**
+ * @param {string} dropdown_value
+ * @returns {dropdown_value is DropdownName}
+ */
+function is_custom(dropdown_value) {
+    return dropdown_value.startsWith("custom-");
+}
+
 
 /**
  * @param {number} i the index of the template

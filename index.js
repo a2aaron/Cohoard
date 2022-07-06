@@ -61,7 +61,8 @@ let template_area = getTypedElementById(HTMLTextAreaElement, "template-editor");
 let template_dropdown = getTypedElementById(HTMLSelectElement, "template-select");
 let edit_template_button = getTypedElementById(HTMLButtonElement, "edit-template-btn");
 let delete_template_button = getTypedElementById(HTMLButtonElement, "delete-template-btn");
-let template_controls = await TemplateControls.mount(template_dropdown, template_area, edit_template_button, delete_template_button);
+let rename_template_button = getTypedElementById(HTMLButtonElement, "rename-template-btn");
+let template_controls = await TemplateControls.mount(template_dropdown, template_area, edit_template_button, delete_template_button, rename_template_button);
 
 let preview_button = getTypedElementById(HTMLButtonElement, "preview-btn");
 let html_button = getTypedElementById(HTMLButtonElement, "html-btn");
