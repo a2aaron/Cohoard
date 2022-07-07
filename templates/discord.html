@@ -143,7 +143,7 @@
 <div class="message-wrapper">
 {#- Post headline. This is the username + timestamp. -#}
 <div class="headline">
-<span style="color: {{ post.user.color | default(value="white") }}; font-size: 100%;">{{ post.user.name | default (value = post.user.key) }}</span>
+<span style="color: {{ post.user.color | default(value="white") }}; font-size: 100%;">{{ post.user.name }}</span>
 <span class="timestamp">{{ post.timestamp | default (value = "") }}</span>
 </div>
 

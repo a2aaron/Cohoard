@@ -1,3 +1,5 @@
+#![feature(map_try_insert)]
+
 use std::{collections::HashMap, error::Error};
 
 use css_inline::{CSSInliner, InlineError};
@@ -82,9 +84,12 @@ pub fn parse_posts(config: &Config, input: String) -> Vec<PostBlock> {
 
         let user = config.people.get(name).cloned().unwrap_or({
             User {
-                fields: [("name".to_string(), name.to_string())]
-                    .into_iter()
-                    .collect(),
+                fields: [
+                    ("name".to_string(), name.to_string()),
+                    ("key".to_string(), name.to_string()),
+                ]
+                .into_iter()
+                .collect(),
             }
         });
 

@@ -55,6 +55,11 @@ pub fn load_config(config: &str) -> Result<Config, Box<dyn Error>> {
             .user
             .fields
             .insert("key".to_string(), person.key.clone());
+        // Also ensure that a User always has a name. If no name is provided, default to the key.
+        let _ = person
+            .user
+            .fields
+            .try_insert("name".to_string(), person.key.clone());
         people.insert(person.key, person.user);
     }
 
