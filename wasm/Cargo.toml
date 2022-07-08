@@ -18,7 +18,8 @@ version = "*"
 
 [dependencies]
 wasm-bindgen = { version = "0.2.74", features = ["serde-serialize"], default-features = false }
-tera         = { version = "1.16.0"                                , default-features = false } # note: tera needs no default features or else it won't compile
+tera = { version = "1.16.0", default-features = false } # note: tera needs no default features or else it won't compile
+wee_alloc = "0.4.5"
 
 [profile.release]
 opt-level = "z"
