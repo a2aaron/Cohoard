@@ -1,0 +1,33 @@
+[package]
+name = "cohoard-wasm"
+version = "0.2.0"
+edition = "2021"
+description = "turn chatlogs into formatted posts for cohost"
+repository = "https://github.com/a2aaron/Cohoard"
+license = "MIT OR Apache-2.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "cohoard_wasm"
+crate-type = ["cdylib"]
+
+[dependencies.cohoard]
+path = ".."
+version = "*"
+
+[dependencies]
+wasm-bindgen = { version = "0.2.74", features = ["serde-serialize"], default-features = false }
+tera         = { version = "1.16.0"                                , default-features = false } # note: tera needs no default features or else it won't compile
+
+[profile.release]
+opt-level = "z"
+lto = "fat"
+codegen-units = 1
+# panic = "abort"
+# debug = true
+# split-debuginfo = "packed"
+# strip = "debuginfo"
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ['-Oz']

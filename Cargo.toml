@@ -1,10 +1,12 @@
 [package]
 name = "cohoard"
 version = "0.2.0"
+authors = ["Aaron Kofsky <aaronko@umich.edu>"]
 edition = "2021"
 description = "turn chatlogs into formatted posts for cohost"
 repository = "https://github.com/a2aaron/Cohoard"
 license = "MIT OR Apache-2.0"
+readme = "../README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -21,16 +23,7 @@ pulldown-cmark      = { version = "0.9.1"                                     , 
 serde               = { version = "1.0.137", features = ["derive"]            , default-features = false}
 serde_yaml          = { version = "0.8.24"                                    , default-features = false}
 tera                = { version = "1.16.0"                                    , default-features = false} # note: tera needs no default features or else it won't compile
-wasm-bindgen        = { version = "0.2.74", features = ["serde-serialize"]    , default-features = false}
 
 [profile.release]
-opt-level = "z"
 lto = "fat"
 codegen-units = 1
-# panic = "abort"
-# debug = true
-# split-debuginfo = "packed"
-# strip = "debuginfo"
-
-[package.metadata.wasm-pack.profile.release]
-wasm-opt = ['-Oz']

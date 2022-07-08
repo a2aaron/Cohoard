@@ -7,13 +7,11 @@ use kuchiki::{traits::TendrilSink, NodeRef};
 use pulldown_cmark::html;
 use serde::{Deserialize, Serialize};
 use tera::{Context, Tera};
-use wasm_bindgen::prelude::*;
 
 pub mod config;
 use config::Config;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[wasm_bindgen]
 pub struct User {
     #[serde(flatten)]
     fields: HashMap<String, String>,
@@ -26,7 +24,6 @@ pub struct User {
 /// - The timestamp would change
 /// - A message is sent by a different person than the previous person
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[wasm_bindgen]
 pub struct PostBlock {
     user: User,
     timestamp: Option<String>,
@@ -262,58 +259,4 @@ fn markdown_to_html(
         .replace("</code>", "</span>");
 
     Ok(tera::Value::String(html))
-}
-
-pub mod js {
-    use std::error::Error;
-
-    use wasm_bindgen::prelude::*;
-
-    #[wasm_bindgen]
-    pub struct Config(JsValue);
-
-    #[wasm_bindgen]
-    pub struct PostBlockArray(JsValue);
-
-    #[wasm_bindgen]
-    pub fn parse_posts(config: &Config, input: String) -> Result<PostBlockArray, JsError> {
-        let config = config.0.into_serde()?;
-        let posts = super::parse_posts(&config, input);
-        Ok(PostBlockArray(JsValue::from_serde(&posts)?))
-    }
-
-    fn get_full_msg(mut err: &dyn Error) -> String {
-        let mut messages = vec![err.to_string()];
-        while let Some(new_err) = err.source() {
-            err = new_err;
-            messages.push(err.to_string());
-        }
-        messages.join("\n")
-    }
-
-    #[wasm_bindgen]
-    pub fn render(
-        template_name: &str,
-        template: &str,
-        posts: &PostBlockArray,
-    ) -> Result<String, JsError> {
-        let posts = posts.0.into_serde::<Vec<_>>()?;
-        super::render(template_name, template, &posts).map_err(|err| {
-            // Try to parse out a Tera error message, if one was encountered during rendering.
-            // TODO: provide more context?
-            if let Some(tera_error) = err.source().and_then(|e| e.downcast_ref::<tera::Error>()) {
-                if let tera::ErrorKind::Msg(msg) = &tera_error.kind {
-                    return JsError::new(msg);
-                }
-            }
-            JsError::new(&get_full_msg(err.as_ref()))
-        })
-    }
-
-    #[wasm_bindgen]
-    pub fn load_config(config: &str) -> Result<Config, JsError> {
-        let config = crate::config::load_config(config)
-            .map_err(|err| JsError::new(&get_full_msg(err.as_ref())))?;
-        Ok(Config(JsValue::from_serde(&config)?))
-    }
 }
