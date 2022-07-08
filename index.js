@@ -4,7 +4,8 @@ import { ConfigTable } from "./config_table.js"
 import { TemplateControls, DISCORD_BUILTIN } from "./template_controls.js";
 import { getTypedElementById } from "./util.js";
 
-await init();
+/** @type {typeof cohoard_module?} */
+let cohoard = null;
 
 /**
  * Load and set the current config 
@@ -24,7 +25,13 @@ function load_config() {
 // Render the chat log to the preview/HTML areas using the
 // currently selected template.
 export function render() {
+   if (cohoard == null) {
+      console.info("Can't render - cohoard module not loaded");
+      return;
+   }
+
    if (COHOARD_CONFIG == null) {
+      console.info("Can't render - Cohoard config is null");
       return;
    }
    console.info("rendering...");
@@ -44,8 +51,8 @@ export function render() {
 }
 
 // The config object that the Cohoard Rust library uses.
-/** @type {cohoard.Config} */
-let COHOARD_CONFIG;
+/** @type {cohoard_module.Config?} */
+let COHOARD_CONFIG = null;
 
 // Get HTML elements that are part of the UI.
 
@@ -97,12 +104,13 @@ edit_template_button.addEventListener("click", () => {
    template_area.classList.remove("hidden");
 })
 
-// Initial load -- load the config and render the script
-load_config();
-render();
-
 // Render the examples in the quick start guide
 function render_examples() {
+   if (cohoard == null) {
+      console.error("Can't render examples - cohoard module was not loaded");
+      return;
+   }
+
    let discord_example_script = getTypedElementById(HTMLPreElement, "discord-example-script");
    let discord_example_div = getTypedElementById(HTMLDivElement, "discord-example-render");
 
@@ -124,11 +132,21 @@ function render_examples() {
    let cohoard_config = cohoard.load_config(config_json);
 
    let posts = cohoard.parse_posts(cohoard_config, discord_example_script.innerText);
-   let rendered = cohoard.render("template", DISCORD_BUILTIN.content, posts);
+   let rendered = cohoard.render("template", DISCORD_BUILTIN.content ?? "Couldn't load Discord template", posts);
    discord_example_div.innerHTML = rendered;
    // Remove the negative margin on the rendered post.
    // @ts-ignore
    discord_example_div.firstChild.style.margin = "auto";
 }
 
-render_examples()
+function after_cohoard_load() {
+   load_config();
+   render();
+   render_examples()
+}
+
+
+await init();
+cohoard = cohoard_module;
+
+after_cohoard_load();
