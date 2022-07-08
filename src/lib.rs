@@ -203,6 +203,9 @@ fn inline_style_tags(html: &str) -> Result<String, InlineError> {
     let inliner = CSSInliner::options()
         .inline_style_tags(true)
         .remove_style_tags(true)
+        .load_remote_stylesheets(false)
+        .base_url(None)
+        .extra_css(None)
         .build();
     inliner.inline(html)
 }
