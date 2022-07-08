@@ -26,7 +26,9 @@ main {
     grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
     grid-template-rows: fit-content(0);
 }
-#preview-column { overflow-y: hidden; }
+#preview-column {
+    overflow-y: hidden;
+}
 
 @media (max-width: 850px) {
     main { grid-template-columns: 1fr; }   
@@ -43,6 +45,7 @@ main {
     padding: 16px 12px;
     overflow-x: hidden;
     overflow-y: auto;
+    min-height: 400px;
 }
 
 .output-textarea {
@@ -55,4 +58,22 @@ main {
     color: red;
     bottom: 0.5em;
     background-color: rgba(255, 255, 255, 0.9);
+}
+
+.spinner {
+    width: 120px;
+    height: 120px;
+    margin-top: 100px;
+    animation: fadein 1s linear, spin 2s ease infinite;
+}
+
+@keyframes fadein {
+    0% { opacity: 0; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
