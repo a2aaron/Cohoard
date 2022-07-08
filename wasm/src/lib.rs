@@ -2,6 +2,8 @@ use std::error::Error;
 
 use wasm_bindgen::prelude::*;
 
+use cohoard_rs as cohoard;
+
 #[wasm_bindgen]
 pub struct Config(JsValue);
 

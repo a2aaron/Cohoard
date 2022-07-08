@@ -2,6 +2,8 @@ use std::{error::Error, io::Read, path::PathBuf};
 
 use clap::Parser as _;
 
+use cohoard_rs as cohoard;
+
 use cohoard::config;
 
 #[derive(Debug, clap::Parser)]

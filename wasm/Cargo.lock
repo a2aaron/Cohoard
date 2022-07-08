@@ -117,6 +117,15 @@ dependencies = [
 name = "cohoard"
 version = "0.3.0"
 dependencies = [
+ "cohoard_rs",
+ "tera",
+ "wasm-bindgen",
+]
+
+[[package]]
+name = "cohoard_rs"
+version = "0.3.0"
+dependencies = [
  "clap",
  "css-inline",
  "kuchiki",
@@ -124,15 +133,6 @@ dependencies = [
  "serde",
  "serde_yaml",
  "tera",
-]
-
-[[package]]
-name = "cohoard-wasm"
-version = "0.3.0"
-dependencies = [
- "cohoard",
- "tera",
- "wasm-bindgen",
 ]
 
 [[package]]

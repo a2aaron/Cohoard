@@ -108,7 +108,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "cohoard"
+name = "cohoard_rs"
 version = "0.3.0"
 dependencies = [
  "clap",
