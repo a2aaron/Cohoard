@@ -1,6 +1,6 @@
 # Cohoard - Post formatted chatlogs to Cohost!
 
-Cohoard is a tool for turning chatlogs into formatted posts on Cohost. You can use Cohoard to easily format your silly conversations like a Discord channel, an MSPA chatlog, and so on.
+[Cohoard](https://a2aaron.github.io/Cohoard/) is a tool for turning chatlogs into formatted posts on [Cohost](https://cohost.org/). You can use Cohoard to easily format your silly conversations like a Discord channel, an MSPA chatlog, and so on.
 
 ## Discord Template
 
