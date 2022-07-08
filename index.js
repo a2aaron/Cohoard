@@ -81,7 +81,8 @@ export function render() {
    } catch (err) {
       let the_err = /** @type {Error} */ (err);
       // @ts-ignore
-      console.error("Failed to render template", the_err);
+      console.error("Failed to render template", the_err.message);
+      console.error(the_err);
       // Try to parse the error message into something useful
       let missing_var = parse_as_missing_variable(the_err.message);
       if (missing_var) {
