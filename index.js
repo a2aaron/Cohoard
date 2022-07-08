@@ -1,4 +1,4 @@
-import init, * as cohoard from "https://static.witchoflight.com/~a2aaron/cohoard/0.2.0/cohoard.js";
+import init, * as cohoard_module from "https://static.witchoflight.com/~a2aaron/cohoard/0.2.0/cohoard.js";
 
 import { ConfigTable } from "./config_table.js"
 import { TemplateControls, DISCORD_BUILTIN } from "./template_controls.js";
@@ -199,8 +199,14 @@ function after_cohoard_load() {
    render_examples()
 }
 
+try {
+   await init();
+} catch (err) {
+   console.error("oh god oh fuck we couldn't load cohoard ", err);
+   preview_area.innerHTML = "Something broke, we couldn't load Cohoard :(";
+   render_error_msg.innerText = String(err);
+}
 
-await init();
 cohoard = cohoard_module;
 
 after_cohoard_load();
