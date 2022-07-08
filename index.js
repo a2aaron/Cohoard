@@ -22,6 +22,39 @@ function load_config() {
    }
 }
 
+/**
+ * Attempt to parse an error message as a Tera error messages. Tera error messages are of the format
+ * "Variable `variable_name` not found while rendering 'template_name'"
+ * This function attempts to extract `variable_name` from the message.
+ * @param {string} err_msg the error message
+ * @returns {string?} the missing variable
+ */
+function parse_as_missing_variable(err_msg) {
+   const regexp = /Variable `([^`]*)` not found in context while rendering /;
+   const matches = err_msg.match(regexp);
+   if (matches == null) {
+      return null;
+   } else {
+      return matches[1];
+   }
+}
+
+/**
+ * Attempts to determine if a Tera variable name represents a missing field. These are generally of 
+ * the form "post.user.field_name", however, `post` could technically be any variable. This function
+ * attempts to exact `field_name` from the variable name.
+ * @param {string} tera_var_name 
+ * @returns {string?} the field name
+ */
+function parse_as_missing_field(tera_var_name) {
+   const arr = tera_var_name.split(".");
+   if (arr.length == 3 && arr[1] == "user") {
+      return arr[2];
+   } else {
+      return null;
+   }
+}
+
 // Render the chat log to the preview/HTML areas using the
 // currently selected template.
 export function render() {
@@ -42,10 +75,32 @@ export function render() {
       preview_area.innerHTML = rendered;
       html_area.value = rendered;
 
+      config_table.unmark_errs();
+
       render_error_msg.innerText = "";
    } catch (err) {
-      render_error_msg.innerText = String(err);
-      console.error(err);
+      let the_err = /** @type {Error} */ (err);
+      // @ts-ignore
+      console.error("Failed to render template", the_err);
+      // Try to parse the error message into something useful
+      let missing_var = parse_as_missing_variable(the_err.message);
+      if (missing_var) {
+         const field = parse_as_missing_field(missing_var);
+         if (field) {
+            // Try to highlight the missing field in the config table.
+            config_table.unmark_errs();
+            const is_key_in_table = config_table.mark_err(field);
+            if (is_key_in_table) {
+               render_error_msg.innerText = `Field "${field}" is missing from a row in the Config Table`;
+            } else {
+               render_error_msg.innerText = `Couldn't find a field named "${field}" (Maybe you need to add it to the Config Table?)`;
+            }
+         } else {
+            render_error_msg.innerText = `Invalid variable "${missing_var}"`;
+         }
+      } else {
+         render_error_msg.innerText = the_err.message;
+      }
    }
 }
 
@@ -151,6 +206,7 @@ try {
    preview_area.innerHTML = "Something broke, we couldn't load Cohoard :(";
    render_error_msg.innerText = String(err);
 }
+
 cohoard = cohoard_module;
 
 after_cohoard_load();
