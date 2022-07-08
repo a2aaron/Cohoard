@@ -4,7 +4,6 @@ choost.html
 choost.md
 
 src/
+wasm/
 readme-images/
 css-inline/
-measure_out/
-measure_size.sh
