@@ -1,4 +1,4 @@
-import * as cohoard from "https://static.witchoflight.com/~a2aaron/cohoard/0.2.0/cohoard.js";
+import * as cohoard from "https://static.witchoflight.com/~a2aaron/cohoard/0.3.0/cohoard.js";
 
 import { h, localStorageOrDefault, assert_html_node } from "./util.js";
 
