@@ -12,13 +12,25 @@ license = "MIT OR Apache-2.0"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-clap = { version = "3.2.8", features = ["derive"] }
-css-inline = "0.8.1"
+clap                = { version = "3.2.8", features = ["derive", "std"]       , default-features = false}
+css-inline          = { version = "0.8.1"                                     , default-features = false}
 # We use specifically version 0.8.1 of kuchiki because css-inline uses the same version. Hopefully
 # this means we won't need to compile two version of kuchiki + it's dependents into the crate.
-kuchiki = "0.8.1"
-pulldown-cmark = "0.9.1"
-serde = { version = "1.0.137", features = ["derive"] }
-serde_yaml = "0.8.24"
-tera = { version = "1.16.0", default-features = false }
-wasm-bindgen = { version = "0.2.74", features = ["serde-serialize"] }
+kuchiki             = { version = "0.8.1"                                     , default-features = false}
+pulldown-cmark      = { version = "0.9.1"                                     , default-features = false}
+serde               = { version = "1.0.137", features = ["derive"]            , default-features = false}
+serde_yaml          = { version = "0.8.24"                                    , default-features = false}
+tera                = { version = "1.16.0"                                    , default-features = false} # note: tera needs no default features or else it won't compile
+wasm-bindgen        = { version = "0.2.74", features = ["serde-serialize"]    , default-features = false}
+
+[profile.release]
+opt-level = "z"
+lto = "fat"
+codegen-units = 1
+# panic = "abort"
+# debug = true
+# split-debuginfo = "packed"
+# strip = "debuginfo"
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ['-Oz']
