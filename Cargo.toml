@@ -23,7 +23,7 @@ kuchiki             = { version = "0.8.1"                                     , 
 pulldown-cmark      = { version = "0.9.1"                                     , default-features = false}
 serde               = { version = "1.0.137", features = ["derive"]            , default-features = false}
 serde_yaml          = { version = "0.8.24"                                    , default-features = false}
-tera                = { version = "1.16.0"                                    , default-features = false} # note: tera needs no default features or else it won't compile
+tera                = { path = "tera"                                         , default-features = false} # note: tera needs no default features or else it won't compile
 
 [profile.release]
 lto = "fat"
