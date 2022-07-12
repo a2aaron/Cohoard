@@ -1,0 +1,1 @@
+NOCOLOR: I have no color!
