@@ -15,7 +15,8 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 clap                = { version = "3.2.8", features = ["derive", "std"]       , default-features = false}
-css-inline          = { path = "css-inline/css-inline"                        , default-features = false}
+# pinned to "minimal" branch, https://github.com/a2aaron/css-inline/commit/7e4fdd2812c90a743a22343bb310cb77d7349542
+css-inline          = { git = "https://github.com/a2aaron/css-inline", rev = "7e4fdd2812c90a743a22343bb310cb77d7349542", default-features = false}
 # We use specifically version 0.8.1 of kuchiki because css-inline uses the same version. Hopefully
 # this means we won't need to compile two version of kuchiki + it's dependents into the crate.
 kuchiki             = { version = "0.8.1"                                     , default-features = false}

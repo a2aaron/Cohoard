@@ -139,6 +139,7 @@ dependencies = [
 [[package]]
 name = "css-inline"
 version = "0.8.1"
+source = "git+https://github.com/a2aaron/css-inline?rev=7e4fdd2812c90a743a22343bb310cb77d7349542#7e4fdd2812c90a743a22343bb310cb77d7349542"
 dependencies = [
  "cssparser 0.29.6",
  "indexmap",
