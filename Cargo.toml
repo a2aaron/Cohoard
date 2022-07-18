@@ -23,7 +23,9 @@ kuchiki             = { version = "0.8.1"                                     , 
 pulldown-cmark      = { version = "0.9.1"                                     , default-features = false}
 serde               = { version = "1.0.137", features = ["derive"]            , default-features = false}
 serde_yaml          = { version = "0.8.24"                                    , default-features = false}
-tera                = { path = "tera"                                         , default-features = false} # note: tera needs no default features or else it won't compile
+# pinned to "render-errors" branch, https://github.com/a2aaron/tera/commit/fd4ef22159b428acf0aec4331c9c6103e2fd05b0
+# note: tera needs no default features or else it won't compile
+tera                = { git = "https://github.com/a2aaron/tera", rev = "fd4ef22159b428acf0aec4331c9c6103e2fd05b0"  , default-features = false}
 
 [profile.release]
 lto = "fat"

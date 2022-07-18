@@ -1005,6 +1005,7 @@ dependencies = [
 [[package]]
 name = "tera"
 version = "1.16.0"
+source = "git+https://github.com/a2aaron/tera?rev=fd4ef22159b428acf0aec4331c9c6103e2fd05b0#fd4ef22159b428acf0aec4331c9c6103e2fd05b0"
 dependencies = [
  "globwalk",
  "lazy_static",
