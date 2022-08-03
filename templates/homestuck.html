@@ -1,0 +1,75 @@
+<style>
+   .cohoard-underline { text-decoration: underline; }
+
+   .cohoard-code { 
+      font-family: monospace;
+      /* Avoid stripping white space */
+      white-space: pre-wrap;
+   }
+
+   .cohoard-codeblock {
+      font-family: monospace;
+      /* Avoid stripping white space */
+      white-space: pre-wrap;
+   }
+
+   #container {
+       /* Cohost adds padding around the post, which usually looks weird. This negative margin undoes
+       that padding. */
+       margin: -16px -12px;
+       background: #c6c6c6;
+    }
+    
+    #container-inner {
+        max-width: 650px;
+        padding: 16px;
+        margin: 0 auto;
+        background: #efefef;
+   }
+
+   #border {
+       border: 1px dashed gray;
+       padding: 1px;
+       margin: 15px;
+       min-height: 26px;
+       overflow: hidden;
+   }
+   summary {
+       font-size: 0;
+       height: 24px;
+       margin-bottom: -24px;
+       position: relative;
+   }
+   .center { text-align: center; }
+   #chat {
+       font-family: "courier-std", courier, monospace;
+       font-weight: bold;
+       padding: 15px;
+       font-size: 20px;
+   }
+   button { pointer-events: none; }
+   .full { width: 100%; background: #efefef; }
+   .on-top { position: relative; z-index: 1; pointer-events: none; }
+</style>
+
+<div id="container">
+<div id="container-inner">
+<div id="border">
+<details open>
+<summary class="center full"><button>Show Pesterlog</button></summary>
+<div class="center full on-top"><button>Hide Pesterlog</button></div>
+<div id="chat">
+
+{%- for postblock in posts -%}
+{%- for message in postblock.messages -%}
+<div class="message" style="color: {{ postblock.user.color | default(value="black") }}">
+{{ postblock.user.handle | default(value=postblock.user.key) }}: {{ message | markdown | trim | safe }}
+</div>
+{%- endfor -%}
+{%- endfor -%}
+
+</div>
+</details>
+</div>
+</div>
+</div>
