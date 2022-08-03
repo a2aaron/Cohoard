@@ -116,10 +116,7 @@ pub fn parse_posts(config: &Config, input: String) -> Vec<PostBlock> {
                     // as a multiline message.
                     // Note that multiline messages have slightly closer spacing
                     // compared to lines across different messages
-                    if maybe_next_name
-                        .chars()
-                        .all(|x| x.is_alphabetic() && x.is_uppercase())
-                    {
+                    if maybe_next_name.chars().all(|x| x.is_alphanumeric()) {
                         if maybe_next_name != name && !name.is_empty() {
                             try_post(&config, &mut posts, &name, timestamp.clone(), &mut messages);
                         }

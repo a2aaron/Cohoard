@@ -1,0 +1,62 @@
+<style>
+   .cohoard-underline { text-decoration: underline; }
+
+   .cohoard-code { 
+      font-family: monospace;
+      /* Avoid stripping white space */
+      white-space: pre-wrap;
+   }
+
+   .cohoard-codeblock {
+      font-family: monospace;
+      /* Avoid stripping white space */
+      white-space: pre-wrap;
+   }
+
+   #post-wrapper {
+      padding: 16px;
+      /* Cohost adds padding around the post, which usually looks weird. This negative margin undoes
+         that padding. */
+      margin: -16px -12px;
+      background: black;
+    }
+
+   .message-content {
+      white-space: break-spaces;
+      word-wrap: break-word;
+      margin: 25px auto;
+      width: 92%;
+      color: white;
+      font-family: Helvetica, Arial, sans-serif;
+      font-weight: normal;
+      line-height: 1.6;
+      font-size: 1.25em;
+      box-sizing: border-box;
+   }
+
+{%- for user in users -%}
+      .{{user.key}} {
+         color: {{ user.color | default(value = "white") }};
+         padding-left: {{ user.padding_left | default(value = "0") }};
+      }
+
+      {#- Span highlighting is used in 20020 -#}
+      .{{user.key}} span.highlight {
+         background-color: {{ user.background_color | default(value = "transparent") }};
+      }
+{%- endfor -%}
+</style>
+    
+<div id="post-wrapper">
+   
+
+{%- for postblock in posts -%}
+<div class="post-block">
+
+{%- for message in postblock.messages %}
+<p class="message-content {{ postblock.user.key }}"><span class="highlight">{{ message | markdown | trim | safe }}</span></p>
+
+{%- endfor -%}
+</div>
+{%- endfor -%}
+</div>
