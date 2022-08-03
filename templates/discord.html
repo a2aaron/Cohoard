@@ -116,6 +116,23 @@
       margin: 4px 0 8px 0;
       line-height: 22px;
    }
+
+{%- for user in users -%}
+   .{{user.key}}.headline-username {
+      color: {{ user.color | default(value="white") }};
+      font-size: 100%;
+   }
+
+   .{{user.key}}.avatar {
+      {% if user.avatar %}
+         background-image: url({{ user.avatar | safe }});
+      {% elif user.color %}
+         background: {{ user.color }};
+      {% else %}
+         background: #43b581;
+      {% endif %}
+   }
+{%- endfor -%}
 </style>
 
 {#- The div for the background and global font styling. -#}
@@ -131,19 +148,12 @@
 {#- The profile picture for the post. The user avatar URL can 
    point to local files, but this will break when uploading to
    Cohost.-#}
-<div class="avatar"
-     style="{% if post.user.avatar %}
-               background-image: url({{ post.user.avatar | safe }});
-            {% elif post.user.color %}
-               background: {{ post.user.color }};
-            {% else %}
-               background: #43b581;
-            {% endif %}"></div>
+<div class="{{post.user.key}} avatar"></div>
 
 <div class="message-wrapper">
 {#- Post headline. This is the username + timestamp. -#}
 <div class="headline">
-<span style="color: {{ post.user.color | default(value="white") }}; font-size: 100%;">{{ post.user.name }}</span>
+<span class="{{post.user.key}} headline-username">{{ post.user.name }}</span>
 <span class="timestamp">{{ post.timestamp | default (value = "") }}</span>
 </div>
 

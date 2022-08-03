@@ -116,10 +116,7 @@ pub fn parse_posts(config: &Config, input: String) -> Vec<PostBlock> {
                     // as a multiline message.
                     // Note that multiline messages have slightly closer spacing
                     // compared to lines across different messages
-                    if maybe_next_name
-                        .chars()
-                        .all(|x| x.is_alphabetic() && x.is_uppercase())
-                    {
+                    if maybe_next_name.chars().all(|x| x.is_alphanumeric()) {
                         if maybe_next_name != name && !name.is_empty() {
                             try_post(&config, &mut posts, &name, timestamp.clone(), &mut messages);
                         }
@@ -155,6 +152,7 @@ pub fn render(
     template_name: &str,
     template: &str,
     posts: &[PostBlock],
+    config: &Config,
 ) -> Result<String, Box<dyn Error>> {
     let mut tera = Tera::default();
     tera.add_raw_template(template_name, template)?;
@@ -162,6 +160,7 @@ pub fn render(
 
     let mut context = Context::new();
     context.insert("posts", &posts);
+    context.insert("users", &config.people.values().collect::<Vec<_>>());
 
     let html = tera.render(template_name, &context)?;
 
