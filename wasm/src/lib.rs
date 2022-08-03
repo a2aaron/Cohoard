@@ -31,9 +31,11 @@ pub fn render(
     template_name: &str,
     template: &str,
     posts: &PostBlockArray,
+    config: &Config,
 ) -> Result<String, JsError> {
     let posts = posts.0.into_serde::<Vec<_>>()?;
-    cohoard::render(template_name, template, &posts).map_err(|err| {
+    let config = config.0.into_serde()?;
+    cohoard::render(template_name, template, &posts, &config).map_err(|err| {
         // Try to parse out a Tera error message, if one was encountered during rendering.
         // TODO: provide more context?
         if let Some(tera_error) = err.source().and_then(|e| e.downcast_ref::<tera::Error>()) {
