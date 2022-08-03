@@ -35,15 +35,15 @@
    }
 
 {%- for user in users -%}
-      .{{user.key}} {
-         color: {{ user.color | default(value = "white") }};
-         padding-left: {{ user.padding_left | default(value = "0") }};
-      }
+   .{{user.key}} {
+      color: {{ user.color | default(value = "white") }};
+      padding-left: {{ user.padding_left | default(value = "0") }};
+   }
 
-      {#- Span highlighting is used in 20020 -#}
-      .{{user.key}} span.highlight {
-         background-color: {{ user.background_color | default(value = "transparent") }};
-      }
+   {#- Span highlighting is used in 20020 -#}
+   .{{user.key}} span.highlight {
+      background-color: {{ user.background_color | default(value = "transparent") }};
+   }
 {%- endfor -%}
 </style>
     
