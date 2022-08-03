@@ -10,7 +10,7 @@ let cohoard = null;
 /**
  * Load and set the current config 
  */
-function load_config() {
+export function load_config() {
    config_table.save_table();
    try {
       COHOARD_CONFIG = config_table.cohoard_config;
@@ -136,10 +136,6 @@ let render_error_msg = getTypedElementById(HTMLDivElement, "render-error-msg");
 
 script_textarea.addEventListener("input", render)
 
-config_div.addEventListener("input", () => {
-   load_config();
-   render();
-})
 
 preview_button.addEventListener("click", () => {
    preview_area.classList.remove("hidden");

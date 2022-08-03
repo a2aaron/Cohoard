@@ -1,5 +1,6 @@
 import * as cohoard from "https://static.witchoflight.com/~a2aaron/cohoard/0.3.1/cohoard.js";
 
+import { render, load_config } from "./index.js";
 import { h, localStorageOrDefault, assert_html_node } from "./util.js";
 
 /**
@@ -16,6 +17,14 @@ export class ConfigTable {
         this.element = element;
         this.table = make_table_node(columns, body);
         element.appendChild(this.table);
+
+        this.element.addEventListener("input", () => {
+            this.check_bottom_row();
+            this.check_right_column();
+
+            load_config();
+            render();
+        })
     }
 
     /**
@@ -96,6 +105,35 @@ export class ConfigTable {
             }
         }
     }
+
+    /**
+     * Check if the bottom-most row is non-empty. If it is, add a row.
+     * @returns {boolean} true if a row was added
+     */
+    check_bottom_row() {
+        console.assert(this.table.rows.length >= 2);
+        let last_row = this.table.rows[this.table.rows.length - 1];
+        for (let cell of last_row.cells) {
+            let input = into_input(cell);
+            if (input.value != "") {
+                let placeholders = get_columns(this.table);
+                // An array of empty strings
+                let init_values = Array.from({ length: placeholders.length }).map(el => "");
+                let row = make_row(init_values, placeholders);
+                this.table.appendChild(row)
+                return true;
+            }
+        }
+        return false;
+
+    }
+
+    /**
+     * Check if the right-most column is non-empty. If it is, add a column.
+     */
+    check_right_column() {
+        console.log("TODO");
+    }
 }
 
 /**
@@ -134,18 +172,31 @@ function make_table_node(cols, body) {
     table.appendChild(header_row);
 
     for (const row of body) {
-        let row_node = document.createElement("tr");
-        for (let i = 0; i < cols.length; i += 1) {
-            let init_value = "";
-            if (row[i] != undefined) {
-                init_value = row[i];
-            }
-            row_node.appendChild(body_cell(init_value, cols[i]));
-        }
-        table.appendChild(row_node);
+        table.appendChild(make_row(row, cols));
     }
 
     return table;
+}
+
+/**
+ * Creates an `HTMLTableRowElement` containing `init_values.length` `HTMLTableCellElements`, each of which contains a
+ * `HTMLInputElement`. 
+ * @param {Array<string>} init_values the initial values for each `HTMLInputElement`.
+ * @param {Array<string>} placeholders the placeholder strings for each `HTMLInputElement`
+ * @returns {HTMLTableRowElement}
+ */
+function make_row(init_values, placeholders) {
+    console.assert(init_values.length == placeholders.length);
+
+    let row_node = document.createElement("tr");
+    for (let i = 0; i < init_values.length; i += 1) {
+        let init_value = "";
+        if (init_values[i] != undefined) {
+            init_value = init_values[i];
+        }
+        row_node.appendChild(body_cell(init_value, placeholders[i]));
+    }
+    return row_node;
 }
 
 /**
@@ -269,4 +320,15 @@ function body_cell(value, placeholder) {
         h("input", { type: "text", placeholder, value, style: "color: inherit;" })
     );
     return /** @type {HTMLTableCellElement} */ (cell);
+}
+
+/**
+ * Returns the `HTMLInputElement` element contained within the `HTMLTableCellElement`. This function
+ * will throw if the `cell` does not contain an `HTMLInputElement`.
+ * @param {HTMLTableCellElement} cell - The cell to get the `HTMLInputElement`
+ * @returns {HTMLInputElement} - The `HTMLInputElement` element inside the `HTMLTableCellElement`
+ */
+function into_input(cell) {
+    assert_html_node(cell.firstChild, HTMLInputElement);
+    return cell.firstChild;
 }
