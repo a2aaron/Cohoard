@@ -87,15 +87,26 @@ EGGBUG: yeah! and now this message will appear in its own PostBlock</pre>
     </p>
     <h4>Discord Template</h4>
       <ul>
-        <li><strong>name</strong> - The username displayed in the headline. If not provided, defaults to the key</li>
-        <li><strong>color</strong> - The color of the username. This can be any CSS color value, for example "<code>red</code>" or "<code>#FF0000</code>" both work.</li>
-        <li><strong>avatar</strong> - A URL pointing to the avatar of the poster. If not provided, then the avatar will be blank.</li>
+        <li><strong><code>name</code></strong> - The username displayed in the headline. If not provided, defaults to the key</li>
+        <li><strong><code>color</code></strong> - The color of the username. This (and any other color field) can be any CSS color value, for example "<code>red</code>" or "<code>#FF0000</code>" both work.</li>
+        <li><strong><code>avatar</code></strong> - A URL pointing to the avatar of the poster. If not provided, then the avatar will be blank.</li>
       </ul>
     <h4>Twitter Template</h4>
       <ul>
-        <li><strong>name</strong> - The display name of the Tweeter</li>
-        <li><strong>handle</strong> - The handle of the Tweeter. The template automatically prepends the "@" symbol for you</li>
-        <li><strong>avatar</strong> - A URL pointing to the avatar of the poster. If not provided, then the avatar will be blank.</li>
+        <li><strong><code>name</code></strong> - The display name of the Tweeter</li>
+        <li><strong><code>handle</code></strong> - The handle of the Tweeter. The template automatically prepends the "@" symbol for you</li>
+        <li><strong><code>avatar</code></strong> - A URL pointing to the avatar of the poster. If not provided, then the avatar will be blank.</li>
+      </ul>
+    <h4>Pesterlog Template</h4>
+      <ul>
+        <li><strong><code>handle</code></strong> - The handle name of the user. If not provided, defaults to the key</li>
+        <li><strong><code>color</code></strong> - The color of the user. If not provided, defaults to black.</li>
+      </ul>
+    <h4>17776 Template</h4>
+      <ul>
+        <li><strong><code>color</code></strong> - The color of the text. If not provided, defaults to white.</li>
+        <li><strong><code>background_color</code></strong> - The background color of the user. If not provided, defaults to transparent. This is typically used by the satellite characters in 20020, with black colored text.</li>
+        <li><strong><code>padding_left</code></strong> - How far to indent the text. If not provided, defaults to zero. Typically, 17776 uses increments of <code>10%</code> for different characters.</li>
       </ul>
     <h3>The Preview Window</h3>
     <p>On the right side is the preview window. Any changes you make to the Script will automatically
