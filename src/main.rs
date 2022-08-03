@@ -43,6 +43,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         args.template.to_str().unwrap_or("template"),
         &template_contents,
         &posts,
+        &config,
     )?;
 
     if let Some(out_path) = args.out_file {

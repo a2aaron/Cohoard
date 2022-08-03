@@ -155,6 +155,7 @@ pub fn render(
     template_name: &str,
     template: &str,
     posts: &[PostBlock],
+    config: &Config,
 ) -> Result<String, Box<dyn Error>> {
     let mut tera = Tera::default();
     tera.add_raw_template(template_name, template)?;
@@ -162,6 +163,7 @@ pub fn render(
 
     let mut context = Context::new();
     context.insert("posts", &posts);
+    context.insert("users", &config.people.values().collect::<Vec<_>>());
 
     let html = tera.render(template_name, &context)?;
 
