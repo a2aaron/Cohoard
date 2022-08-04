@@ -137,45 +137,37 @@
 
 {#- The div for the background and global font styling. -#}
 <div id="post-wrapper">
+   {%- for post in posts -%}
+   {#- This first div ensures correct spacing and also ensures
+      the avatar appears next to the postblock body. -#}
+   <div class="post-block">
+      {#- The profile picture for the post. The user avatar URL can 
+         point to local files, but this will break when uploading to
+         Cohost.-#}
+      <div class="{{post.user.key}} avatar"></div>
+      <div class="message-wrapper">
+         {#- Post headline. This is the username + timestamp. -#}
+         <div class="headline">
+            <span class="{{post.user.key}} headline-username">{{ post.user.name }}</span>
+            <span class="timestamp">{{ post.timestamp | default (value = "") }}</span>
+         </div>
 
-{#- Begin the list of posts. -#}
-{%- for post in posts -%}
-
-{#- This first div ensures correct spacing and also ensures
-   the avatar appears next to the postblock body. -#}
-<div class="post-block" >
-
-{#- The profile picture for the post. The user avatar URL can 
-   point to local files, but this will break when uploading to
-   Cohost.-#}
-<div class="{{post.user.key}} avatar"></div>
-
-<div class="message-wrapper">
-{#- Post headline. This is the username + timestamp. -#}
-<div class="headline">
-<span class="{{post.user.key}} headline-username">{{ post.user.name }}</span>
-<span class="timestamp">{{ post.timestamp | default (value = "") }}</span>
-</div>
-
-{#- Message contents (multiple messages are collapsed into 
-   a single post body) -#}
-{%- for message in post.messages %}
-<p class="message-content">
-{#- "safe" keyword is required here, because messages will
-   sometimes contain newlines, which we add <br>s to. 
-   By default, Tera will escape these tags into literal 
-   text, but we don't want this (we want actual html tags
-   for the newline), so we need to tell Tera that this is
-   safe to not escape (even though, technically, it is not.
-   This also means that messages that contain literal text
-   of HTML tags will end up rendered as actual HTML tags.
-   If you want to type HTML tags (that aren't inside code
-   blocks), you can escape it with &lt;. -#}
-{{- message | markdown | trim | safe }}
-</p>
-
-{%- endfor -%} {#- end message contents for -#}
-</div>         {#- end message-wrapper div -#}
-</div>         {#- end post-block div i-#}
-{%- endfor -%} {#- end postblock for -#}
+         {#- Message Contents (multiple messages are collapsed into a single post body) -#}
+            
+         {#- "safe" keyword is required here, because messages will
+         sometimes contain newlines, which we add <br>s to. 
+         By default, Tera will escape these tags into literal 
+         text, but we don't want this (we want actual html tags
+         for the newline), so we need to tell Tera that this is
+         safe to not escape (even though, technically, it is not.
+         This also means that messages that contain literal text
+         of HTML tags will end up rendered as actual HTML tags.
+         If you want to type HTML tags (that aren't inside code
+         blocks), you can escape it with &lt;. -#}
+         {%- for message in post.messages %}
+         <p class="message-content">{{- message | markdown | trim | safe }}</p>
+         {%- endfor -%}
+      </div>         {#- end message-wrapper div -#}
+   </div>         {#- end post-block div i-#}
+   {%- endfor -%} {#- end postblock for -#}
 </div>         {#- end post-wrapper div -#}
