@@ -182,6 +182,7 @@ export class ConfigTable {
                 did_delete = true;
             }
         }
+        this.save_table();
         return did_delete;
     }
 }
