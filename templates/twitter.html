@@ -34,12 +34,12 @@
     /* Sidebar styling */
 
     #sidebar {
-        display: flex;
         grid-area: sidebar;
+        display: flex;
         flex-direction: column;
         align-items: center;
-        border-right: 1px solid #333;
         padding: 16px 0;
+        border-right: 1px solid #333;
     }
 
     .sidebar-icon {
@@ -51,13 +51,13 @@
 
     #new-post-circle {
         display: flex;
-        width: 52px;
-        height: 52px;
-        background-color: rgb(29, 155, 240);
         justify-content: center;
         align-items: center;
-        border-radius: 9999px;
+        width: 52px;
+        height: 52px;
         margin-top: auto;
+        background-color: rgb(29, 155, 240);
+        border-radius: 9999px;
         cursor: pointer;
     }
     
@@ -70,10 +70,10 @@
 
     #main {
         display: flex;
-        grid-area: tweets;
         flex-direction: column;
-        padding: 16px 0 0 0;
+        grid-area: tweets;
         max-height: 500px;
+        padding: 16px 0 0 0;
     }
 
     /* Latest tweets styling */
@@ -88,14 +88,14 @@
 
     #latest-tweets-text {
         margin: 0;
-        color: white;
         margin-top: -5px;
+        color: white;
     }
 
     #latest-tweets-icon {
         width: 24px;
-        cursor: pointer;
         margin: 0;
+        cursor: pointer;
     }
 
     /* Post editor styling */
@@ -108,9 +108,9 @@
     
     /* Timeline styling */
     #timeline {
+        position: relative;
         overflow-y: scroll;
         width: 100%;
-        position: relative;
     }
 
     /* "What's Happening" styling */
@@ -120,33 +120,33 @@
         grid-template-areas: 'avatar input' 'avatar post';
         grid-template-columns: 60px 1fr;
         grid-template-rows: 1fr 48px;
-        border-bottom: 1px solid #333;
         padding: 0 16px 8px 16px;
+        border-bottom: 1px solid #333;
     }
 
     #whats-happening-avatar-container {
-        display: flex;
         grid-area: avatar;
-        align-items: center;
+        display: flex;
         flex-direction: column;
+        align-items: center;
         justify-content: flex-start;
         margin-right: 12px;
     }
 
     #whats-happening-text-container {
-        display: flex;
         grid-area: input;
+        display: flex;
     }
 
     #whats-happening-text {
-        color: #72767B;
-        font-size: 20px;
         padding: 6px 12px;
+        font-size: 20px;
+        color: #72767B;
     }
 
     #post-editor-icons-container {
-        display: flex;
         grid-area: post;
+        display: flex;
         flex-direction: row;
         align-items: center;
         justify-content: flex-start;
@@ -154,23 +154,25 @@
     }
 
     #tweet-button {
-        cursor: pointer;
-        background-color: rgb(29, 155, 240);
-        border-radius: 9999px;
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 0 16px;
         height: 36px;
         margin-left: auto;
+        padding: 0 16px;
+        background-color: rgb(29, 155, 240);
+        border-radius: 9999px;
         font-weight: bold;
+        cursor: pointer;
     }
 
     /* Tweet styling */
     .tweet-container {
         display: flex;
         flex-direction: row;
+        align-items: flex-start;
         justify-content: flex-start;
+        width: 100%;
         padding: 16px;
         border-bottom: 1px solid #333;
     }
@@ -183,14 +185,21 @@
     }
 
     .tweet-text-container {
-        margin-left: 22px;
         display: flex;
         flex-direction: column;
         width: 100%;
+        margin-left: 22px;
     }
 
-    .headline-username { font-weight: bold; margin-right: 2px; }
-    .headline-handle { color: #72767B; cursor: pointer; }
+    .headline-username {
+        margin-right: 2px;
+        font-weight: bold;
+    }
+
+    .headline-handle {
+        color: #72767B;
+        cursor: pointer;
+    }
 
     .tweet-content { margin: 0; }
 
@@ -209,8 +218,8 @@
 
     .avatar-image {
         width: 48px;
-        border-radius: 9999px;
         margin: 0;
+        border-radius: 9999px;
     }
 </style>
 
