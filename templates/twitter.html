@@ -249,11 +249,11 @@
             </div>
             {%- for post in posts -%}
             <div class="tweet-container">
-                <img src="{{ post.user.avatar | safe }}" alt="user avatar" class="avatar-image"/>
+                <img src="{{ post.user.avatar | default(value="") | safe }}" alt="user avatar" class="avatar-image"/>
                 <div class="tweet-text-container">
                     <div>
                         <span class="headline-username">{{ post.user.name }}</span>
-                        <span class="headline-handle"><span>@</span>{{ post.user.handle }} · {{ post.timestamp | default(value="0s") }}</span>
+                        <span class="headline-handle">@{{ post.user.handle | default(value="") }} · {{ post.timestamp | default(value="0s") }}</span>
                     </div>
                     {%- for message in post.messages %}
                     <p class="tweet-content">
