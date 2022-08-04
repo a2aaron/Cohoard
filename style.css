@@ -42,7 +42,7 @@ main {
 }
 
 #config-wrapper {
-    overflow-x: scroll;
+    overflow-x: auto;
 }
 
 #preview-output {

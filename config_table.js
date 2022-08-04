@@ -154,7 +154,35 @@ export class ConfigTable {
      * @returns {boolean} true if a column or row was removed
      */
     remove_empty_rows_and_columns() {
-        return false;
+        let table_width = this.table.rows[0].cells.length;
+        let table_height = this.table.rows.length;
+
+        let did_delete = false;
+        for (let row_i = table_height - 1; row_i >= 0; row_i--) {
+            // Skip the first and last rows.
+            if (row_i == 0 || row_i == table_height - 1) {
+                continue;
+            }
+
+            if (is_row_empty(this.table, row_i)) {
+                this.table.deleteRow(row_i);
+                did_delete = true;
+            }
+        }
+
+        for (let col_i = table_width - 1; col_i >= 0; col_i--) {
+            if (col_i == 0 || col_i == table_width - 1) {
+                continue;
+            }
+
+            if (is_column_empty(this.table, col_i)) {
+                for (let row of this.table.rows) {
+                    row.deleteCell(col_i);
+                }
+                did_delete = true;
+            }
+        }
+        return did_delete;
     }
 }
 
