@@ -130,9 +130,33 @@ export class ConfigTable {
 
     /**
      * Check if the right-most column is non-empty. If it is, add a column.
+     * @returns {boolean} true if a row was added
      */
     check_right_column() {
-        console.log("TODO");
+        console.assert(this.table.rows.length > 0);
+        console.assert(this.table.rows[0].cells.length >= 2);
+        let last_col_i = this.table.rows[0].cells.length - 1;
+
+        let needs_insert = false;
+        for (let row_i = 0; row_i < this.table.rows.length; row_i++) {
+            let input = into_input(this.table.rows[row_i].cells[last_col_i]);
+            if (input.value != "") {
+                needs_insert = true;
+                break;
+            }
+        }
+
+        if (needs_insert) {
+            for (let row of this.table.rows) {
+                if (row.rowIndex == 0) {
+                    row.appendChild(column_cell(this.table, last_col_i + 1, ""));
+                } else {
+                    row.appendChild(body_cell("", ""));
+                }
+            }
+        }
+
+        return needs_insert;
     }
 }
 
@@ -160,11 +184,7 @@ function make_table_node(cols, body) {
             let cell = h("th", {}, "key");
             header_row.appendChild(cell);
         } else {
-            let textarea = /** @type { HTMLInputElement } */ (h("input", { type: "text", placeholder: "key name", value: col }));
-            // Update the placeholder text whenever the header cell is edited.
-            let cell = h("th", {}, textarea);
-            cell.addEventListener("input", () => update_placeholders(table, i, textarea.value));
-            header_row.appendChild(cell);
+            header_row.appendChild(column_cell(table, i, col));
         }
 
     }
@@ -308,6 +328,26 @@ function get_columns(table) {
     return cols;
 }
 
+/**
+ * Return a column cell for the table. The column cell has an event handler which updates the placeholder
+ * text of the body cells when the cell is edited.
+ * @param {HTMLTableElement} table - The table which placeholder values are updated when editing.
+ * @param {number} col_i - The column index of the new column cell. Used for the event listener.
+ * @param {string} value - The initial value of the column cell's text input.
+ * @returns {HTMLTableCellElement} - The table cell containing the text input.
+ */
+function column_cell(table, col_i, value) {
+    let input = h("input", { type: "text", placeholder: "key name", value: value });
+    let cell = h("th", {}, input);
+    assert_html_node(cell, HTMLTableCellElement);
+
+    // Update the placeholder text whenever the header cell is edited.
+    cell.addEventListener("input", () => {
+        assert_html_node(input, HTMLInputElement);
+        update_placeholders(table, col_i, input.value)
+    });
+    return cell;
+}
 
 /**
  * Return a body cell for the table.
