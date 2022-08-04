@@ -177,13 +177,6 @@
         border-bottom: 1px solid #333;
     }
 
-    .tweet-container2 {
-        display: flex;
-        flex-direction: row;
-        align-items: flex-start;
-        width: 100%;
-    }
-
     .tweet-text-container {
         display: flex;
         flex-direction: column;
@@ -256,24 +249,22 @@
             </div>
             {%- for post in posts -%}
             <div class="tweet-container">
-                <div class="tweet-container2">
-                    <img src="{{ post.user.avatar | safe }}" alt="user avatar" class="avatar-image"/>
-                    <div class="tweet-text-container">
-                        <div>
-                            <span class="headline-username">{{ post.user.name }}</span>
-                            <span class="headline-handle"><span>@</span>{{ post.user.handle }} · {{ post.timestamp | default(value="0s") }}</span>
-                        </div>
-                        {%- for message in post.messages %}
-                        <p class="tweet-content">
-                           {{- message | markdown | trim | safe -}}
-                        </p>
-                        {%- endfor -%}
-                        <div class="reply-icons-container">
-                            <img src="{{reply_chat}}" alt="reply" class="reply-icon" />
-                            <img src="{{reply_like}}" alt="like" class="reply-icon" />
-                            <img src="{{reply_rt}}" alt="retweet" class="reply-icon" />
-                            <img src="{{reply_share}}" alt="share" class="reply-icon" />
-                        </div>
+                <img src="{{ post.user.avatar | safe }}" alt="user avatar" class="avatar-image"/>
+                <div class="tweet-text-container">
+                    <div>
+                        <span class="headline-username">{{ post.user.name }}</span>
+                        <span class="headline-handle"><span>@</span>{{ post.user.handle }} · {{ post.timestamp | default(value="0s") }}</span>
+                    </div>
+                    {%- for message in post.messages %}
+                    <p class="tweet-content">
+                        {{- message | markdown | trim | safe -}}
+                    </p>
+                    {%- endfor -%}
+                    <div class="reply-icons-container">
+                        <img src="{{reply_chat}}" alt="reply" class="reply-icon" />
+                        <img src="{{reply_like}}" alt="like" class="reply-icon" />
+                        <img src="{{reply_rt}}" alt="retweet" class="reply-icon" />
+                        <img src="{{reply_share}}" alt="share" class="reply-icon" />
                     </div>
                 </div>
             </div>
