@@ -112,19 +112,18 @@ export class ConfigTable {
      */
     check_bottom_row() {
         console.assert(this.table.rows.length >= 2);
-        let last_row = this.table.rows[this.table.rows.length - 1];
-        for (let cell of last_row.cells) {
-            let input = into_input(cell);
-            if (input.value != "") {
-                let placeholders = get_columns(this.table);
-                // An array of empty strings
-                let init_values = Array.from({ length: placeholders.length }).map(el => "");
-                let row = make_row(init_values, placeholders);
-                this.table.appendChild(row)
-                return true;
-            }
+        let last_row = this.table.rows.length - 1;
+
+        if (!is_row_empty(this.table, last_row)) {
+            let placeholders = get_columns(this.table);
+            // An array of empty strings
+            let init_values = Array.from({ length: placeholders.length }).map(el => "");
+            let row = make_row(init_values, placeholders);
+            this.table.appendChild(row)
+            return true;
+        } else {
+            return false;
         }
-        return false;
 
     }
 
@@ -133,20 +132,8 @@ export class ConfigTable {
      * @returns {boolean} true if a row was added
      */
     check_right_column() {
-        console.assert(this.table.rows.length > 0);
-        console.assert(this.table.rows[0].cells.length >= 2);
         let last_col_i = this.table.rows[0].cells.length - 1;
-
-        let needs_insert = false;
-        for (let row_i = 0; row_i < this.table.rows.length; row_i++) {
-            let input = into_input(this.table.rows[row_i].cells[last_col_i]);
-            if (input.value != "") {
-                needs_insert = true;
-                break;
-            }
-        }
-
-        if (needs_insert) {
+        if (!is_column_empty(this.table, last_col_i)) {
             for (let row of this.table.rows) {
                 if (row.rowIndex == 0) {
                     row.appendChild(column_cell(this.table, last_col_i + 1, ""));
@@ -154,9 +141,20 @@ export class ConfigTable {
                     row.appendChild(body_cell("", ""));
                 }
             }
+            return true;
+        } else {
+            return false;
         }
+    }
 
-        return needs_insert;
+    /**
+     * Removes fully empty rows or columns. Will always leave at least two rows and two columns however.
+     * (The "key" column cannot be removed, nor can the row containing the keys. Additionally, at
+     * least one blank row and column will also always be kept.)
+     * @returns {boolean} true if a column or row was removed
+     */
+    remove_empty_rows_and_columns() {
+        return false;
     }
 }
 
@@ -326,6 +324,55 @@ function get_columns(table) {
         }
     }
     return cols;
+}
+
+
+/**
+ * Check if a particular row of a table is empty.
+ * @param {HTMLTableElement} table The table to check
+ * @param {number} row_i The index of the row to check
+ * @returns {boolean} true if the row's `HTMLInputElement`s are all the empty string.
+ * Note that the zeroth row is always non-empty (since it contains the unmodifiable "key" field)
+ */
+function is_row_empty(table, row_i) {
+    console.assert(row_i >= 0);
+    if (row_i == 0) {
+        return false;
+    }
+
+    console.assert(row_i < table.rows.length);
+    let row = table.rows[row_i];
+    for (let cell of row.cells) {
+        let input = into_input(cell);
+        if (input.value != "") {
+            return false;
+        }
+    }
+    return true;
+}
+
+/**
+ * Check if a particular column of a table is empty.
+ * @param {HTMLTableElement} table The table to check
+ * @param {number} column_i The index of the column to check
+ * @returns {boolean} true if the column's `HTMLInputElement`s are all the empty string.
+ * Note that the zeroth column is always non-empty (since it contains the unmodifiable "key" field)
+ */
+function is_column_empty(table, column_i) {
+    console.assert(column_i >= 0);
+    if (column_i == 0) {
+        return false;
+    }
+
+    for (let row_i = 0; row_i < table.rows.length; row_i++) {
+        console.assert(column_i < table.rows[row_i].cells.length);
+
+        let input = into_input(table.rows[row_i].cells[column_i]);
+        if (input.value != "") {
+            return false;
+        }
+    }
+    return true;
 }
 
 /**

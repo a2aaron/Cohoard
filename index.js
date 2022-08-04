@@ -115,6 +115,7 @@ let script_textarea = getTypedElementById(HTMLTextAreaElement, "script");
 
 let config_div = getTypedElementById(HTMLDivElement, "config-wrapper");
 let config_table = ConfigTable.mount(config_div, ["key", "name", "color", "avatar", "handle"], 10);
+let cleanup_button = getTypedElementById(HTMLButtonElement, "cleanup-btn")
 
 let preview_area = getTypedElementById(HTMLDivElement, "preview-output");
 let html_area = getTypedElementById(HTMLTextAreaElement, "html-output");
@@ -136,6 +137,9 @@ let render_error_msg = getTypedElementById(HTMLDivElement, "render-error-msg");
 
 script_textarea.addEventListener("input", render)
 
+cleanup_button.addEventListener("click", () => {
+   config_table.remove_empty_rows_and_columns();
+})
 
 preview_button.addEventListener("click", () => {
    preview_area.classList.remove("hidden");
