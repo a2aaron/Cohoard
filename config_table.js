@@ -248,12 +248,13 @@ function make_row(init_values, placeholders) {
 /**
  * Update the placeholder text of the cells in a specified column.
  * @param {HTMLTableElement} table The table to update the placeholders in
- * @param {number} col_i The index of column to update. If this is 0, then nothing happens.
+ * @param {HTMLTableCellElement} header_cell The header cell of the column to update.
+ * If this cell is in the first column, then nothing happens.
  * @param {string} new_placeholder The new placeholder text to use
  */
-function update_placeholders(table, col_i, new_placeholder) {
+function update_placeholders(table, header_cell, new_placeholder) {
     // The first col is always the "key" column, so we can ignore it.
-    if (col_i == 0) {
+    if (header_cell.cellIndex == 0) {
         return;
     }
 
@@ -262,7 +263,7 @@ function update_placeholders(table, col_i, new_placeholder) {
         if (row.rowIndex == 0) {
             continue;
         }
-        let cell = row.cells[col_i];
+        let cell = row.cells[header_cell.cellIndex];
         assert_html_node(cell.firstChild, HTMLInputElement);
         cell.firstChild.placeholder = new_placeholder;
     }
@@ -413,15 +414,16 @@ function is_column_empty(table, column_i) {
  */
 function column_cell(table, col_i, value) {
     let input = h("input", { type: "text", placeholder: "key name", value: value });
-    let cell = h("th", {}, input);
-    assert_html_node(cell, HTMLTableCellElement);
+    let header_cell = h("th", {}, input);
+    assert_html_node(header_cell, HTMLTableCellElement);
 
     // Update the placeholder text whenever the header cell is edited.
-    cell.addEventListener("input", () => {
+    header_cell.addEventListener("input", () => {
+        assert_html_node(header_cell, HTMLTableCellElement);
         assert_html_node(input, HTMLInputElement);
-        update_placeholders(table, col_i, input.value)
+        update_placeholders(table, header_cell, input.value)
     });
-    return cell;
+    return header_cell;
 }
 
 /**
