@@ -111,6 +111,8 @@
       line-height: 22px;
    }
 
+   a { color: rgb(0, 175, 244); }
+
 {%- for user in users -%}
    .{{user.key}}.headline-username {
       color: {{ user.color | default(value="white") }};
