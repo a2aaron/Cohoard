@@ -2,7 +2,7 @@ import init, * as cohoard_module from "https://static.witchoflight.com/~a2aaron/
 
 import { ConfigTable } from "./config_table.js"
 import { TemplateControls, DISCORD_BUILTIN } from "./template_controls.js";
-import { getTypedElementById } from "./util.js";
+import { getTypedElementById, localStorageOrDefault } from "./util.js";
 
 /** @type {typeof cohoard_module?} */
 let cohoard = null;
@@ -135,29 +135,32 @@ let render_error_msg = getTypedElementById(HTMLDivElement, "render-error-msg");
 
 // Set up event listeners.
 
-script_textarea.addEventListener("input", render)
+script_textarea.addEventListener("input", () => {
+   localStorage.setItem("script", script_textarea.value);
+   render();
+});
 
 cleanup_button.addEventListener("click", () => {
    config_table.remove_empty_rows_and_columns();
-})
+});
 
 preview_button.addEventListener("click", () => {
    preview_area.classList.remove("hidden");
    html_area.classList.add("hidden");
    template_area.classList.add("hidden");
-})
+});
 
 html_button.addEventListener("click", () => {
    preview_area.classList.add("hidden");
    html_area.classList.remove("hidden");
    template_area.classList.add("hidden");
-})
+});
 
 edit_template_button.addEventListener("click", () => {
    preview_area.classList.add("hidden");
    html_area.classList.add("hidden");
    template_area.classList.remove("hidden");
-})
+});
 
 // Render the examples in the quick start guide
 function render_examples() {
@@ -194,12 +197,13 @@ function render_examples() {
    discord_example_div.firstChild.style.margin = "auto";
 }
 
-function after_cohoard_load() {
-   load_config();
-   render();
-   render_examples()
+let saved_script = localStorage.getItem("script");
+if (saved_script != null) {
+   script_textarea.value = saved_script;
 }
 
+
+// Load cohoard library.
 try {
    await init();
 } catch (err) {
@@ -209,5 +213,11 @@ try {
 }
 
 cohoard = cohoard_module;
+
+function after_cohoard_load() {
+   load_config();
+   render();
+   render_examples()
+}
 
 after_cohoard_load();
