@@ -161,7 +161,7 @@
          If you want to type HTML tags (that aren't inside code
          blocks), you can escape it with &lt;. -#}
          {%- for message in post.messages %}
-         <p class="message-content">{{- message | markdown | trim | safe }}</p>
+<p class="message-content">{{- message | markdown | trim | safe }}</p>
          {%- endfor -%}
       </div>         {#- end message-wrapper div -#}
    </div>         {#- end post-block div i-#}

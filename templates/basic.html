@@ -83,30 +83,27 @@
        other information that can be used to style the post. Note that try to access 
        a key that does not exist will result in errors. -#}
 
-    <h2>{% if postblock.user.key -%}
-          {{- postblock.user.key -}}
-       {%- else -%}
-          [key missing]
-       {%- endif -%}</h2>
+<h2>{% if postblock.user.key -%}
+      {{- postblock.user.key -}}
+   {%- else -%}
+      [key missing]
+   {%- endif -%}</h2>
 
     {%- for message in postblock.messages %}
-
-    <p class="message-content">
-
+    
     {#- Here, we finally render our message, first passing it through some filters. 
-        The first filter converts Markdown into the HTML tags listed above. This can 
-        be removed if you do not want text to be treated as Markdown, but note that 
-        Cohost does still attempt to style text containing Markdown, which could mess 
-        up formatting.
+      The first filter converts Markdown into the HTML tags listed above. This can 
+      be removed if you do not want text to be treated as Markdown, but note that 
+      Cohost does still attempt to style text containing Markdown, which could mess 
+      up formatting.
+      
+      The trim filter will remove trailing and leading whitespace in the message.
+      
+      Finally, the safe filter allows you to insert HTML tags directly into text. 
+      Without it, Tera will escape HTML tags in the script using &lt; and &gt; 
+      (This would also make it impossible to use <u> tags in the script). -#}
+<p class="message-content">{{ message | markdown | trim | safe }}</p>
 
-        The trim filter will remove trailing and leading whitespace in the message.
-
-        Finally, the safe filter allows you to insert HTML tags directly into text. 
-        Without it, Tera will escape HTML tags in the script using &lt; and &gt; 
-        (This would also make it impossible to use <u> tags in the script). -#}
-
-        {{ message | markdown | trim | safe }}
-    </p>
     {%- endfor -%}
  </div>
  {%- endfor -%}

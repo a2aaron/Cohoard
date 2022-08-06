@@ -272,10 +272,8 @@
                             {%- endif -%}
                         </span>
                     </div>
-                    {%- for message in post.messages %}
-                    <p class="tweet-content">
-                        {{- message | markdown | trim | safe -}}
-                    </p>
+                    {%- for message in post.messages -%}
+<p class="tweet-content">{{- message | markdown | trim | safe -}}</p>
                     {%- endfor -%}
                     <div class="reply-icons-container">
                         <img src="{{reply_chat}}" alt="reply" class="reply-icon" />
