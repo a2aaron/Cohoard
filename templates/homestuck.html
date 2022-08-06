@@ -40,14 +40,30 @@
        margin-bottom: -24px;
        position: relative;
    }
-   .center { text-align: center; }
+   .center { 
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        text-align: center;
+   }
    #chat {
        font-family: "courier-std", courier, monospace;
        font-weight: bold;
        padding: 15px;
        font-size: 20px;
    }
-   button { pointer-events: none; }
+   .button {
+        width: fit-content;
+        height: 22px;
+        padding: 1px 4px;
+        border: 1px solid rgb(143, 143, 156);
+        border-radius: 4px;
+        background-color: rgb(233, 233, 237);
+        font-family: -apple-system, sans-serif;
+        font-size: 13.3333px;
+        user-select: none;
+        pointer-events: none;
+    }
    .full { width: 100%; background: #efefef; }
    .on-top { position: relative; z-index: 1; pointer-events: none; }
 </style>
@@ -56,8 +72,8 @@
 <div id="container-inner">
 <div id="border">
 <details open>
-<summary class="center full"><button>Show Pesterlog</button></summary>
-<div class="center full on-top"><button>Hide Pesterlog</button></div>
+<summary class="center full"><div class="button">Show Pesterlog</div></summary>
+<div class="center full on-top"><div class="button">Hide Pesterlog</div></div>
 <div id="chat">
 
 {%- for postblock in posts -%}
