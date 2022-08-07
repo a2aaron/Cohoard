@@ -1,0 +1,25 @@
+name: Rust
+
+on:
+  workflow_dispatch:
+    inputs:
+      versionName:
+        description: 'The version of the WASM binary. This determines the name of the folder that will be uploaded to.'
+        required: true
+        type: string
+        
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  wasm-pack:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - run: cd wasm
+    - run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+    - run: wasm-pack build --target web --release
+    - run: wasm-pack pack
+    - run: cd pkg
+    - run: ls
