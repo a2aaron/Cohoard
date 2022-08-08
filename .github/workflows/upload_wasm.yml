@@ -22,7 +22,6 @@ jobs:
       - name: Build and Pack
         run: |
           wasm-pack build --target web --release
-          wasm-pack pack
       - name: Pre-Publish
         run: |
           cd pkg && pwd
@@ -31,7 +30,7 @@ jobs:
       - uses: BetaHuhn/do-spaces-action@v2
         with:
           access_key: ${{ secrets.DIGITAL_OCEAN_ACCESS_KEY }}
-          secret_key: ${{ secrets.DIGITAL_OCEAN_SECRET_KEY }}
+          secret_key: ${{ secrets.DIGITAL_OCEAN_ACCESS_SECRET }}
           space_name: ${{ secrets.DIGITAL_OCEAN_SPACE_NAME }}
           space_region: ${{ secrets.DIGITAL_OCEAN_SPACE_REGION }}
           source: ./wasm/pkg
