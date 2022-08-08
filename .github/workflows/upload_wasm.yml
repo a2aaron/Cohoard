@@ -1,12 +1,6 @@
 name: Publish New Cohoard Version
 
-on:
-  workflow_dispatch:
-    inputs:
-      versionName:
-        description: 'The version of the WASM binary. This determines the name of the folder that will be uploaded to.'
-        required: true
-        type: string
+on: [workflow_dispatch]
 
 env:
   CARGO_TERM_COLOR: always
@@ -29,11 +23,18 @@ jobs:
       run: |
            wasm-pack build --target web --release
            wasm-pack pack
-    - name: Publish
-      run: |
-           cd pkg
-           mkdir ${{ inputs.versionName }}
-           mv cohoard.js ${{ inputs.versionName }}
-           mv cohoard_bg.wasm ${{ inputs.versionName }}
-           cd ${{ inputs.versionName }} && pwd && ls
-           echo "Publishing cohoard.js and cohoard_bg.wasm..."
+      - name: Pre-Publish
+        steps: |
+               cd pkg && pwd
+               ls
+               echo "Publishing cohoard package to ~a2aaron/cohoard/"
+      - uses: BetaHuhn/do-spaces-action@v2
+        with:
+          access_key: ${{ secrets.DIGITAL_OCEAN_ACCESS_KEY }}
+          secret_key: ${{ secrets.DIGITAL_OCEAN_SECRET_KEY }}
+          space_name: ${{ secrets.DIGITAL_OCEAN_SPACE_NAME }}
+          space_region: ${{ secrets.DIGITAL_OCEAN_SPACE_REGION }}
+          source: ./wasm/pkg
+          out_dir: ~a2aaron/cohoard
+          versioning: true
+  
