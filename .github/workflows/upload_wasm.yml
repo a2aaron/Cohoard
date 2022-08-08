@@ -18,7 +18,10 @@ jobs:
            rustup default nightly
            curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
     - name: Print Info
-      run: pwd && ls && rustup show
+      run: |
+           pwd
+           ls
+           rustup show
     - name: Build and Pack
       run: |
            wasm-pack build --target web --release
