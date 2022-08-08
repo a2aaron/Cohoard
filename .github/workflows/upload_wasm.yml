@@ -12,25 +12,22 @@ jobs:
       run:
         working-directory: ./wasm
     steps:
-    - uses: actions/checkout@v3
-    - name: Download and Set Up
-      run: |
-           rustup default nightly
-           curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-    - name: Print Info
-      run: |
-           pwd
-           ls
-           rustup show
-    - name: Build and Pack
-      run: |
-           wasm-pack build --target web --release
-           wasm-pack pack
+      - uses: actions/checkout@v3
+      - name: Download and Set Up
+        run: |
+          rustup default nightly
+          curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+      - name: Print Info
+        run: pwd && ls && rustup show
+      - name: Build and Pack
+        run: |
+          wasm-pack build --target web --release
+          wasm-pack pack
       - name: Pre-Publish
-        steps: |
-               cd pkg && pwd
-               ls
-               echo "Publishing cohoard package to ~a2aaron/cohoard/"
+        run: |
+          cd pkg && pwd
+          ls
+          echo "Publishing cohoard package to ~a2aaron/cohoard/"
       - uses: BetaHuhn/do-spaces-action@v2
         with:
           access_key: ${{ secrets.DIGITAL_OCEAN_ACCESS_KEY }}
@@ -40,4 +37,3 @@ jobs:
           source: ./wasm/pkg
           out_dir: ~a2aaron/cohoard
           versioning: true
-  
