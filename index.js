@@ -8,21 +8,6 @@ import { getTypedElementById, localStorageOrDefault } from "./util.js";
 let cohoard = null;
 
 /**
- * Load and set the current config 
- */
-export function load_config() {
-   config_table.save_table();
-   try {
-      COHOARD_CONFIG = config_table.cohoard_config;
-      config_error_msg.innerText = "";
-   } catch (err) {
-      // @ts-ignore
-      config_error_msg.innerText = err;
-      console.error(err);
-   }
-}
-
-/**
  * Attempt to parse an error message as a Tera error messages. Tera error messages are of the format
  * "Variable `variable_name` not found while rendering 'template_name'"
  * This function attempts to extract `variable_name` from the message.
@@ -63,26 +48,21 @@ export function render() {
       return;
    }
 
-   if (COHOARD_CONFIG == null) {
-      console.info("Can't render - Cohoard config is null");
-      return;
-   }
-   console.info("rendering...");
-   let posts = cohoard.parse_posts(COHOARD_CONFIG, script_textarea.value);
-
    try {
-      let rendered = cohoard.render("template", template_area.value, posts, COHOARD_CONFIG);
+      console.info("rendering...");
+      let cohoard_config = config_table.cohoard_config;
+      let posts = cohoard.parse_posts(cohoard_config, script_textarea.value);
+      let rendered = cohoard.render("template", template_area.value, posts, cohoard_config);
       preview_area.innerHTML = rendered;
       html_area.value = rendered;
 
       config_table.unmark_errs();
 
-      render_error_msg.innerText = "";
+      error_msg.innerText = "";
    } catch (err) {
       let the_err = /** @type {Error} */ (err);
       // @ts-ignore
-      console.error("Failed to render template", the_err.message);
-      console.error(the_err);
+      console.error("Failed to render template\n", the_err);
       // Try to parse the error message into something useful
       let missing_var = parse_as_missing_variable(the_err.message);
       if (missing_var) {
@@ -92,15 +72,15 @@ export function render() {
             config_table.unmark_errs();
             const is_key_in_table = config_table.mark_err(field);
             if (is_key_in_table) {
-               render_error_msg.innerText = `Field "${field}" is missing from a row in the Config Table`;
+               error_msg.innerText = `Field "${field}" is missing from a row in the Config Table`;
             } else {
-               render_error_msg.innerText = `Couldn't find a field named "${field}" (Maybe you need to add it to the Config Table?)`;
+               error_msg.innerText = `Couldn't find a field named "${field}" (Maybe you need to add it to the Config Table?)`;
             }
          } else {
-            render_error_msg.innerText = `Invalid variable "${missing_var}"`;
+            error_msg.innerText = `Invalid variable "${missing_var}"`;
          }
       } else {
-         render_error_msg.innerText = the_err.message;
+         error_msg.innerText = the_err.message;
       }
    }
 }
@@ -132,8 +112,7 @@ let template_controls = await TemplateControls.mount(template_dropdown, template
 let preview_button = getTypedElementById(HTMLButtonElement, "preview-btn");
 let html_button = getTypedElementById(HTMLButtonElement, "html-btn");
 
-let config_error_msg = getTypedElementById(HTMLDivElement, "config-error-msg");
-let render_error_msg = getTypedElementById(HTMLDivElement, "render-error-msg");
+let error_msg = getTypedElementById(HTMLPreElement, "error-msg");
 
 // Set up event listeners.
 
@@ -190,7 +169,6 @@ add_person_dropdown.addEventListener("input", () => {
    }
 
    add_person_dropdown.value = "add-row";
-   load_config();
    render();
 })
 
@@ -241,13 +219,12 @@ try {
 } catch (err) {
    console.error("oh god oh fuck we couldn't load cohoard ", err);
    preview_area.innerHTML = "Something broke, we couldn't load Cohoard :(";
-   render_error_msg.innerText = String(err);
+   error_msg.innerText = String(err);
 }
 
 cohoard = cohoard_module;
 
 function after_cohoard_load() {
-   load_config();
    render();
    render_examples()
 }

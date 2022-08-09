@@ -1,6 +1,6 @@
 import * as cohoard from "https://static.witchoflight.com/~a2aaron/cohoard/v0.4.0/cohoard.js";
 
-import { render, load_config } from "./index.js";
+import { render } from "./index.js";
 import { h, localStorageOrDefault, assert_html_node } from "./util.js";
 
 /**
@@ -22,7 +22,6 @@ export class ConfigTable {
             this.check_bottom_row();
             this.check_right_column();
 
-            load_config();
             render();
         })
     }
