@@ -3,6 +3,7 @@ import init, * as cohoard_module from "https://static.witchoflight.com/~a2aaron/
 import { ConfigTable } from "./config_table.js"
 import { TemplateControls, DISCORD_BUILTIN } from "./template_controls.js";
 import { getTypedElementById, localStorageOrDefault } from "./util.js";
+import { PRESETS } from "./presets.js"
 
 /** @type {typeof cohoard_module?} */
 let cohoard = null;
@@ -144,24 +145,19 @@ edit_template_button.addEventListener("click", () => {
 });
 
 add_person_dropdown.addEventListener("input", () => {
-   let presets = /** @type {{[key: string]: object}} */ ({
-      "cohost-eggbug": {
-         key: "EGGBUG",
-         name: "egg bug!",
-         color: "#83254f",
-         avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/eggbug.png",
-         handle: "eggbug"
-      },
-      "cohost-bugegg": {
-         key: "BUGEGG",
-         name: "bug egg >:3",
-         color: "#258359",
-         avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/bugegg.png",
-         handle: "bugegg"
-      },
-   });
    let preset_name = add_person_dropdown.value;
-   let preset = presets[preset_name];
+
+   let preset;
+   if (preset_name == "cohost-random") {
+      let random_int = Math.floor(Math.random() * 1000000);
+      preset = {
+         key: "CHOSTER",
+         name: "Choster",
+         avatar: `https://cohost.org/rc/default-avatar/${random_int}.png`,
+      };
+   } else {
+      preset = PRESETS[preset_name];
+   }
    if (preset) {
       config_table.append_row(preset);
    } else {
@@ -183,18 +179,7 @@ function render_examples() {
    let discord_example_div = getTypedElementById(HTMLDivElement, "discord-example-render");
 
    let config_json = JSON.stringify({
-      people: [{
-         key: "EGGBUG",
-         name: "egg bug!",
-         color: "#83254f",
-         avatar: "https://i.imgur.com/BBaogem.png"
-      },
-      {
-         key: "BUGEGG",
-         name: "bug egg!",
-         color: "#258359",
-         avatar: "https://i.imgur.com/BAFNmyY.png",
-      }]
+      people: [PRESETS["cohost-eggbug"], PRESETS["cohost-bugegg"]]
    });
 
    let cohoard_config = cohoard.load_config(config_json);
