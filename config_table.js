@@ -107,6 +107,54 @@ export class ConfigTable {
     }
 
     /**
+     * Appends a row to the table, leaving a blank row at the end. The row's values will consist of
+     * the init_value's keys
+     * @param {object} init_values the initial values of the row. This is a dictionary. The keys of 
+     * the dictionary correspond to column keys, and the values of the dictionary correspond to the 
+     * initial value the cell corresponding to the column key will have. If the Config table contains
+     * a column key that the `init_values` dictionary does not have, the corresponding cell will be
+     * blank. If `init_values` contains a column key that the Config table does not have, a new column
+     * will be appended to the table containing the key, and the other rows in the table will have empty
+     * initial values.
+     */
+    append_row(init_values) {
+        let columns = get_columns(this.table);
+        let blanks = Array.from({ length: columns.length }).map(el => "");
+        let row = make_row(blanks, columns);
+        let last_row = this.table.lastChild;
+        this.table.insertBefore(row, last_row);
+        for (const [col_key, init_value] of Object.entries(init_values)) {
+            let col_index = columns.indexOf(col_key);
+            let input;
+            if (col_index == -1) {
+                this.append_blank_column(col_key);
+                input = into_input(row.cells[row.cells.length - 2]);
+            } else {
+                input = into_input(row.cells[col_index]);
+            }
+            input.value = init_value;
+        }
+    }
+
+    /**
+     * Appends a blank column to the table, ensuring there is a blank column at the end.
+     * @param {string} column_key The value of the column key
+     */
+    append_blank_column(column_key) {
+        let last_col_i = this.table.rows[0].cells.length - 1;
+        for (let row of this.table.rows) {
+            let cell;
+            if (row.rowIndex == 0) {
+                cell = column_cell(this.table, last_col_i + 1, column_key);
+            } else {
+                cell = body_cell("", "");
+            }
+
+            row.insertBefore(cell, row.lastChild);
+        }
+    }
+
+    /**
      * Check if the bottom-most row is non-empty. If it is, add a row.
      * @returns {boolean} true if a row was added
      */

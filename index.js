@@ -116,6 +116,8 @@ let script_textarea = getTypedElementById(HTMLTextAreaElement, "script");
 let config_div = getTypedElementById(HTMLDivElement, "config-wrapper");
 let config_table = ConfigTable.mount(config_div, ["key", "name", "color", "avatar", "handle"], 10);
 let cleanup_button = getTypedElementById(HTMLButtonElement, "cleanup-btn")
+let add_person_dropdown = getTypedElementById(HTMLSelectElement, "add-person-select");
+add_person_dropdown.value = "add-row";
 
 let preview_area = getTypedElementById(HTMLDivElement, "preview-output");
 let html_area = getTypedElementById(HTMLTextAreaElement, "html-output");
@@ -161,6 +163,36 @@ edit_template_button.addEventListener("click", () => {
    html_area.classList.add("hidden");
    template_area.classList.remove("hidden");
 });
+
+add_person_dropdown.addEventListener("input", () => {
+   let presets = /** @type {{[key: string]: object}} */ ({
+      "cohost-eggbug": {
+         key: "EGGBUG",
+         name: "egg bug!",
+         color: "#83254f",
+         avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/eggbug.png",
+         handle: "eggbug"
+      },
+      "cohost-bugegg": {
+         key: "BUGEGG",
+         name: "bug egg >:3",
+         color: "#258359",
+         avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/bugegg.png",
+         handle: "bugegg"
+      },
+   });
+   let preset_name = add_person_dropdown.value;
+   let preset = presets[preset_name];
+   if (preset) {
+      config_table.append_row(preset);
+   } else {
+      console.error(`missing preset name: ${preset_name}`);
+   }
+
+   add_person_dropdown.value = "add-row";
+   load_config();
+   render();
+})
 
 // Render the examples in the quick start guide
 function render_examples() {

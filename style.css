@@ -45,6 +45,10 @@ main {
     overflow-x: auto;
 }
 
+#add-person-select {
+    width: fit-content;
+}
+
 #preview-output {
     padding: 16px 12px;
     overflow-x: hidden;
