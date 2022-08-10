@@ -15,6 +15,52 @@ export const PRESETS = {
         avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/bugegg.png",
         handle: "bugegg"
     },
+    // 17776
+    "17776-juice": {
+        key: "JUICE",
+        name: "Jupiter Icy Moons Explorer",
+        color: "#ffea02",
+        avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/17776-juice.jpg",
+        padding_left: "20%",
+    },
+    "17776-nine": {
+        key: "NINE",
+        name: "Pioneer 9",
+        color: "#ff6767",
+        avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/17776-nine.jpg",
+        padding_left: "10%",
+    },
+    "17776-ten": {
+        key: "TEN",
+        name: "Pioneer 10",
+        color: "#92ff92",
+        avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/17776-ten.jpg",
+        padding_left: "0%",
+    },
+    "20020-juice": {
+        key: "JUICE",
+        name: "Jupiter Icy Moons Explorer",
+        color: "black",
+        background_color: "#fef29a",
+        avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/17776-juice.jpg",
+        padding_left: "20%",
+    },
+    "20020-nine": {
+        key: "NINE",
+        name: "Pioneer 9",
+        color: "black",
+        background_color: "#ff8080",
+        avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/17776-nine.jpg",
+        padding_left: "10%",
+    },
+    "20020-ten": {
+        key: "TEN",
+        name: "Pioneer 10",
+        color: "black",
+        background_color: "#89dc89",
+        avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/17776-ten.jpg",
+        padding_left: "0%",
+    },
     // UTILITY
     "utility-black": {
         key: "BLACK",
