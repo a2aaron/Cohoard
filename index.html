@@ -188,8 +188,9 @@ EGGBUG: yeah! and now this message will appear in its own PostBlock</pre>
       </ul>
     <h4>Pesterlog Template</h4>
       <ul>
-        <li><strong><code>handle</code></strong> - The handle name of the user. If not provided, defaults to the key</li>
-        <li><strong><code>color</code></strong> - The color of the user. If not provided, defaults to black.</li>
+        <li><strong><code>short_handle</code></strong> - The handle displayed just before a chat message. For example, Dave Strider's <code>short_handle</code> is <code>TG</code>. </li>
+        <li><strong><code>handle</code></strong> - Optional. A synonym for <code>short_handle</code>. The template will prefer using the <code>short_handle</code> and will fall back to <code>handle</code> and finally <code>key</code> if not provided.</li>
+        <li><strong><code>color</code></strong> - The color of the user. This is the color the chat message will be rendered in. If not provided, defaults to black.</li>
       </ul>
     <h4>17776 Template</h4>
       <ul>
