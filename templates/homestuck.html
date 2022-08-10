@@ -79,11 +79,16 @@
 <div id="chat">
 
 {%- for postblock in posts -%}
-{%- for message in postblock.messages -%}
-<div class="message" style="color: {{ postblock.user.color | default(value="black") }}">
-{{ postblock.user.handle | default(value=postblock.user.key) }}: {{ message | markdown | trim | safe }}
-</div>
-{%- endfor -%}
+    {%- for message in postblock.messages -%}
+        {%- if postblock.user.short_handle -%}
+            {%- set handle = postblock.user.short_handle -%}
+        {%- elif postblock.user.handle -%}
+            {%- set handle = postblock.user.handle -%}
+        {%- else -%}
+            {%- set handle = postblock.user.key -%}
+        {%- endif -%}
+        <div class="message" style="color: {{ postblock.user.color | default(value="black") }}">{{ handle }}: {{ message | markdown | trim | safe }}</div>
+    {%- endfor -%}
 {%- endfor -%}
 
 </div>
