@@ -23,7 +23,10 @@ export class ConfigTable {
             this.check_right_column();
 
             render();
-        })
+            this.save_table()
+        });
+
+        window.addEventListener("beforeunload", () => this.save_table());
     }
 
     /**
@@ -46,6 +49,7 @@ export class ConfigTable {
         let cols = localStorageOrDefault("configTableCols", init_cols);
 
         let table = new ConfigTable(element, cols, body);
+
         return table;
     }
 
@@ -133,6 +137,7 @@ export class ConfigTable {
             }
             input.value = init_value;
         }
+        this.save_table()
     }
 
     /**
@@ -151,6 +156,7 @@ export class ConfigTable {
 
             row.insertBefore(cell, row.lastChild);
         }
+        this.save_table()
     }
 
     /**
@@ -171,6 +177,7 @@ export class ConfigTable {
         } else {
             return false;
         }
+
 
     }
 
