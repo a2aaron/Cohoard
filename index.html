@@ -1,24 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Cohoard - Format Chatlogs for Cohost</title>
-    <script src="./index.js" type="module"></script>
-    <link rel="stylesheet" href="style.css">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="manifest" href="/site.webmanifest">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cohoard - Format Chatlogs for Cohost</title>
+  <script src="./index.js" type="module"></script>
+  <link rel="stylesheet" href="style.css">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="manifest" href="/site.webmanifest">
 </head>
+
 <body>
   <f-col class="gap-1">
     <h1>
-        Cohoard - Format Chatlogs for Cohost
+      Cohoard - Format Chatlogs for Cohost
     </h1>
     <main class="gap-1">
       <f-col id="editing-column" class="gap-1">
         <div>
-          <textarea id="script">@ Today
+          <textarea
+                    id="script">@ Today
 EGGBUG: welcome to Cohoard!
 EGGBUG: use Cohoard to format your chatlogs like Discord conversations, Twitter threads, and more!
 EGGBUG: the text area in the upper left holds your chatlog, formatted like a play script!
@@ -66,7 +69,7 @@ EGGBUG: when you're happy with how everything looks, click the "HTML" button abo
             <option value="homestuck-gamzee">Gamzee Makara</option>
             <option value="homestuck-eridan">Eridan Ampora</option>
             <option value="homestuck-feferi">Feferi Peixes</option>
-          </optgroup> 
+          </optgroup>
           <optgroup label="Homestuck - Alpha Trolls">
             <option value="homestuck-kankri">Kankri Vantas</option>
             <option value="homestuck-damara">Damara Megido</option>
@@ -94,7 +97,7 @@ EGGBUG: when you're happy with how everything looks, click the "HTML" button abo
             <option value="20020-nine">Nine (20020)</option>
             <option value="20020-ten">Ten (20020)</option>
             <option value="20020-juice">Juice (20020)</option>
-          </optgroup> 
+          </optgroup>
           <optgroup label="Discord Defaults">
             <option value="discord-red">Discord Red</option>
             <option value="discord-yellow">Discord Yellow</option>
@@ -130,10 +133,13 @@ EGGBUG: when you're happy with how everything looks, click the "HTML" button abo
             <button id="delete-template-btn" class="hidden">Delete</button>
             <label for="template-select">Template Preset:</label>
             <select id="template-select"></select>
-          </div>  
+          </div>
         </f-row>
         <div id="preview-output">
-          <f-row><f-sp></f-sp><img src="https://i.imgur.com/BBaogem.png" alt="eggbug is loading!" class="spinner"><f-sp></f-sp></f-row>
+          <f-row>
+            <f-sp></f-sp><img src="https://i.imgur.com/BBaogem.png" alt="eggbug is loading!" class="spinner">
+            <f-sp></f-sp>
+          </f-row>
         </div>
         <textarea readonly id="html-output" class="hidden output-textarea">Loading...</textarea>
         <textarea id="template-editor" class="hidden output-textarea">Paste in a custom template here!</textarea>
@@ -144,16 +150,18 @@ EGGBUG: when you're happy with how everything looks, click the "HTML" button abo
 
   <div id="instructions">
     <h2>Quick Start Guide</h2>
-    <p>Cohoard is a tool for quickly and easily formatting chatlogs for posting on <a href="www.cohost.org">Cohost</a>.</p>
+    <p>Cohoard is a tool for quickly and easily formatting chatlogs for posting on <a href="www.cohost.org">Cohost</a>.
+    </p>
     <h3>The Script</h3>
     <p>The Script contains the main content of your post. You can write messages in playscript format--that is,
       something like <code>EGGBUG: i'm eggbug!</code>. The name before the colon is called the <em>key</em> and is used
       in the Config Table.</p>
-    <p>Messages are collected into <em>PostBlocks</em>, which are posts which should be grouped "together"
-      in some way. For example, in the Discord template, we group all messages in the same PostBlock under
-      the same headline (the avatar + username that is displayed in Discord). This helps mimic the feel of
-      Discord more accurately. Other templates may use PostBlocks differently.</p>
-    <p>A new PostBlock is issued whenever the current speaker changes. For example, in the conversation below, there are three PostBlocks</p>
+    <p>Messages are collected into <em>PostBlocks</em>, which are posts which should be grouped "together" in some way.
+      For example, in the Discord template, we group all messages in the same PostBlock under the same headline (the
+      avatar + username that is displayed in Discord). This helps mimic the feel of Discord more accurately. Other
+      templates may use PostBlocks differently.</p>
+    <p>A new PostBlock is issued whenever the current speaker changes. For example, in the conversation below, there are
+      three PostBlocks</p>
     <pre id="discord-example-script">
 EGGBUG: hi!
 EGGBUG: these three messages are part of the same PostBlock
@@ -167,48 +175,59 @@ EGGBUG: yeah! and now this message will appear in its own PostBlock</pre>
       its own line will set a timestamp for the posts. You can also use most Markdown features, like
       bolding, italices, codeblocks, and so on.</p>
     <h3>Config Table</h3>
-    <p>The Config Table is a table of keys and values. Each row of the table describes how a person
-       in the Script should be styled, and typically includes information like their username or avatar.
-       The first column of the table is the "<code>key</code>", which should match with the keys in the script. This
-       is typically an ALL CAPS name (like "<code>EGGBUG</code>") but does not have to be. The rest of the columns
-       can be renamed to whatever keys that the template is expecting to have. Currently the two preset 
-       templates take the following keys.
-    </p>
+    <p>The Config Table is a table of keys and values. Each row of the table describes how a person in the Script should
+      be styled, and typically includes information like their username or avatar. The first column of the table is the
+      "<code>key</code>", which should match with the keys in the script. This is typically an ALL CAPS name (like
+      "<code>EGGBUG</code>") but does not have to be. The rest of the columns can be renamed to whatever keys that the
+      template is expecting to have. Currently the two preset templates take the following keys.</p>
     <h4>Discord Template</h4>
-      <ul>
-        <li><strong><code>name</code></strong> - The username displayed in the headline. If not provided, defaults to the key</li>
-        <li><strong><code>color</code></strong> - The color of the username. This (and any other color field) can be any CSS color value, for example "<code>red</code>" or "<code>#FF0000</code>" both work.</li>
-        <li><strong><code>avatar</code></strong> - A URL pointing to the avatar of the poster. If not provided, then the avatar will be blank.</li>
-      </ul>
+    <ul>
+      <li><strong><code>name</code></strong> - The username displayed in the headline. If not provided, defaults to the
+        key</li>
+      <li><strong><code>color</code></strong> - The color of the username. This (and any other color field) can be any
+        CSS color value, for example "<code>red</code>" or "<code>#FF0000</code>" both work.</li>
+      <li><strong><code>avatar</code></strong> - A URL pointing to the avatar of the poster. If not provided, then the
+        avatar will be blank.</li>
+    </ul>
     <h4>Twitter Template</h4>
-      <ul>
-        <li><strong><code>name</code></strong> - The display name of the Tweeter</li>
-        <li><strong><code>handle</code></strong> - The handle of the Tweeter. The template automatically prepends the "@" symbol for you</li>
-        <li><strong><code>avatar</code></strong> - A URL pointing to the avatar of the poster. If not provided, then the avatar will be blank.</li>
-      </ul>
+    <ul>
+      <li><strong><code>name</code></strong> - The display name of the Tweeter</li>
+      <li><strong><code>handle</code></strong> - The handle of the Tweeter. The template automatically prepends the "@"
+        symbol for you</li>
+      <li><strong><code>avatar</code></strong> - A URL pointing to the avatar of the poster. If not provided, then the
+        avatar will be blank.</li>
+    </ul>
     <h4>Pesterlog Template</h4>
-      <ul>
-        <li><strong><code>short_handle</code></strong> - The handle displayed just before a chat message. For example, Dave Strider's <code>short_handle</code> is <code>TG</code>. </li>
-        <li><strong><code>handle</code></strong> - Optional. A synonym for <code>short_handle</code>. The template will prefer using the <code>short_handle</code> and will fall back to <code>handle</code> and finally <code>key</code> if not provided.</li>
-        <li><strong><code>color</code></strong> - The color of the user. This is the color the chat message will be rendered in. If not provided, defaults to black.</li>
-      </ul>
+    <ul>
+      <li><strong><code>short_handle</code></strong> - The handle displayed just before a chat message. For example,
+        Dave Strider's <code>short_handle</code> is <code>TG</code>. </li>
+      <li><strong><code>handle</code></strong> - Optional. A synonym for <code>short_handle</code>. The template will
+        prefer using the <code>short_handle</code> and will fall back to <code>handle</code> and finally
+        <code>key</code> if not provided.
+      </li>
+      <li><strong><code>color</code></strong> - The color of the user. This is the color the chat message will be
+        rendered in. If not provided, defaults to black.</li>
+    </ul>
     <h4>17776 Template</h4>
-      <ul>
-        <li><strong><code>color</code></strong> - The color of the text. If not provided, defaults to white.</li>
-        <li><strong><code>background_color</code></strong> - The background color of the user. If not provided, defaults to transparent. This is typically used by the satellite characters in 20020, with black colored text.</li>
-        <li><strong><code>padding_left</code></strong> - How far to indent the text. If not provided, defaults to zero. Typically, 17776 uses increments of <code>10%</code> for different characters.</li>
-      </ul>
+    <ul>
+      <li><strong><code>color</code></strong> - The color of the text. If not provided, defaults to white.</li>
+      <li><strong><code>background_color</code></strong> - The background color of the user. If not provided, defaults
+        to transparent. This is typically used by the satellite characters in 20020, with black colored text.</li>
+      <li><strong><code>padding_left</code></strong> - How far to indent the text. If not provided, defaults to zero.
+        Typically, 17776 uses increments of <code>10%</code> for different characters.</li>
+    </ul>
     <h3>The Preview Window</h3>
-    <p>On the right side is the preview window. Any changes you make to the Script will automatically
-       update the preview window. You can click on the button labeled "HTML" to switch to a raw HTML
-       view of your post--this is the text that can be copy-pasted directly into a Cohost post.</p>
-    <p>You can use the Template Preset dropdown to switch between stored Templates, including custom Tepmlates you have made.
-       To make a custom Template, choose "<code>Create New Preset...</code>" from the dropdown.
-       Custom Templates can be edited using the "Edit Template" button and are saved in the browser's localStorage.
-       You can also rename and delete custom templates.
-    </p>
+    <p>On the right side is the preview window. Any changes you make to the Script will automatically update the preview
+      window. You can click on the button labeled "HTML" to switch to a raw HTML view of your post--this is the text
+      that can be copy-pasted directly into a Cohost post.</p>
+    <p>You can use the Template Preset dropdown to switch between stored Templates, including custom Tepmlates you have
+      made. To make a custom Template, choose "<code>Create New Preset...</code>" from the dropdown. Custom Templates
+      can be edited using the "Edit Template" button and are saved in the browser's localStorage. You can also rename
+      and delete custom templates.</p>
     <h3>Contributing</h3>
-    <p>If you have any bug reports, feature requests, or template suggestions, feel free to submit them on the Issues page of the <a href="https://github.com/a2aaron/Cohoard">Github repo</a>.</p>
+    <p>If you have any bug reports, feature requests, or template suggestions, feel free to submit them on the Issues
+      page of the <a href="https://github.com/a2aaron/Cohoard">Github repo</a>.</p>
   </div>
 </body>
+
 </html>
