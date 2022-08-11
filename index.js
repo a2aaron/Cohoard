@@ -108,7 +108,8 @@ let template_dropdown = getTypedElementById(HTMLSelectElement, "template-select"
 let edit_template_button = getTypedElementById(HTMLButtonElement, "edit-template-btn");
 let delete_template_button = getTypedElementById(HTMLButtonElement, "delete-template-btn");
 let rename_template_button = getTypedElementById(HTMLButtonElement, "rename-template-btn");
-let template_controls = await TemplateControls.mount(template_dropdown, template_area, edit_template_button, delete_template_button, rename_template_button);
+let template_ui = getTypedElementById(HTMLElement, "template-ui");
+let template_controls = await TemplateControls.mount(template_dropdown, template_area, edit_template_button, delete_template_button, rename_template_button, template_ui);
 
 let preview_button = getTypedElementById(HTMLButtonElement, "preview-btn");
 let html_button = getTypedElementById(HTMLButtonElement, "html-btn");
@@ -185,7 +186,7 @@ function render_examples() {
    let cohoard_config = cohoard.load_config(config_json);
 
    let posts = cohoard.parse_posts(cohoard_config, discord_example_script.innerText);
-   let rendered = cohoard.render("template", DISCORD_BUILTIN.content ?? "Couldn't load Discord template", posts, cohoard_config);
+   let rendered = cohoard.render("template", DISCORD_BUILTIN.get_content(), posts, cohoard_config);
    discord_example_div.innerHTML = rendered;
    // Remove the negative margin on the rendered post.
    // @ts-ignore

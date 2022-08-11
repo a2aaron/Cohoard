@@ -1,5 +1,32 @@
-import { h, localStorageOrDefault, enumerate } from "./util.js";
+import { h, localStorageOrDefault, enumerate, assert_html_node } from "./util.js";
 import { render } from "./index.js";
+
+
+/**
+ * @typedef {`builtin-${number}` | `custom-${number}`} DropdownName
+ * @typedef {{
+ *      "name": string,
+ *      "type": "text" | "url" | "time" | "datetime" | "email" |
+ *              "checkbox" | "radio" | "color" | "range" | "file",
+ *      "label": string,
+ * }} UIDescription
+ */
+
+/**
+ * @param {object} ui_desc
+ * @returns {ui_desc is UIDescription}
+ */
+function is_ui_description(ui_desc) {
+    if (Object.hasOwn(ui_desc, "name") &&
+        Object.hasOwn(ui_desc, "type") &&
+        Object.hasOwn(ui_desc, "label")) {
+        return ["text", "url", "time", "datetime", "email",
+            "checkbox", "radio", "color", "range", "file"]
+            // @ts-ignore
+            .includes(ui_desc.type);
+    }
+    return false;
+}
 
 /**
  * Manages the template preset UI
@@ -11,15 +38,24 @@ export class TemplateControls {
      * @param {HTMLButtonElement} edit_template_button
      * @param {HTMLButtonElement} delete_template_button
      * @param {HTMLButtonElement} rename_template_button
+     * @param {HTMLDivElement} template_ui
      * @param {Array<Template>} builtin_templates
      * @param {Array<Template>} custom_templates
      */
-    constructor(dropdown_element, template_area, edit_template_button, delete_template_button, rename_template_button, builtin_templates, custom_templates) {
+    constructor(dropdown_element,
+        template_area,
+        edit_template_button,
+        delete_template_button,
+        rename_template_button,
+        template_ui,
+        builtin_templates,
+        custom_templates) {
         this.dropdown = dropdown_element;
         this.template_area = template_area;
         this.edit_template_button = edit_template_button;
         this.delete_template_button = delete_template_button;
         this.rename_template_button = rename_template_button;
+        this.template_ui = template_ui;
         this.builtin_templates = builtin_templates;
         this.custom_templates = custom_templates;
 
@@ -30,6 +66,8 @@ export class TemplateControls {
             } else if (is_dropdown_value(this.dropdown.value)) {
                 this.set_current_template(this.dropdown.value);
             }
+
+            this.regenerate_ui();
             render();
         });
 
@@ -40,8 +78,10 @@ export class TemplateControls {
                 if (template == null) {
                     console.warn(`couldn't get template ${this.dropdown.value}`);
                 } else {
-                    template.content = template_area.value;
+                    template.set_content(template_area.value);
                 }
+
+                this.regenerate_ui();
                 render();
             }
         })
@@ -72,6 +112,8 @@ export class TemplateControls {
                 } else {
                     this.set_current_template(builtin_i(0));
                 }
+
+                this.regenerate_ui();
                 render();
             }
         });
@@ -117,12 +159,20 @@ export class TemplateControls {
      * @param {HTMLButtonElement} edit_template_button the "Edit Template" button
      * @param {HTMLButtonElement} delete_template_button the "Delete Template" button
      * @param {HTMLButtonElement} rename_template_button the "Rename Template" button
+     * @param {HTMLDivElement} template_ui the area for the template UI.
      * @returns {Promise<TemplateControls>} 
      */
-    static async mount(template_dropdown, template_area, edit_template_button, delete_template_button, rename_template_button) {
+    static async mount(template_dropdown, template_area, edit_template_button, delete_template_button, rename_template_button, template_ui) {
         let builtin_templates = [DISCORD_BUILTIN, TWITTER_BUILTIN, PESTERLOG_BUILTIN, FOOTBALL_BUILTIN];
         let custom_templates = get_custom_templates();
-        let template_controls = new TemplateControls(template_dropdown, template_area, edit_template_button, delete_template_button, rename_template_button, builtin_templates, custom_templates);
+        let template_controls = new TemplateControls(
+            template_dropdown,
+            template_area,
+            edit_template_button,
+            delete_template_button,
+            rename_template_button,
+            template_ui,
+            builtin_templates, custom_templates);
 
         return template_controls;
     }
@@ -141,12 +191,8 @@ export class TemplateControls {
     }
 
     /**
-     * @typedef {`builtin-${number}` | `custom-${number}`} DropdownName
-     */
-
-    /**
      * @param {DropdownName} dropdown_name the name of the template used by the dropdown selector
-     * @returns {Template?} the Template that has the given name
+     * @returns {Template} the Template that has the given name
      */
     get_template(dropdown_name) {
         if (dropdown_name.startsWith("builtin")) {
@@ -172,12 +218,7 @@ export class TemplateControls {
         }
 
         this.template_area.readOnly = template.is_builtin;
-        if (template.content == null) {
-            console.warn(`template for ${dropdown_name} has null content!`, template);
-            this.template_area.value = "Couldn't load template!";
-        } else {
-            this.template_area.value = template.content;
-        }
+        this.template_area.value = template.get_content();
 
         if (template.is_builtin) {
             this.edit_template_button.innerText = "View Template";
@@ -212,6 +253,24 @@ export class TemplateControls {
             this.set_current_template(last_dropdown_value);
         }
     }
+
+    /**
+     * Returns the currently selected template
+     * @returns {Template}
+     */
+    get_current_template() {
+        let dropdown_name = this.dropdown.value;
+        if (is_dropdown_value(dropdown_name)) {
+            return this.get_template(dropdown_name)
+        } else {
+            throw new Error(`Currently selected dropdown value (${dropdown_name}) is not a DropdownName!`)
+        }
+    }
+
+    regenerate_ui() {
+        const html_nodes = this.get_current_template().get_ui_elements();
+        this.template_ui.replaceChildren(...html_nodes);
+    }
 }
 
 /**
@@ -219,7 +278,13 @@ export class TemplateControls {
  */
 function save_custom_templates(templates) {
     console.info("Saving custom templates.");
-    localStorage.setItem("customTemplates", JSON.stringify(templates));
+    let saved_templates = templates.map((template) => {
+        return {
+            content: template.get_content(),
+            displayed_name: template.displayed_name,
+        }
+    })
+    localStorage.setItem("customTemplates", JSON.stringify(saved_templates));
 }
 
 /**
@@ -261,7 +326,6 @@ function is_custom(dropdown_value) {
     return dropdown_value.startsWith("custom-");
 }
 
-
 /**
  * @param {number} i the index of the template
  * @returns {DropdownName}
@@ -278,16 +342,23 @@ function custom_i(i) {
     return `custom-${i}`;
 }
 
+/** 
+ * @private {string} #content
+ */
 class Template {
+    #content;
+    #ui_elements;
+
     /**
      * @param {string} displayed_name the displayed name of the template
      * @param {boolean} is_builtin true if the template is builtin
-     * @param {string | null} content the contents of the template (if not builtin)
+     * @param {string} content the contents of the template (if not builtin)
      */
     constructor(displayed_name, content, is_builtin) {
         this.displayed_name = displayed_name;
         this.is_builtin = is_builtin;
-        this.content = content;
+        this.#content = content;
+        this.#ui_elements = parse_ui_description(content);
     }
 
     /**
@@ -297,6 +368,44 @@ class Template {
      */
     get_html_node(value) {
         return option(value, this.displayed_name);
+    }
+
+    /**
+     * Returns the HTML elements of the UI. This attempts to find a comment within the template similar 
+     * to the schema below:
+     * {#-config
+     * [{
+     *      "name": "light_mode",
+     *      "type": "boolean",
+     *      "description": "Use Light Mode",
+     *  }, {
+     *      "name": "background_color",
+     *      "type": "string",
+     *      "description": "Custom Background Color",
+     *  },
+     * ]
+     * config-#}
+     * This format is, specifically, a JSON string containing array of objects that have a name, type,
+     * and description keys, all of which have string values.
+     * @returns {Array<HTMLElement>}
+     */
+    get_ui_elements() {
+        return this.#ui_elements.map((element) => element.get_html_element());
+    }
+
+    /**
+     * @returns {string}
+     */
+    get_content() {
+        return this.#content;
+    }
+
+    /**
+     * @param {string} new_content 
+     */
+    set_content(new_content) {
+        this.#content = new_content;
+        this.#ui_elements = parse_ui_description(new_content);
     }
 
     /**
@@ -316,6 +425,61 @@ class Template {
      */
     static custom(displayed_name, content) {
         return new Template(displayed_name, content, false);
+    }
+}
+
+/**
+ * Attempts to parse the UI description in the template contents. If it cannot, returns an empty array.
+ * @param {string} content 
+ * @returns {Array<UIElement>}
+ */
+function parse_ui_description(content) {
+    // Regenerate the UI elements.
+    const regexp = /{#-config([\S\s]*)config-#}/;
+    const matches = content.match(regexp);
+    if (matches == null) {
+        return [];
+    }
+    const json_text = matches[1];
+    try {
+        const json_arr = JSON.parse(json_text);
+        if (!(json_arr instanceof Array)) {
+            throw new Error(`expected ${json_text} to be JSON containing an array. Got ${json_arr} instead.`);
+        }
+        return json_arr.map((ui_desc) => {
+            if (is_ui_description(ui_desc)) {
+                return new UIElement(ui_desc);
+            } else {
+                console.error(ui_desc);
+                throw new Error(`expected ${ui_desc} to be a UIDescription`);
+            }
+        });
+    } catch (err) {
+        console.error("Couldn't parse UI description from content! Reason: ", err);
+        console.log(json_text);
+        return [];
+    }
+}
+
+class UIElement {
+    #html_element;
+    /**
+     * @param {UIDescription} ui_description
+     */
+    constructor(ui_description) {
+        const label = `template-ui-${ui_description.name}`;
+
+        let input_element = h("input", { type: ui_description.type, id: label });
+        let label_element = h("label", { for: label }, [ui_description.label]);
+
+        this.#html_element = h("div", { class: "template-ui-element" }, [label_element, input_element]);
+    }
+
+    /**
+     * @returns {HTMLElement}
+     */
+    get_html_element() {
+        return this.#html_element;
     }
 }
 
