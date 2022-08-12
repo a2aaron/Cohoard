@@ -83,7 +83,7 @@ export class TemplateControls {
      * @param {HTMLButtonElement} edit_template_button
      * @param {HTMLButtonElement} delete_template_button
      * @param {HTMLButtonElement} rename_template_button
-     * @param {HTMLDivElement} template_ui
+     * @param {HTMLElement} template_ui
      * @param {Array<Template>} builtin_templates
      * @param {Array<Template>} custom_templates
      */
@@ -204,7 +204,7 @@ export class TemplateControls {
      * @param {HTMLButtonElement} edit_template_button the "Edit Template" button
      * @param {HTMLButtonElement} delete_template_button the "Delete Template" button
      * @param {HTMLButtonElement} rename_template_button the "Rename Template" button
-     * @param {HTMLDivElement} template_ui the area for the template UI controls.
+     * @param {HTMLElement} template_ui the area for the template UI controls.
      * @returns {Promise<TemplateControls>} 
      */
     static async mount(template_dropdown, template_area, edit_template_button, delete_template_button, rename_template_button, template_ui) {
@@ -331,7 +331,11 @@ export class TemplateControls {
      * Regenerate the UI HTML elements. 
      */
     #regenerate_ui() {
-        const html_nodes = this.get_current_template().get_ui_elements();
+        const ui_elements = this.get_current_template().get_ui_elements();
+        let html_nodes = /** @type {Array<HTMLElement>} */ ([]);
+        for (const [name, ui_element] of Object.entries(ui_elements)) {
+            html_nodes.push(ui_element.get_html_element());
+        }
         this.template_ui.replaceChildren(...html_nodes);
     }
 }
@@ -379,10 +383,13 @@ function load_custom_templates() {
 /** 
  * A class containing the contents and other information about a template. This also stores the
  * template's UI HTMLElements.
- * @private {string} #content
  */
 class Template {
+    /** The text content of the Template. 
+     * @type {string} */
     #content;
+    /** The UIElements associated with this template. 
+     * @type {UIElements} */
     #ui_elements;
 
     /**
@@ -409,10 +416,23 @@ class Template {
     /**
      * Returns the HTML elements of the UI. If there are no elements or the UI config couldn't be parsed,
      * this array is empty.
-     * @returns {Array<HTMLElement>}
+     * @returns {UIElements}
      */
     get_ui_elements() {
-        return this.#ui_elements.map((element) => element.get_html_element());
+        return this.#ui_elements;
+    }
+
+    /**
+     * Returns the current values of the UIs. The keys of the returned object correspond to the 
+     * variable name the value is for.
+     * @returns {{[key: string]: string | boolean}}
+     */
+    get_ui_values() {
+        let values = /** @type {{[key: string]: string | boolean}} */ ({});
+        for (const [name, element] of Object.entries(this.#ui_elements)) {
+            values[name] = element.get_value();
+        }
+        return values;
     }
 
     /**
@@ -431,7 +451,18 @@ class Template {
      */
     set_content(new_content) {
         this.#content = new_content;
-        this.#ui_elements = parse_ui_description(new_content);
+        let new_elements = parse_ui_description(new_content);
+
+        for (const [name, old_element] of Object.entries(this.#ui_elements)) {
+            // If the new element would have the same name and type as the old element, use the old
+            // elements's previous value, so that we do not clobber it.
+            if (new_elements[name] && UIElement.equals(new_elements[name], old_element)) {
+                console.log("Merging...", name, old_element, new_elements[name]);
+                new_elements[name].set_value(old_element.get_value());
+            }
+        }
+
+        this.#ui_elements = new_elements;
     }
 
     /**
@@ -481,53 +512,75 @@ export const BASIC_TEMPLATE = await get_template_from_url("https://raw.githubuse
  * config-#}
  * This format is, specifically, a JSON string containing an array of UIDescriptions.
  * @param {string} content 
- * @returns {Array<UIElement>}
+ * @returns {UIElements} A dictionary whose keys are each UIDescription's "name" field and
+ * the values are the corresponding UIElement
  */
 function parse_ui_description(content) {
     // Match anything between "{#-config" and "config-#}"
     const regexp = /{#-config([\S\s]*)config-#}/;
     const matches = content.match(regexp);
     if (matches == null) {
-        return [];
+        return {};
     }
     const json_text = matches[1];
-    try {
-        // Try to parse the text as JSON.
-        const json_arr = JSON.parse(json_text);
-        if (!(json_arr instanceof Array)) {
-            throw new Error(`expected ${json_text} to be JSON containing an array. Got ${json_arr} instead.`);
-        }
-        return json_arr.map((ui_desc) => {
-            if (is_ui_description(ui_desc)) {
-                return new UIElement(ui_desc);
-            } else {
-                console.error(ui_desc);
-                throw new Error(`expected ${ui_desc} to be a UIDescription`);
-            }
-        });
-    } catch (err) {
-        console.error("Couldn't parse UI description from content! Reason: ", err);
-        console.log(json_text);
-        return [];
+    // Try to parse the text as JSON.
+    const json_arr = JSON.parse(json_text);
+    if (!(json_arr instanceof Array)) {
+        console.error(`expected ${json_text} to be JSON containing an array. Got ${json_arr} instead.`);
+        return {};
     }
+
+    // Finally, set up the dictionary.
+    let elements = /** @type {UIElements} */ ({});
+    for (let ui_desc of json_arr) {
+        if (is_ui_description(ui_desc)) {
+            elements[ui_desc.name] = new UIElement(ui_desc);
+        } else {
+            console.error(`Expected ${ui_desc} to be a UIDescription!`);
+        }
+    }
+    return elements;
 }
 
 /**
  * Wraps an HTMLElement containing an input element and a lable. The input element's type is determined
  * by the given UIDescription's type. The label's contents are determined by the UIDescription's label field
+ * 
+ * @typedef {{[key: string]: UIElement}} UIElements
  */
 class UIElement {
+    /** The public consumable UI element, containing both the input and the label.
+     * @type {HTMLElement} */
     #html_element;
+    /** @type {HTMLInputElement} */
+    #input_element
     /**
-     * @param {UIDescription} ui_description
+     * @param {UIDescription} ui_description the UIDescription for this element. determines the type and label of the element
      */
     constructor(ui_description) {
         const label = `template-ui-${ui_description.name}`;
 
-        let input_element = h("input", { type: ui_description.type, id: label });
+        //@ts-ignore
+        this.#input_element = h("input", { type: ui_description.type, id: label });
+        // Rerender whenever this UI object is changed.
+        this.#input_element.addEventListener("input", () => render())
+
         let label_element = h("label", { for: label }, [ui_description.label]);
 
-        this.#html_element = h("div", { class: "template-ui-element gap-1" }, [label_element, input_element]);
+        this.#html_element = h("div", { class: "template-ui-element gap-1" }, [label_element, this.#input_element]);
+
+
+        this.ui_description = ui_description;
+    }
+
+    /**
+     * Returns true if the given UIElements match in type and name.
+     * @param {UIElement} a
+     * @param {UIElement} b 
+     * @returns 
+     */
+    static equals(a, b) {
+        return a.ui_description.type == b.ui_description.type && a.ui_description.name == b.ui_description.name;
     }
 
     /**
@@ -536,6 +589,29 @@ class UIElement {
      */
     get_html_element() {
         return this.#html_element;
+    }
+
+    /**
+     * Set the current value of the UI element
+     * @param {boolean | string} value
+     */
+    set_value(value) {
+        if (typeof value == "boolean") {
+            this.#input_element.checked = value;
+        } else {
+            this.#input_element.value = value;
+        }
+    }
+
+    /**
+     * @returns {string | boolean}
+     */
+    get_value() {
+        if (this.ui_description.type == "checkbox") {
+            return this.#input_element.checked;
+        } else {
+            return this.#input_element.value;
+        }
     }
 }
 

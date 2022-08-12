@@ -52,7 +52,9 @@ export function render() {
    try {
       let cohoard_config = config_table.cohoard_config;
       let posts = cohoard.parse_posts(cohoard_config, script_textarea.value);
-      let rendered = cohoard.render("template", template_area.value, posts, cohoard_config);
+      let template_contents = template_controls.get_current_template().get_content();
+      // let template_ui_values = template_controls.get_current_template().get_ui_values();
+      let rendered = cohoard.render("template", template_contents, posts, cohoard_config);
       preview_area.innerHTML = rendered;
       html_area.value = rendered;
 
