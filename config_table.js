@@ -151,7 +151,7 @@ export class ConfigTable {
             if (row.rowIndex == 0) {
                 cell = column_cell(this.table, last_col_i + 1, column_key);
             } else {
-                cell = body_cell("", "");
+                cell = body_cell("", column_key);
             }
 
             row.insertBefore(cell, row.lastChild);
