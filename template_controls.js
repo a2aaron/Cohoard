@@ -472,7 +472,7 @@ class UIElement {
         let input_element = h("input", { type: ui_description.type, id: label });
         let label_element = h("label", { for: label }, [ui_description.label]);
 
-        this.#html_element = h("div", { class: "template-ui-element" }, [label_element, input_element]);
+        this.#html_element = h("div", { class: "template-ui-element gap-1" }, [label_element, input_element]);
     }
 
     /**
