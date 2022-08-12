@@ -19,8 +19,8 @@ export class ConfigTable {
         element.appendChild(this.table);
 
         this.element.addEventListener("input", () => {
-            this.check_bottom_row();
-            this.check_right_column();
+            this.#check_bottom_row();
+            this.#check_right_column();
 
             render();
             this.save_table()
@@ -163,7 +163,7 @@ export class ConfigTable {
      * Check if the bottom-most row is non-empty. If it is, add a row.
      * @returns {boolean} true if a row was added
      */
-    check_bottom_row() {
+    #check_bottom_row() {
         console.assert(this.table.rows.length >= 2);
         let last_row = this.table.rows.length - 1;
 
@@ -185,7 +185,7 @@ export class ConfigTable {
      * Check if the right-most column is non-empty. If it is, add a column.
      * @returns {boolean} true if a row was added
      */
-    check_right_column() {
+    #check_right_column() {
         let last_col_i = this.table.rows[0].cells.length - 1;
         if (!is_column_empty(this.table, last_col_i)) {
             for (let row of this.table.rows) {
