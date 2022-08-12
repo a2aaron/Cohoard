@@ -3,7 +3,50 @@ import { render } from "./index.js";
 
 
 /**
+ * A DropdownName consists of any string starting with "builtin-" or "custom-" followed immediately
+ * by a number. These are used by the template selector dropdown's `value` attributes, which
+ * are the internal names of the templates.
  * @typedef {`builtin-${number}` | `custom-${number}`} DropdownName
+ */
+
+/**
+ * @param {string} dropdown_value
+ * @returns {dropdown_value is DropdownName}
+ */
+function is_dropdown_value(dropdown_value) {
+    return dropdown_value.startsWith("builtin-") || dropdown_value.startsWith("custom-");
+}
+
+/**
+ * @param {string} dropdown_value
+ * @returns {dropdown_value is DropdownName}
+ */
+function is_custom(dropdown_value) {
+    return dropdown_value.startsWith("custom-");
+}
+
+/**
+ * @param {number} i the index of the template
+ * @returns {DropdownName}
+ */
+function builtin_i(i) {
+    return `builtin-${i}`;
+}
+
+/**
+ * @param {number} i the index of the template
+ * @returns {DropdownName}
+ */
+function custom_i(i) {
+    return `custom-${i}`;
+}
+
+/**
+ * A UIDescription is an object with a `name`, `label`, and `type` properties. The `name` and `label`
+ * are strings. `type` is a string corresponding to an `<input>`'s `type` attribute (for example,
+ * valid values include "text" and "checkbox"). This is used to describe what sort of UI element a
+ * template wishes to include as a control for itself. UIDescriptions are transformed into UIElements
+ * when being shown to the user.
  * @typedef {{
  *      "name": string,
  *      "type": "text" | "url" | "time" | "datetime" | "email" |
@@ -13,6 +56,7 @@ import { render } from "./index.js";
  */
 
 /**
+ * Returns true if `ui_desc` is a UIDescription.
  * @param {object} ui_desc
  * @returns {ui_desc is UIDescription}
  */
@@ -27,6 +71,7 @@ function is_ui_description(ui_desc) {
     }
     return false;
 }
+
 
 /**
  * Manages the template preset UI
@@ -67,7 +112,7 @@ export class TemplateControls {
                 this.set_current_template(this.dropdown.value);
             }
 
-            this.regenerate_ui();
+            this.#regenerate_ui();
             render();
         });
 
@@ -81,7 +126,7 @@ export class TemplateControls {
                     template.set_content(template_area.value);
                 }
 
-                this.regenerate_ui();
+                this.#regenerate_ui();
                 render();
             }
         })
@@ -102,7 +147,7 @@ export class TemplateControls {
                 let index = Number(dropdown_value.replace("custom-", ""));
                 this.custom_templates.splice(index, 1);
 
-                this.renegerate_dropdown();
+                this.#renegerate_dropdown();
                 if (index < this.custom_templates.length) {
                     this.set_current_template(custom_i(index));
                 } else if (this.custom_templates.length != 0 && index != 0) {
@@ -113,7 +158,7 @@ export class TemplateControls {
                     this.set_current_template(builtin_i(0));
                 }
 
-                this.regenerate_ui();
+                this.#regenerate_ui();
                 render();
             }
         });
@@ -135,7 +180,7 @@ export class TemplateControls {
                     template.displayed_name = new_name;
                 }
 
-                this.renegerate_dropdown();
+                this.#renegerate_dropdown();
                 save_custom_templates(this.custom_templates);
             }
         });
@@ -146,7 +191,7 @@ export class TemplateControls {
 
 
         // Set up the dropdown nodes.
-        this.renegerate_dropdown();
+        this.#renegerate_dropdown();
 
         // Set the current template to the first builtin template.
         this.set_current_template("builtin-0");
@@ -186,7 +231,7 @@ export class TemplateControls {
         let new_template = Template.custom("Custom Template " + i, BASIC_TEMPLATE);
         this.custom_templates.push(new_template);
 
-        this.renegerate_dropdown();
+        this.#renegerate_dropdown();
         this.set_current_template(custom_i(i));
     }
 
@@ -232,7 +277,7 @@ export class TemplateControls {
         }
     }
 
-    renegerate_dropdown() {
+    #renegerate_dropdown() {
         let last_dropdown_value = this.dropdown.value;
 
         let builtin_group = h("optgroup", { label: "Builtin Templates" });
@@ -267,7 +312,7 @@ export class TemplateControls {
         }
     }
 
-    regenerate_ui() {
+    #regenerate_ui() {
         const html_nodes = this.get_current_template().get_ui_elements();
         this.template_ui.replaceChildren(...html_nodes);
     }
@@ -310,38 +355,6 @@ function get_custom_templates() {
     }
 }
 
-/**
- * @param {string} dropdown_value
- * @returns {dropdown_value is DropdownName}
- */
-function is_dropdown_value(dropdown_value) {
-    return dropdown_value.startsWith("builtin-") || dropdown_value.startsWith("custom-");
-}
-
-/**
- * @param {string} dropdown_value
- * @returns {dropdown_value is DropdownName}
- */
-function is_custom(dropdown_value) {
-    return dropdown_value.startsWith("custom-");
-}
-
-/**
- * @param {number} i the index of the template
- * @returns {DropdownName}
- */
-function builtin_i(i) {
-    return `builtin-${i}`;
-}
-
-/**
- * @param {number} i the index of the template
- * @returns {DropdownName}
- */
-function custom_i(i) {
-    return `custom-${i}`;
-}
-
 /** 
  * @private {string} #content
  */
@@ -371,22 +384,7 @@ class Template {
     }
 
     /**
-     * Returns the HTML elements of the UI. This attempts to find a comment within the template similar 
-     * to the schema below:
-     * {#-config
-     * [{
-     *      "name": "light_mode",
-     *      "type": "boolean",
-     *      "description": "Use Light Mode",
-     *  }, {
-     *      "name": "background_color",
-     *      "type": "string",
-     *      "description": "Custom Background Color",
-     *  },
-     * ]
-     * config-#}
-     * This format is, specifically, a JSON string containing array of objects that have a name, type,
-     * and description keys, all of which have string values.
+     * Returns the HTML elements of the UI.
      * @returns {Array<HTMLElement>}
      */
     get_ui_elements() {
@@ -430,6 +428,20 @@ class Template {
 
 /**
  * Attempts to parse the UI description in the template contents. If it cannot, returns an empty array.
+ * This attempts to find a comment within the template similar to the schema below:
+ * {#-config
+ * [{
+ *      "name": "light_mode",
+ *      "type": "boolean",
+ *      "label": "Use Light Mode",
+ *  }, {
+ *      "name": "background_color",
+ *      "type": "string",
+ *      "label": "Custom Background Color",
+ *  },
+ * ]
+ * config-#}
+ * This format is, specifically, a JSON string containing an array of UIDescriptions.
  * @param {string} content 
  * @returns {Array<UIElement>}
  */
@@ -492,7 +504,7 @@ export const PESTERLOG_BUILTIN = await Template.builtin("Pesterlog", "https://ra
 export const BASIC_TEMPLATE = await get_template_from_url("https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/basic.html") ?? "Couldn't fetch template!";
 
 /**
- * Returns an `<option>` tag
+ * Returns an `<option>` tag with the `value` attribute set to `value` and the given `body`.
  * @param {string} value the value of the value attribute
  * @param {string} body the body of the option tag
  * @returns {HTMLOptionElement}
