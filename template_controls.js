@@ -104,7 +104,7 @@ export class TemplateControls {
         this.builtin_templates = builtin_templates;
         this.custom_templates = custom_templates;
 
-        // Event listener for re-rendering when changing the dropdown
+        // Event listener for re-rendering when changing the selected template via the dropdown.
         this.dropdown.addEventListener("input", async () => {
             if (this.dropdown.value == "new-preset") {
                 this.add_new_preset()
@@ -116,7 +116,7 @@ export class TemplateControls {
             render();
         });
 
-        // Event listener for re-rendering when editing the template
+        // Event listener for re-rendering when editing the template.
         this.template_area.addEventListener("input", async () => {
             if (is_dropdown_value(this.dropdown.value)) {
                 let template = this.get_template(this.dropdown.value);
@@ -126,6 +126,7 @@ export class TemplateControls {
                     template.set_content(template_area.value);
                 }
 
+                // We regenerate the UI, since the UI-config might have changed.
                 this.#regenerate_ui();
                 render();
             }
@@ -189,7 +190,6 @@ export class TemplateControls {
         window.addEventListener("beforeunload", () => save_custom_templates(this.custom_templates));
         window.setInterval(() => save_custom_templates(this.custom_templates), 5000);
 
-
         // Set up the dropdown nodes.
         this.#renegerate_dropdown();
 
@@ -198,18 +198,18 @@ export class TemplateControls {
     }
 
     /**
-     * 
+     * Mount the TemplateControls to the given HTML elements. 
      * @param {HTMLSelectElement} template_dropdown the dropdown that presets will be located in.
      * @param {HTMLTextAreaElement} template_area the editable template window
      * @param {HTMLButtonElement} edit_template_button the "Edit Template" button
      * @param {HTMLButtonElement} delete_template_button the "Delete Template" button
      * @param {HTMLButtonElement} rename_template_button the "Rename Template" button
-     * @param {HTMLDivElement} template_ui the area for the template UI.
+     * @param {HTMLDivElement} template_ui the area for the template UI controls.
      * @returns {Promise<TemplateControls>} 
      */
     static async mount(template_dropdown, template_area, edit_template_button, delete_template_button, rename_template_button, template_ui) {
         let builtin_templates = [DISCORD_BUILTIN, TWITTER_BUILTIN, PESTERLOG_BUILTIN, FOOTBALL_BUILTIN];
-        let custom_templates = get_custom_templates();
+        let custom_templates = load_custom_templates();
         let template_controls = new TemplateControls(
             template_dropdown,
             template_area,
@@ -223,7 +223,7 @@ export class TemplateControls {
     }
 
     /**
-     * Add a new blank custom preset
+     * Add a new blank custom preset. This also sets the current template to the blank template.
      */
     add_new_preset() {
         let i = this.custom_templates.length;
@@ -236,8 +236,9 @@ export class TemplateControls {
     }
 
     /**
+     * Returns the template that has the name `dropdown_name`.
      * @param {DropdownName} dropdown_name the name of the template used by the dropdown selector
-     * @returns {Template} the Template that has the given name
+     * @returns {Template?} the Template that has the given name, if it exists
      */
     get_template(dropdown_name) {
         if (dropdown_name.startsWith("builtin")) {
@@ -252,13 +253,15 @@ export class TemplateControls {
     }
 
     /**
-     * Sets the given template as the current template
+     * Sets the given template as the current template. If the template does not exist, then this
+     * function defaults to the first builtin template
      * @param {DropdownName} dropdown_name the name of the template used by the dropdown selector
      */
     set_current_template(dropdown_name) {
         this.dropdown.value = dropdown_name;
         let template = this.get_template(dropdown_name);
         if (template == null) {
+            console.warn(`Couldn't get template ${dropdown_name}!`);
             template = this.builtin_templates[0];
         }
 
@@ -269,7 +272,6 @@ export class TemplateControls {
             this.edit_template_button.innerText = "View Template";
             this.delete_template_button.classList.add("hidden");
             this.rename_template_button.classList.add("hidden");
-
         } else {
             this.edit_template_button.innerText = "Edit Template";
             this.delete_template_button.classList.remove("hidden");
@@ -277,7 +279,32 @@ export class TemplateControls {
         }
     }
 
+    /**
+     * Returns the currently selected template.
+     * @returns {Template}
+     */
+    get_current_template() {
+        let dropdown_name = this.dropdown.value;
+        if (is_dropdown_value(dropdown_name)) {
+            let template = this.get_template(dropdown_name);
+            if (template != null) {
+                return template;
+            } else {
+                throw new Error(`Couldn't get template ${dropdown_name}?`);
+            }
+        } else {
+            // Ideally this should never happen, since the only time this happens is when the "Make New Preset" option
+            // is selected, which we immediately unselect.
+            throw new Error(`Currently selected dropdown value (${dropdown_name}) is not a DropdownName!`)
+        }
+    }
+
+    /**
+     * Regenerate the template selector dropdown. This should be called whenever the list of available templates is modified.
+     */
     #renegerate_dropdown() {
+        // Get the current dropdown value. Regenerating the dropdown will reset the current selection
+        // back to the first option in the list, so we will need to restore it.
         let last_dropdown_value = this.dropdown.value;
 
         let builtin_group = h("optgroup", { label: "Builtin Templates" });
@@ -294,24 +321,15 @@ export class TemplateControls {
 
         this.dropdown.replaceChildren(builtin_group, custom_group, new_preset);
 
+        // Restore the user's previously selected template.
         if (is_dropdown_value(last_dropdown_value)) {
             this.set_current_template(last_dropdown_value);
         }
     }
 
     /**
-     * Returns the currently selected template
-     * @returns {Template}
+     * Regenerate the UI HTML elements. 
      */
-    get_current_template() {
-        let dropdown_name = this.dropdown.value;
-        if (is_dropdown_value(dropdown_name)) {
-            return this.get_template(dropdown_name)
-        } else {
-            throw new Error(`Currently selected dropdown value (${dropdown_name}) is not a DropdownName!`)
-        }
-    }
-
     #regenerate_ui() {
         const html_nodes = this.get_current_template().get_ui_elements();
         this.template_ui.replaceChildren(...html_nodes);
@@ -319,10 +337,10 @@ export class TemplateControls {
 }
 
 /**
+ * Save the custom templates to localStorage.
  * @param {Array<Template>} templates the templates to save
  */
 function save_custom_templates(templates) {
-    console.info("Saving custom templates.");
     let saved_templates = templates.map((template) => {
         return {
             content: template.get_content(),
@@ -333,9 +351,10 @@ function save_custom_templates(templates) {
 }
 
 /**
+ * Load custom templates from localStorage. If this fails, returns an empty array.
  * @returns {Array<Template>} the saved custom templates
  */
-function get_custom_templates() {
+function load_custom_templates() {
     try {
         let stored_templates = localStorageOrDefault("customTemplates", []);
         if (!(Array.isArray(stored_templates))) {
@@ -343,6 +362,8 @@ function get_custom_templates() {
             return [];
         }
 
+        // The objects from localStorage are just bare objects--not actually the class, so we need
+        // to explicitly construct Templates.
         let templates = [];
         for (let [i, template] of enumerate(stored_templates)) {
             let real_template = Template.custom(template.displayed_name, template.content);
@@ -356,6 +377,8 @@ function get_custom_templates() {
 }
 
 /** 
+ * A class containing the contents and other information about a template. This also stores the
+ * template's UI HTMLElements.
  * @private {string} #content
  */
 class Template {
@@ -384,7 +407,8 @@ class Template {
     }
 
     /**
-     * Returns the HTML elements of the UI.
+     * Returns the HTML elements of the UI. If there are no elements or the UI config couldn't be parsed,
+     * this array is empty.
      * @returns {Array<HTMLElement>}
      */
     get_ui_elements() {
@@ -392,6 +416,7 @@ class Template {
     }
 
     /**
+     * Get the template's contents
      * @returns {string}
      */
     get_content() {
@@ -399,6 +424,9 @@ class Template {
     }
 
     /**
+     * Set the template's contents. This also parses for UI configs and will re-generate the existing
+     * ui_elements (so subseqeuent calls to `get_ui_elements` will no longer point to the same nodes).
+     * TODO: Doing this also clobbers the currently selected values for the UI elements, which we should avoid doing.
      * @param {string} new_content 
      */
     set_content(new_content) {
@@ -407,6 +435,7 @@ class Template {
     }
 
     /**
+     * Create a builtin template. The contents are fetched from the given URL.
      * @param {string} displayed_name the displayed name of the template
      * @param {string} url the url to get the template from
      * @returns {Promise<Template>}
@@ -417,6 +446,7 @@ class Template {
     }
 
     /**
+     * Create a custom template with the given contents.
      * @param {string} displayed_name the displayed name of the template
      * @param {string} content the initial contents of the template
      * @returns {Template} 
@@ -425,6 +455,14 @@ class Template {
         return new Template(displayed_name, content, false);
     }
 }
+
+export const DISCORD_BUILTIN = await Template.builtin("Discord", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/discord.html");
+export const TWITTER_BUILTIN = await Template.builtin("Twitter", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/twitter.html");
+export const FOOTBALL_BUILTIN = await Template.builtin("17776", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/17776.html");
+export const PESTERLOG_BUILTIN = await Template.builtin("Pesterlog", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/homestuck.html");
+
+
+export const BASIC_TEMPLATE = await get_template_from_url("https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/basic.html") ?? "Couldn't fetch template!";
 
 /**
  * Attempts to parse the UI description in the template contents. If it cannot, returns an empty array.
@@ -446,7 +484,7 @@ class Template {
  * @returns {Array<UIElement>}
  */
 function parse_ui_description(content) {
-    // Regenerate the UI elements.
+    // Match anything between "{#-config" and "config-#}"
     const regexp = /{#-config([\S\s]*)config-#}/;
     const matches = content.match(regexp);
     if (matches == null) {
@@ -454,6 +492,7 @@ function parse_ui_description(content) {
     }
     const json_text = matches[1];
     try {
+        // Try to parse the text as JSON.
         const json_arr = JSON.parse(json_text);
         if (!(json_arr instanceof Array)) {
             throw new Error(`expected ${json_text} to be JSON containing an array. Got ${json_arr} instead.`);
@@ -473,6 +512,10 @@ function parse_ui_description(content) {
     }
 }
 
+/**
+ * Wraps an HTMLElement containing an input element and a lable. The input element's type is determined
+ * by the given UIDescription's type. The label's contents are determined by the UIDescription's label field
+ */
 class UIElement {
     #html_element;
     /**
@@ -488,20 +531,13 @@ class UIElement {
     }
 
     /**
+     * Return the HTMLElement containing the UI.
      * @returns {HTMLElement}
      */
     get_html_element() {
         return this.#html_element;
     }
 }
-
-export const DISCORD_BUILTIN = await Template.builtin("Discord", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/discord.html");
-export const TWITTER_BUILTIN = await Template.builtin("Twitter", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/twitter.html");
-export const FOOTBALL_BUILTIN = await Template.builtin("17776", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/17776.html");
-export const PESTERLOG_BUILTIN = await Template.builtin("Pesterlog", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/homestuck.html");
-
-
-export const BASIC_TEMPLATE = await get_template_from_url("https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/basic.html") ?? "Couldn't fetch template!";
 
 /**
  * Returns an `<option>` tag with the `value` attribute set to `value` and the given `body`.

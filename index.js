@@ -50,7 +50,6 @@ export function render() {
    }
 
    try {
-      console.info("rendering...");
       let cohoard_config = config_table.cohoard_config;
       let posts = cohoard.parse_posts(cohoard_config, script_textarea.value);
       let rendered = cohoard.render("template", template_area.value, posts, cohoard_config);
