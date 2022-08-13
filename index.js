@@ -1,4 +1,4 @@
-import init, * as cohoard_module from "https://static.witchoflight.com/~a2aaron/cohoard/v0.4.0/cohoard.js";
+import init, * as cohoard_module from "https://static.witchoflight.com/~a2aaron/cohoard/v0.5.0/cohoard.js";
 
 import { ConfigTable } from "./config_table.js"
 import { TemplateControls, DISCORD_BUILTIN } from "./template_controls.js";
@@ -53,8 +53,9 @@ export function render() {
       let cohoard_config = config_table.cohoard_config;
       let posts = cohoard.parse_posts(cohoard_config, script_textarea.value);
       let template_contents = template_controls.get_current_template().get_content();
-      // let template_ui_values = template_controls.get_current_template().get_ui_values();
-      let rendered = cohoard.render("template", template_contents, posts, cohoard_config);
+      let template_ui_values = template_controls.get_current_template().get_ui_values();
+      console.log(template_ui_values);
+      let rendered = cohoard.render("template", template_contents, posts, cohoard_config, template_ui_values);
       preview_area.innerHTML = rendered;
       html_area.value = rendered;
 
@@ -187,7 +188,7 @@ function render_examples() {
    let cohoard_config = cohoard.load_config(config_json);
 
    let posts = cohoard.parse_posts(cohoard_config, discord_example_script.innerText);
-   let rendered = cohoard.render("template", DISCORD_BUILTIN.get_content(), posts, cohoard_config);
+   let rendered = cohoard.render("template", DISCORD_BUILTIN.get_content(), posts, cohoard_config, {});
    discord_example_div.innerHTML = rendered;
    // Remove the negative margin on the rendered post.
    // @ts-ignore
