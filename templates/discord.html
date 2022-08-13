@@ -1,10 +1,40 @@
+{#-config
+   [{
+      "name": "light_mode",
+      "type": "checkbox",
+      "label": "Use Light Mode"
+   }, {
+      "name": "avatar_default_color",
+      "type": "color",
+      "label": "Default Avatar Color",
+      "default": "#43b581"
+   }]
+config-#}
+
+{%- if light_mode -%}
+   {%- set background_color = "#ffffff" -%}
+   {%- set username_default_color = "#060607" -%}
+   {%- set timestamp_color = "#5e6772" -%}
+   {%- set text_color = "#2e3338" -%}
+   {%- set code_background_color = "#f2f3f5" -%}
+   {%- set code_border_color = "#e3e5e8" -%}
+{%- else -%}
+   {%- set background_color = "#36393E" -%}
+   {%- set username_default_color = "#ffffff" -%}
+   {%- set timestamp_color = "#a3a6aa" -%}
+   {%- set text_color = "#DCDDDE" -%}
+   {%- set code_background_color = "#2f3136" -%}
+   {%- set code_border_color = "#202225" -%}
+{%- endif -%}
+
+
 {#- The styling rules for converted Markdown text. -#}
 <style>
    strong {
       font-weight: 700;
       /* This is necessary because Cohost adjusts the color of bold text, which messes up the 
          off-white coloring of our text. */
-      color: #DCDDDE;
+      color: {{ text_color }};
    }
 
    .cohoard-underline {
@@ -22,7 +52,7 @@
       padding: .2em;
       margin: -.2em 0;
 
-      background: #2f3136;
+      background: {{ code_background_color }};
       border-radius: 3px;
    }
 
@@ -39,9 +69,9 @@
       box-sizing: border-box;
       
       background-clip: border-box;
-      background: #2f3136;
+      background: {{ code_background_color }};
       
-      border: 1px solid #202225;
+      border: 1px solid {{ code_border_color }};
       border-radius: 4px;
    }
 </style>
@@ -54,15 +84,13 @@
          most people probably don't have that font installed.
          Hence we use some fallback fonts that look sort of like it. */
       font-family: Whitney, Verdana, "Helvetica Neue", Helvetica, Arial, sans-serif;
-      /* #36393E is the dark mode background color. 
-         TODO: Add light mode background color. */
-      background-color: #36393E;
+      background-color: {{ background_color }};
       min-height: 128px;
       padding: 16px;
       line-height: 1.375rem;
       margin: -16px -12px;
       /* Message body text color */
-      color: #DCDDDE;
+      color: {{ text_color }};
       font-size: 1rem;
    }
 
@@ -99,7 +127,7 @@
    }
 
    .timestamp {
-      color: #A3A6AA;
+      color: {{ timestamp_color }};
       font-size: 0.75rem;
       padding-left: 10px;
    }
@@ -115,7 +143,7 @@
 
 {%- for user in users -%}
    .{{user.key}}.headline-username {
-      color: {{ user.color | default(value="white") }};
+      color: {{ user.color | default(value=username_default_color) }};
       font-size: 100%;
    }
 
@@ -125,7 +153,7 @@
       {% elif user.color %}
          background: {{ user.color }};
       {% else %}
-         background: #43b581;
+         background: {{ avatar_default_color }};
       {% endif %}
    }
 {%- endfor -%}
