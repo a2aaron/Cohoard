@@ -489,14 +489,6 @@ class Template {
     }
 }
 
-export const DISCORD_BUILTIN = await Template.builtin("Discord", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/discord.html");
-export const TWITTER_BUILTIN = await Template.builtin("Twitter", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/twitter.html");
-export const FOOTBALL_BUILTIN = await Template.builtin("17776", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/17776.html");
-export const PESTERLOG_BUILTIN = await Template.builtin("Pesterlog", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/homestuck.html");
-
-
-export const BASIC_TEMPLATE = await get_template_from_url("https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/basic.html") ?? "Couldn't fetch template!";
-
 /**
  * Attempts to parse the UI description in the template contents. If it cannot, returns an empty array.
  * This attempts to find a comment within the template similar to the schema below:
@@ -538,7 +530,7 @@ function parse_ui_description(content) {
             if (is_ui_description(ui_desc)) {
                 elements[ui_desc.name] = new UIElement(ui_desc);
             } else {
-                console.error(`Expected ${ui_desc} to be a UIDescription!`);
+                console.error(`Expected ${ui_desc} to be a UIDescription!`, ui_desc);
             }
         }
         return elements;
@@ -663,3 +655,11 @@ async function get_template_from_url(url) {
     });
     return text;
 }
+
+export const DISCORD_BUILTIN = await Template.builtin("Discord", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/discord.html");
+export const TWITTER_BUILTIN = await Template.builtin("Twitter", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/twitter.html");
+export const FOOTBALL_BUILTIN = await Template.builtin("17776", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/17776.html");
+export const PESTERLOG_BUILTIN = await Template.builtin("Pesterlog", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/homestuck.html");
+
+
+export const BASIC_TEMPLATE = await get_template_from_url("https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/basic.html") ?? "Couldn't fetch template!";
