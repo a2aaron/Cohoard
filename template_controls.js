@@ -526,22 +526,27 @@ function parse_ui_description(content) {
     }
     const json_text = matches[1];
     // Try to parse the text as JSON.
-    const json_arr = JSON.parse(json_text);
-    if (!(json_arr instanceof Array)) {
-        console.error(`expected ${json_text} to be JSON containing an array. Got ${json_arr} instead.`);
+    try {
+        const json_arr = JSON.parse(json_text);
+        if (!(json_arr instanceof Array)) {
+            console.error(`expected ${json_text} to be JSON containing an array. Got ${json_arr} instead.`);
+            return {};
+        }
+        // Finally, set up the dictionary.
+        let elements = /** @type {UIElements} */ ({});
+        for (let ui_desc of json_arr) {
+            if (is_ui_description(ui_desc)) {
+                elements[ui_desc.name] = new UIElement(ui_desc);
+            } else {
+                console.error(`Expected ${ui_desc} to be a UIDescription!`);
+            }
+        }
+        return elements;
+    } catch (err) {
+        console.error(err, json_text);
         return {};
     }
 
-    // Finally, set up the dictionary.
-    let elements = /** @type {UIElements} */ ({});
-    for (let ui_desc of json_arr) {
-        if (is_ui_description(ui_desc)) {
-            elements[ui_desc.name] = new UIElement(ui_desc);
-        } else {
-            console.error(`Expected ${ui_desc} to be a UIDescription!`);
-        }
-    }
-    return elements;
 }
 
 /**
