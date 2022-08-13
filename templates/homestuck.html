@@ -1,3 +1,12 @@
+{#-config
+   [{
+      "name": "prefer_short_handle",
+      "type": "checkbox",
+      "label": "Prefer <code>short_handle</code>",
+      "default": "true"
+   }]
+config-#}
+
 <style>
    .cohoard-underline { text-decoration: underline; }
 
@@ -80,7 +89,7 @@
 
 {%- for postblock in posts -%}
     {%- for message in postblock.messages -%}
-        {%- if postblock.user.short_handle -%}
+        {%- if postblock.user.short_handle and prefer_short_handle -%}
             {%- set handle = postblock.user.short_handle -%}
         {%- elif postblock.user.handle -%}
             {%- set handle = postblock.user.handle -%}
