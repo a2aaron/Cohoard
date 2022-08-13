@@ -1,3 +1,17 @@
+{#-config
+   [{
+      "name": "light_mode",
+      "type": "checkbox",
+      "label": "Use Light Mode"
+   }, {
+      "name": "whats_happening_avatar",
+      "type": "url",
+      "label": "\"What's Happening\" Avatar URL",
+      "placeholder": "url to an image",
+      "default": "https://staging.cohostcdn.org/avatar/266-1bb8ccae-655b-44b6-830d-3d15e7467a9d-profile.png"
+   }]
+config-#}
+
 {#- Icon URLs -#}
 {% set sidebar_twitter = "https://staging.cohostcdn.org/attachment/87582302-03a4-476f-bf85-eb7927ec3b24/tw-bird-Artboard%201@3x.png" %}
 {% set sidebar_home = "https://staging.cohostcdn.org/attachment/6d895790-8cbd-425e-bf5a-14c8a9deacd3/tw-home-Artboard%201@3x.png" %}
@@ -17,7 +31,22 @@
 {% set reply_rt = "https://staging.cohostcdn.org/attachment/408a7a6a-eb54-4887-822a-e8dfd60549e8/tw-rt-Artboard%201@3x.png" %}
 {% set reply_share = "https://staging.cohostcdn.org/attachment/5e0d4a8a-d6a9-4728-9079-98d1d148ca60/tw-share-Artboard%201@3x.png" %}
 
-{% set whats_happening_avatar = "https://staging.cohostcdn.org/avatar/266-1bb8ccae-655b-44b6-830d-3d15e7467a9d-profile.png" %}
+{% if light_mode %}
+    {% set background_color = "white" %}
+    {% set border_color = "#eff3f4" %}
+    {% set text_color = "#0f1419" %}
+    {% set handle_color = "#536471" %}
+    {% set share_icon_color = "#536471" %}
+    {% set sidebar_icon_color = "#0f1419" %}
+
+{% else %}
+    {% set background_color = "black" %}
+    {% set border_color = "#333" %}
+    {% set text_color = "#d6d9db" %}
+    {% set handle_color = "#71767b" %}
+    {% set share_icon_color = "#71767b" %}
+    {% set sidebar_icon_color = "#d6d9db" %}
+{% endif %}
 
 <style>
     #post-container {
@@ -27,8 +56,8 @@
         width: calc(100% + 2em);
         height: 500px;
         margin: -1em;
-        background-color: black;
-        color: white;
+        background-color: {{ background_color }};
+        color: {{ text_color }};
     }
 
     /* Sidebar styling */
@@ -39,7 +68,7 @@
         flex-direction: column;
         align-items: center;
         padding: 16px 0;
-        border-right: 1px solid #333;
+        border-right: 1px solid {{ border_color }};
     }
 
     .sidebar-icon {
@@ -89,7 +118,7 @@
     #latest-tweets-text {
         margin: 0;
         margin-top: -5px;
-        color: white;
+        color: {{ text_color }};
     }
 
     #latest-tweets-icon {
@@ -121,7 +150,7 @@
         grid-template-columns: 60px 1fr;
         grid-template-rows: 1fr 48px;
         padding: 0 16px 8px 16px;
-        border-bottom: 1px solid #333;
+        border-bottom: 1px solid {{ border_color }};
     }
 
     #whats-happening-avatar-container {
@@ -141,7 +170,7 @@
     #whats-happening-text {
         padding: 6px 12px;
         font-size: 20px;
-        color: #72767B;
+        color: {{ handle_color }};
     }
 
     #post-editor-icons-container {
@@ -161,6 +190,7 @@
         margin-left: auto;
         padding: 0 16px;
         background-color: rgb(29, 155, 240);
+        color: white;
         border-radius: 9999px;
         font-weight: bold;
         cursor: pointer;
@@ -174,7 +204,7 @@
         justify-content: flex-start;
         width: 100%;
         padding: 16px;
-        border-bottom: 1px solid #333;
+        border-bottom: 1px solid {{ border_color }};
     }
 
     .tweet-text-container {
@@ -190,7 +220,7 @@
     }
 
     .headline-handle {
-        color: #72767B;
+        color: {{ handle_color }};
         cursor: pointer;
     }
 
