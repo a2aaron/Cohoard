@@ -48,10 +48,12 @@ function custom_i(i) {
  * template wishes to include as a control for itself. UIDescriptions are transformed into UIElements
  * when being shown to the user.
  * @typedef {{
- *      "name": string,
- *      "type": "text" | "url" | "time" | "datetime" | "email" |
+ *      name: string,
+ *      type: "text" | "url" | "time" | "datetime" | "email" |
  *              "checkbox" | "radio" | "color" | "range" | "file",
- *      "label": string,
+ *      label: string,
+ *      default?: string,
+ *      placeholder?: string,
  * }} UIDescription
  */
 
@@ -555,13 +557,28 @@ class UIElement {
     /** @type {HTMLInputElement} */
     #input_element
     /**
-     * @param {UIDescription} ui_description the UIDescription for this element. determines the type and label of the element
+     * @param {UIDescription} ui_description the UIDescription for this element. This determines the
+     * contents of the input and label. Specifically:
+     * - the `type` attribute of the `<input>` will be `ui_description.type`
+     * - the `id` attribute of the `<input>` will be `template-ui-${ui_description.name}`
+     * * - the `for` attribute of the `<label>` will be `template-ui-${ui_description.name}`
+     * - the inital `value` of the `<input>` will be `ui_description.default`, if provided
+     * - the `placeholder` attribute of the `<input>` will be `ui_description.placeholder`, if provided
+     * - the body of the `<label>` will be `ui_description.label`
      */
     constructor(ui_description) {
         const label = `template-ui-${ui_description.name}`;
 
         //@ts-ignore
         this.#input_element = h("input", { type: ui_description.type, id: label });
+        if (ui_description.default) {
+            this.#input_element.value = ui_description.default;
+        }
+
+        if (ui_description.placeholder) {
+            this.#input_element.placeholder = ui_description.placeholder;
+        }
+
         // Rerender whenever this UI object is changed.
         this.#input_element.addEventListener("input", () => render())
 
