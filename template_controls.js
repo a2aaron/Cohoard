@@ -579,7 +579,11 @@ class UIElement {
         // Rerender whenever this UI object is changed.
         this.#input_element.addEventListener("input", () => render())
 
-        let label_element = h("label", { for: label }, [ui_description.label]);
+        // Set innerHTML instead of passing the UI description label as a string into the body array
+        // above. This is done so that HTML inside the UI description label will turn into actual
+        // HTML and not text.
+        let label_element = h("label", { for: label }, []);
+        label_element.innerHTML = ui_description.label;
 
         this.#html_element = h("div", { class: "template-ui-element gap-1" }, [label_element, this.#input_element]);
 
