@@ -8,46 +8,46 @@
       "type": "url",
       "label": "\"What's Happening\" Avatar URL",
       "placeholder": "url to an image",
-      "default": "https://staging.cohostcdn.org/avatar/266-1bb8ccae-655b-44b6-830d-3d15e7467a9d-profile.png"
+      "default": "https://static.witchoflight.com/~a2aaron/cohoard-avatars/eggbug-relaxed.png"
    }]
 config-#}
 
 {#- Icon URLs -#}
-{% set sidebar_twitter = "https://staging.cohostcdn.org/attachment/87582302-03a4-476f-bf85-eb7927ec3b24/tw-bird-Artboard%201@3x.png" %}
-{% set sidebar_home = "https://staging.cohostcdn.org/attachment/6d895790-8cbd-425e-bf5a-14c8a9deacd3/tw-home-Artboard%201@3x.png" %}
-{% set sidebar_search = "https://staging.cohostcdn.org/attachment/e6db220d-65db-4a62-b233-1073087c3e9c/tw-search-Artboard%201@3x.png" %}
-{% set sidebar_notifications = "https://staging.cohostcdn.org/attachment/8070edf5-61be-498f-96b4-c6970be4e67e/tw-bell-Artboard%201@3x.png" %}
-{% set sidebar_more = "https://staging.cohostcdn.org/attachment/86d887ce-e71e-4b83-b449-39b7d8eb8e23/tw-more-Artboard%201@3x.png" %}
-{% set sidebar_new_post = "https://staging.cohostcdn.org/attachment/05bfc8a7-6bb9-45b8-8842-49ede893f9b3/tw-feather-Artboard%201@3x.png" %}
+{% set sidebar_twitter = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/bird.png" %}
+{% set sidebar_home = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/home.png" %}
+{% set sidebar_search = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/search.png" %}
+{% set sidebar_notifications = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/notifications.png" %}
+{% set sidebar_more = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/more.png" %}
+{% set sidebar_new_post = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/new_post.png" %}
 
-{% set latest_tweets_icon = "https://staging.cohostcdn.org/attachment/57d36841-c954-4e4c-88b0-185be6ca0df0/tw-stars-Artboard%201@3x.png" %}
+{% set latest_tweets_icon = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/stars.png" %}
 
-{% set post_editor_image = "https://staging.cohostcdn.org/attachment/4981aa61-69e8-489a-8ebc-49102ccd659c/tw-pic-Artboard%201@3x.png" %}
-{% set post_editor_gif = "https://staging.cohostcdn.org/attachment/f589b01e-2892-4fec-8740-84752dd6702d/tw-gif-Artboard%201@3x.png" %}
-{% set post_editor_smile = "https://staging.cohostcdn.org/attachment/d4ed0fb0-a78b-42e7-954a-801a379c4c74/tw-smile-Artboard%201@3x.png" %}
+{% set post_editor_image = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/artboard.png" %}
+{% set post_editor_gif = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/gif.png" %}
+{% set post_editor_smile = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/smile.png" %}
 
-{% set reply_chat = "https://staging.cohostcdn.org/attachment/f527bcd8-d35e-430d-a0ad-efb07cce0bfd/tw-chat-Artboard%201@3x.png" %}
-{% set reply_like = "https://staging.cohostcdn.org/attachment/7b9e088a-021c-4323-9a21-09617a9df964/tw-like-Artboard%201@3x.png" %}
-{% set reply_rt = "https://staging.cohostcdn.org/attachment/408a7a6a-eb54-4887-822a-e8dfd60549e8/tw-rt-Artboard%201@3x.png" %}
-{% set reply_share = "https://staging.cohostcdn.org/attachment/5e0d4a8a-d6a9-4728-9079-98d1d148ca60/tw-share-Artboard%201@3x.png" %}
+{% set reply_chat = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/reply.png" %}
+{% set reply_like = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/like.png" %}
+{% set reply_rt = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/retweet.png" %}
+{% set reply_share = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/share.png" %}
 
 {% if light_mode %}
     {% set background_color = "white" %}
     {% set border_color = "#eff3f4" %}
     {% set text_color = "#0f1419" %}
     {% set handle_color = "#536471" %}
-    {% set share_icon_color = "#536471" %}
+    {% set reply_icon_color = "#536471" %}
     {% set sidebar_icon_color = "#0f1419" %}
-
 {% else %}
     {% set background_color = "black" %}
     {% set border_color = "#333" %}
     {% set text_color = "#d6d9db" %}
     {% set handle_color = "#71767b" %}
-    {% set share_icon_color = "#71767b" %}
+    {% set reply_icon_color = "#71767b" %}
     {% set sidebar_icon_color = "#d6d9db" %}
 {% endif %}
 
+{% set twitter_blue = "#1d9bf0" %}
 <style>
     #post-container {
         display: grid;
@@ -73,8 +73,12 @@ config-#}
 
     .sidebar-icon {
         width: 24px;
+        height: 24px;
+        display: inline-block;
         margin: 0;
         margin-bottom: 32px;
+        background: {{ sidebar_icon_color }};
+        mask-size: cover;
         cursor: pointer;
     }
 
@@ -85,7 +89,7 @@ config-#}
         width: 52px;
         height: 52px;
         margin-top: auto;
-        background-color: rgb(29, 155, 240);
+        background-color: {{ twitter_blue }};
         border-radius: 9999px;
         cursor: pointer;
     }
@@ -123,7 +127,11 @@ config-#}
 
     #latest-tweets-icon {
         width: 24px;
+        height: 24px;
+        display: inline-block;
         margin: 0;
+        background-color: {{ text_color }};
+        mask-size: cover;
         cursor: pointer;
     }
 
@@ -189,7 +197,7 @@ config-#}
         height: 36px;
         margin-left: auto;
         padding: 0 16px;
-        background-color: rgb(29, 155, 240);
+        background-color: {{ twitter_blue }};
         color: white;
         border-radius: 9999px;
         font-weight: bold;
@@ -236,6 +244,9 @@ config-#}
         width: 22px;
         height: 22px;
         margin: 0;
+        display: inline-block;
+        background: {{ reply_icon_color }};
+        mask-size: cover;
         cursor: pointer;
     }
 
@@ -248,11 +259,11 @@ config-#}
 
 <div id="post-container">
     <div id="sidebar">
-        <img src="{{sidebar_twitter}}" alt="twitter" class="sidebar-icon"/>
-        <img src="{{sidebar_home}}" alt="home" class="sidebar-icon" />
-        <img src="{{sidebar_search}}" alt="search" class="sidebar-icon" />
-        <img src="{{sidebar_notifications}}" alt="notifications" class="sidebar-icon" /> 
-        <img src="{{sidebar_more}}" alt="more" class="sidebar-icon" /> 
+        <div style="mask: url({{sidebar_twitter}}); background: {{ twitter_blue }}" class="sidebar-icon"></div>
+        <div style="mask: url({{sidebar_home}})" class="sidebar-icon"></div>
+        <div style="mask: url({{sidebar_search}})" class="sidebar-icon"></div>
+        <div style="mask: url({{sidebar_notifications}})" class="sidebar-icon"></div>
+        <div style="mask: url({{sidebar_more}})" class="sidebar-icon"></div>
         <div id="new-post-circle">
             <img src="{{sidebar_new_post}}" alt="new post" id="new-post-icon" />
         </div>
@@ -260,7 +271,7 @@ config-#}
     <div id="main">
         <div id="latest-tweets-bar">
             <h2 id="latest-tweets-text">Latest Tweets</h2>
-            <img src="{{latest_tweets_icon}}" alt="timeline sparkle" id="latest-tweets-icon" />
+            <div style="mask: url({{latest_tweets_icon}})" id="latest-tweets-icon"></div>
         </div>
         <div id="timeline">
             <div id="whats-happening">
@@ -306,10 +317,10 @@ config-#}
 <p class="tweet-content">{{- message | markdown | trim | safe -}}</p>
                     {%- endfor -%}
                     <div class="reply-icons-container">
-                        <img src="{{reply_chat}}" alt="reply" class="reply-icon" />
-                        <img src="{{reply_like}}" alt="like" class="reply-icon" />
-                        <img src="{{reply_rt}}" alt="retweet" class="reply-icon" />
-                        <img src="{{reply_share}}" alt="share" class="reply-icon" />
+                        <div style="mask: url({{reply_chat}})" class="reply-icon"></div>
+                        <div style="mask: url({{reply_like}})" class="reply-icon"></div>
+                        <div style="mask: url({{reply_rt}})" class="reply-icon"></div>
+                        <div style="mask: url({{reply_share}})" class="reply-icon"></div>
                     </div>
                 </div>
             </div>
