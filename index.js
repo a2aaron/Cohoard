@@ -54,7 +54,6 @@ export function render() {
       let posts = cohoard.parse_posts(cohoard_config, script_textarea.value);
       let template_contents = template_controls.get_current_template().get_content();
       let template_ui_values = template_controls.get_current_template().get_ui_values();
-      console.log(template_ui_values);
       let rendered = cohoard.render("template", template_contents, posts, cohoard_config, template_ui_values);
       preview_area.innerHTML = rendered;
       html_area.value = rendered;

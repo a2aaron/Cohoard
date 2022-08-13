@@ -194,6 +194,7 @@ export class TemplateControls {
 
         // Set up the dropdown nodes.
         this.#renegerate_dropdown();
+        this.#regenerate_ui();
 
         // Set the current template to the first builtin template.
         this.set_current_template("builtin-0");
@@ -459,7 +460,6 @@ class Template {
             // If the new element would have the same name and type as the old element, use the old
             // elements's previous value, so that we do not clobber it.
             if (new_elements[name] && UIElement.equals(new_elements[name], old_element)) {
-                console.log("Merging...", name, old_element, new_elements[name]);
                 new_elements[name].set_value(old_element.get_value());
             }
         }
