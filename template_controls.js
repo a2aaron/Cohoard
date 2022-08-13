@@ -569,7 +569,11 @@ class UIElement {
         //@ts-ignore
         this.#input_element = h("input", { type: ui_description.type, id: label });
         if (ui_description.default) {
-            this.#input_element.value = ui_description.default;
+            if (ui_description.type == "checkbox") {
+                this.#input_element.checked = ui_description.default === "true";
+            } else {
+                this.#input_element.value = ui_description.default;
+            }
         }
 
         if (ui_description.placeholder) {
