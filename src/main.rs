@@ -44,6 +44,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         &template_contents,
         &posts,
         &config,
+        std::iter::empty(),
     )?;
 
     if let Some(out_path) = args.out_file {

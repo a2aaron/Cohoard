@@ -153,6 +153,7 @@ pub fn render(
     template: &str,
     posts: &[PostBlock],
     config: &Config,
+    additional_variables: impl IntoIterator<Item = (String, serde_json::Value)>,
 ) -> Result<String, Box<dyn Error>> {
     let mut tera = Tera::default();
     tera.add_raw_template(template_name, template)?;
@@ -161,6 +162,9 @@ pub fn render(
     let mut context = Context::new();
     context.insert("posts", &posts);
     context.insert("users", &config.people.values().collect::<Vec<_>>());
+    for (name, value) in additional_variables {
+        context.insert(name, &value);
+    }
 
     let html = tera.render(template_name, &context)?;
 

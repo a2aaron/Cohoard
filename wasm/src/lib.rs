@@ -1,4 +1,4 @@
-use std::error::Error;
+use std::{collections::HashMap, error::Error};
 
 use wasm_bindgen::prelude::*;
 
@@ -32,10 +32,22 @@ pub fn render(
     template: &str,
     posts: &PostBlockArray,
     config: &Config,
+    additional_variables: &JsValue,
 ) -> Result<String, JsError> {
     let posts = posts.0.into_serde::<Vec<_>>()?;
     let config = config.0.into_serde()?;
-    cohoard::render(template_name, template, &posts, &config).map_err(|err| {
+
+    let additional_variables =
+        additional_variables.into_serde::<HashMap<String, serde_json::Value>>()?;
+
+    cohoard::render(
+        template_name,
+        template,
+        &posts,
+        &config,
+        additional_variables.into_iter(),
+    )
+    .map_err(|err| {
         // Try to parse out a Tera error message, if one was encountered during rendering.
         // TODO: provide more context?
         if let Some(tera_error) = err.source().and_then(|e| e.downcast_ref::<tera::Error>()) {

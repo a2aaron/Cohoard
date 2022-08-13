@@ -1,6 +1,6 @@
 [package]
 name = "cohoard"
-version = "0.4.0"
+version = "0.5.0"
 edition = "2021"
 description = "turn chatlogs into formatted posts for cohost"
 repository = "https://github.com/a2aaron/Cohoard"
@@ -19,6 +19,8 @@ version = "*"
 [dependencies]
 wasm-bindgen = { version = "0.2.74", features = ["serde-serialize"], default-features = false }
 tera = { version = "1.16.0", default-features = false } # note: tera needs no default features or else it won't compile
+serde_json = "1.0.83"
+js-sys = "0.3.59"
 
 [profile.release]
 opt-level = "z"
