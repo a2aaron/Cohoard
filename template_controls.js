@@ -511,34 +511,43 @@ class Template {
  */
 function parse_ui_description(content) {
     // Match anything between "{#-config" and "config-#}"
-    const regexp = /{#-config([\S\s]*)config-#}/;
-    const matches = content.match(regexp);
-    if (matches == null) {
-        return {};
-    }
-    const json_text = matches[1];
-    // Try to parse the text as JSON.
-    try {
-        const json_arr = JSON.parse(json_text);
-        if (!(json_arr instanceof Array)) {
-            console.error(`expected ${json_text} to be JSON containing an array. Got ${json_arr} instead.`);
-            return {};
+    const regexp = /{#-config(.+?)config-#}/gs;
+    const matches = content.matchAll(regexp);
+    console.log("matches", matches);
+
+    let elements = /** @type {UIElements} */ ({});
+
+    for (const match of matches) {
+        // Try to access the first capture group. Otherwise, skip this match because it's malformed.
+        if (match.length < 2) {
+            continue;
         }
-        // Finally, set up the dictionary.
-        let elements = /** @type {UIElements} */ ({});
-        for (let ui_desc of json_arr) {
-            if (is_ui_description(ui_desc)) {
-                elements[ui_desc.name] = new UIElement(ui_desc);
-            } else {
-                console.error(`Expected ${ui_desc} to be a UIDescription!`, ui_desc);
+
+        let json_text = match[1];
+
+        try {
+            // Try to parse the text as a JSON array.
+            const json_arr = JSON.parse(json_text);
+            if (!(json_arr instanceof Array)) {
+                console.error(`expected ${json_text} to be JSON containing an array. Got ${json_arr} instead.`);
+                continue;
             }
+
+            // Finally, parse the UI descriptions and add them to the dictionary.
+            for (let ui_desc of json_arr) {
+                if (is_ui_description(ui_desc)) {
+                    elements[ui_desc.name] = new UIElement(ui_desc);
+                } else {
+                    console.error(`Expected ${ui_desc} to be a UIDescription!`, ui_desc);
+                }
+            }
+        } catch (err) {
+            console.error(err, json_text);
+            continue;
         }
-        return elements;
-    } catch (err) {
-        console.error(err, json_text);
-        return {};
     }
 
+    return elements;
 }
 
 /**
