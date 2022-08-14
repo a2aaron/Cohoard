@@ -2,7 +2,7 @@ import init, * as cohoard_module from "https://static.witchoflight.com/~a2aaron/
 
 import { ConfigTable } from "./config_table.js"
 import { TemplateControls, DISCORD_BUILTIN } from "./template_controls.js";
-import { getTypedElementById, localStorageOrDefault } from "./util.js";
+import { getTypedElementById, localStorageOrDefault, render_error_messages, set_error_message, unset_error_message } from "./util.js";
 import { PRESETS } from "./presets.js"
 
 /** @type {typeof cohoard_module?} */
@@ -49,21 +49,19 @@ export function render() {
       return;
    }
 
+   let cohoard_config = config_table.cohoard_config;
+   let template_contents = template_controls.get_current_template().get_content();
+   let template_ui_values = template_controls.get_current_template().get_ui_values();
+
    try {
-      let cohoard_config = config_table.cohoard_config;
       let posts = cohoard.parse_posts(cohoard_config, script_textarea.value);
-      let template_contents = template_controls.get_current_template().get_content();
-      let template_ui_values = template_controls.get_current_template().get_ui_values();
       let rendered = cohoard.render("template", template_contents, posts, cohoard_config, template_ui_values);
       preview_area.innerHTML = rendered;
       html_area.value = rendered;
-
+      unset_error_message("render", template_controls.get_current_dropdown());
       config_table.unmark_errs();
-
-      error_msg.innerText = "";
    } catch (err) {
       let the_err = /** @type {Error} */ (err);
-      // @ts-ignore
       console.error("Failed to render template\n", the_err);
       // Try to parse the error message into something useful
       let missing_var = parse_as_missing_variable(the_err.message);
@@ -74,17 +72,19 @@ export function render() {
             config_table.unmark_errs();
             const is_key_in_table = config_table.mark_err(field);
             if (is_key_in_table) {
-               error_msg.innerText = `Field "${field}" is missing from a row in the Config Table`;
+               set_error_message(new Error(`Field "${field}" is missing from a row in the Config Table`, { cause: the_err }), "render", template_controls.get_current_dropdown());
             } else {
-               error_msg.innerText = `Couldn't find a field named "${field}" (Maybe you need to add it to the Config Table?)`;
+               set_error_message(new Error(`Couldn't find a field named "${field}" (Maybe you need to add it to the Config Table?)`, { cause: the_err }), "render", template_controls.get_current_dropdown());
             }
          } else {
-            error_msg.innerText = `Invalid variable "${missing_var}"`;
+            set_error_message(new Error(`Invalid variable "${missing_var}"`, { cause: the_err }), "render", template_controls.get_current_dropdown());
          }
       } else {
-         error_msg.innerText = the_err.message;
+         set_error_message(the_err, "render", template_controls.get_current_dropdown());
       }
    }
+
+   render_error_messages(template_controls.get_current_dropdown());
 }
 
 // The config object that the Cohoard Rust library uses.
@@ -114,8 +114,6 @@ let template_controls = await TemplateControls.mount(template_dropdown, template
 
 let preview_button = getTypedElementById(HTMLButtonElement, "preview-btn");
 let html_button = getTypedElementById(HTMLButtonElement, "html-btn");
-
-let error_msg = getTypedElementById(HTMLPreElement, "error-msg");
 
 // Set up event listeners.
 
@@ -206,14 +204,15 @@ try {
 } catch (err) {
    console.error("oh god oh fuck we couldn't load cohoard ", err);
    preview_area.innerHTML = "Something broke, we couldn't load Cohoard :(";
-   error_msg.innerText = String(err);
+   // @ts-ignore
+   set_error_message(err, "init", "ALL");
 }
 
 cohoard = cohoard_module;
 
 function after_cohoard_load() {
    render();
-   render_examples()
+   render_examples();
 }
 
 after_cohoard_load();

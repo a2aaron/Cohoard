@@ -1,4 +1,4 @@
-import { h, localStorageOrDefault, enumerate, assert_html_node } from "./util.js";
+import { h, localStorageOrDefault, enumerate, render_error_messages, set_error_message, unset_error_message } from "./util.js";
 import { render } from "./index.js";
 
 
@@ -110,8 +110,8 @@ export class TemplateControls {
         this.dropdown.addEventListener("input", async () => {
             if (this.dropdown.value == "new-preset") {
                 this.add_new_preset()
-            } else if (is_dropdown_value(this.dropdown.value)) {
-                this.set_current_template(this.dropdown.value);
+            } else {
+                this.set_current_template(this.get_current_dropdown());
             }
 
             this.#regenerate_ui();
@@ -120,12 +120,19 @@ export class TemplateControls {
 
         // Event listener for re-rendering when editing the template.
         this.template_area.addEventListener("input", async () => {
-            if (is_dropdown_value(this.dropdown.value)) {
-                let template = this.get_template(this.dropdown.value);
+            let dropdown_value = this.get_current_dropdown();
+            if (is_dropdown_value(dropdown_value)) {
+                let template = this.get_template(dropdown_value);
                 if (template == null) {
-                    console.warn(`couldn't get template ${this.dropdown.value}`);
+                    console.warn(`couldn't get template ${dropdown_value}`);
                 } else {
-                    template.set_content(template_area.value);
+                    let maybe_error = template.set_content(template_area.value);
+                    if (maybe_error != null) {
+                        console.error(maybe_error);
+                        set_error_message(maybe_error, "parse_ui_description", dropdown_value);
+                    } else {
+                        unset_error_message("parse_ui_description", dropdown_value);
+                    }
                 }
 
                 // We regenerate the UI, since the UI-config might have changed.
@@ -136,7 +143,7 @@ export class TemplateControls {
 
         // Event listener for the delete button
         this.delete_template_button.addEventListener("click", () => {
-            let dropdown_value = this.dropdown.value;
+            let dropdown_value = this.get_current_dropdown();
             if (is_custom(dropdown_value)) {
                 if (!confirm(`Are you sure you want to delete ${this.dropdown.selectedOptions[0].textContent}?`)) {
                     return;
@@ -168,7 +175,7 @@ export class TemplateControls {
 
         // Event listener for the rename button
         this.rename_template_button.addEventListener("click", () => {
-            let dropdown_value = this.dropdown.value;
+            let dropdown_value = this.get_current_dropdown();
             if (is_custom(dropdown_value)) {
                 let old_name = this.dropdown.selectedOptions[0].textContent ?? "";
                 let new_name = prompt(`Enter the new name for ${old_name}`, old_name);
@@ -231,7 +238,7 @@ export class TemplateControls {
     add_new_preset() {
         let i = this.custom_templates.length;
 
-        let new_template = Template.custom("Custom Template " + i, BASIC_TEMPLATE);
+        let [new_template, maybe_error] = Template.custom("Custom Template " + i, BASIC_TEMPLATE);
         this.custom_templates.push(new_template);
 
         this.#renegerate_dropdown();
@@ -280,6 +287,8 @@ export class TemplateControls {
             this.delete_template_button.classList.remove("hidden");
             this.rename_template_button.classList.remove("hidden");
         }
+
+        render_error_messages(dropdown_name);
     }
 
     /**
@@ -287,18 +296,24 @@ export class TemplateControls {
      * @returns {Template}
      */
     get_current_template() {
-        let dropdown_name = this.dropdown.value;
-        if (is_dropdown_value(dropdown_name)) {
-            let template = this.get_template(dropdown_name);
-            if (template != null) {
-                return template;
-            } else {
-                throw new Error(`Couldn't get template ${dropdown_name}?`);
-            }
+        let template = this.get_template(this.get_current_dropdown());
+        if (template != null) {
+            return template;
         } else {
-            // Ideally this should never happen, since the only time this happens is when the "Make New Preset" option
-            // is selected, which we immediately unselect.
-            throw new Error(`Currently selected dropdown value (${dropdown_name}) is not a DropdownName!`)
+            throw new Error(`Couldn't get template ${this.get_current_dropdown()}?`);
+        }
+    }
+
+    /**
+     * Return the current value of the dropdown selection.
+     * @returns {DropdownName}
+     */
+    get_current_dropdown() {
+        let dropdown_value = this.dropdown.value;
+        if (is_dropdown_value(dropdown_value)) {
+            return dropdown_value;
+        } else {
+            throw new Error(`Currently selected dropdown value ${dropdown_value} is not a Dropdownname!`);
         }
     }
 
@@ -373,7 +388,10 @@ function load_custom_templates() {
         // to explicitly construct Templates.
         let templates = [];
         for (let [i, template] of enumerate(stored_templates)) {
-            let real_template = Template.custom(template.displayed_name, template.content);
+            let [real_template, maybe_error] = Template.custom(template.displayed_name, template.content);
+            if (maybe_error) {
+                console.log(`todo: move this elsewhere`, maybe_error);
+            }
             templates.push(real_template);
         }
         return templates;
@@ -399,12 +417,13 @@ class Template {
      * @param {string} displayed_name the displayed name of the template
      * @param {boolean} is_builtin true if the template is builtin
      * @param {string} content the contents of the template (if not builtin)
+     * @param {UIElements} ui_elements the ui elements of the template
      */
-    constructor(displayed_name, content, is_builtin) {
+    constructor(displayed_name, content, is_builtin, ui_elements) {
         this.displayed_name = displayed_name;
         this.is_builtin = is_builtin;
         this.#content = content;
-        this.#ui_elements = parse_ui_description(content);
+        this.#ui_elements = ui_elements;
     }
 
     /**
@@ -454,7 +473,7 @@ class Template {
      */
     set_content(new_content) {
         this.#content = new_content;
-        let new_elements = parse_ui_description(new_content);
+        let [new_elements, maybe_error] = parse_ui_description(new_content);
 
         for (const [name, old_element] of Object.entries(this.#ui_elements)) {
             // If the new element would have the same name and type as the old element, use the old
@@ -465,6 +484,8 @@ class Template {
         }
 
         this.#ui_elements = new_elements;
+
+        return maybe_error;
     }
 
     /**
@@ -475,17 +496,23 @@ class Template {
      */
     static async builtin(displayed_name, url) {
         let content = await get_template_from_url(url) ?? "Couldn't fetch template!";
-        return new Template(displayed_name, content, true);
+        let [elements, maybe_error] = parse_ui_description(content);
+        if (maybe_error) {
+            console.error(`Builtin Template at ${url} has a UI Template failure!`, maybe_error);
+        }
+        return new Template(displayed_name, content, true, elements);
     }
 
     /**
      * Create a custom template with the given contents.
      * @param {string} displayed_name the displayed name of the template
      * @param {string} content the initial contents of the template
-     * @returns {Template} 
+     * @returns {[Template, Error | null]} 
      */
     static custom(displayed_name, content) {
-        return new Template(displayed_name, content, false);
+        let [elements, maybe_error] = parse_ui_description(content);
+        let template = new Template(displayed_name, content, false, elements);
+        return [template, maybe_error];
     }
 }
 
@@ -506,16 +533,16 @@ class Template {
  * config-#}
  * This format is, specifically, a JSON string containing an array of UIDescriptions.
  * @param {string} content 
- * @returns {UIElements} A dictionary whose keys are each UIDescription's "name" field and
+ * @returns {[UIElements, Error | null]} A dictionary whose keys are each UIDescription's "name" field and
  * the values are the corresponding UIElement
  */
 function parse_ui_description(content) {
     // Match anything between "{#-config" and "config-#}"
     const regexp = /{#-config(.+?)config-#}/gs;
     const matches = content.matchAll(regexp);
-    console.log("matches", matches);
 
     let elements = /** @type {UIElements} */ ({});
+    let maybe_error = null;
 
     for (const match of matches) {
         // Try to access the first capture group. Otherwise, skip this match because it's malformed.
@@ -525,29 +552,33 @@ function parse_ui_description(content) {
 
         let json_text = match[1];
 
+        // Try to parse the text as a JSON array.
+        let json_arr;
         try {
-            // Try to parse the text as a JSON array.
-            const json_arr = JSON.parse(json_text);
-            if (!(json_arr instanceof Array)) {
-                console.error(`expected ${json_text} to be JSON containing an array. Got ${json_arr} instead.`);
-                continue;
-            }
-
-            // Finally, parse the UI descriptions and add them to the dictionary.
-            for (let ui_desc of json_arr) {
-                if (is_ui_description(ui_desc)) {
-                    elements[ui_desc.name] = new UIElement(ui_desc);
-                } else {
-                    console.error(`Expected ${ui_desc} to be a UIDescription!`, ui_desc);
-                }
-            }
+            json_arr = JSON.parse(json_text);
         } catch (err) {
-            console.error(err, json_text);
+            if (err instanceof SyntaxError) {
+                maybe_error = new Error(`Unable to parse config block ${json_text}`, { cause: err });
+            }
             continue;
+        }
+
+        if (!(json_arr instanceof Array)) {
+            maybe_error = new Error(`Expected ${json_text} to be JSON blob containing an array. Got ${json_arr} instead.`);
+            continue;
+        }
+
+        // Finally, parse the UI descriptions and add them to the dictionary.
+        for (let ui_desc of json_arr) {
+            if (is_ui_description(ui_desc)) {
+                elements[ui_desc.name] = new UIElement(ui_desc);
+            } else {
+                maybe_error = new Error(`Expected ${ui_desc} to be a UIDescription!`);
+            }
         }
     }
 
-    return elements;
+    return [elements, maybe_error];
 }
 
 /**

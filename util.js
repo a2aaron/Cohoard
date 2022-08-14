@@ -1,3 +1,62 @@
+
+/** @type {{[key: string]: {[key: string]: string | Error | null}}} */
+let ERROR_MESSAGES = {};
+let ERROR_ELEMENT = getTypedElementById(HTMLPreElement, "error-msg");
+
+/**
+ * Show an error message to the user. The error message has an associated "type" and "template".
+ * These are used to selective show or hide error messages depending on the currently selected
+ * template.
+ * @param {string | Error} msg 
+ * @param {string} type
+ * @param {string} template
+ */
+export function set_error_message(msg, type, template) {
+    if (ERROR_MESSAGES[template] === undefined) {
+        ERROR_MESSAGES[template] = {};
+    }
+    ERROR_MESSAGES[template][type] = msg;
+}
+
+/**
+ * Stop showing the error message to the user.
+ * @param {string} type
+ * @param {string} template
+ */
+export function unset_error_message(type, template) {
+    if (ERROR_MESSAGES[template] && ERROR_MESSAGES[template][type]) {
+        ERROR_MESSAGES[template][type] = null;
+    }
+}
+
+/**
+ * Show the error messages associated with the given template.
+ * @param {string} template 
+ */
+export function render_error_messages(template) {
+    let message = "";
+
+    if (ERROR_MESSAGES[template] != undefined) {
+        for (let error of Object.values(ERROR_MESSAGES[template])) {
+            if (error != null) {
+                message += error.toString();
+                message += "\n\n";
+            }
+        }
+    }
+
+    if (ERROR_MESSAGES["ALL"] != undefined) {
+        for (let error of Object.values(ERROR_MESSAGES["ALL"])) {
+            if (error != null) {
+                message += error.toString();
+                message += "\n\n";
+            }
+        }
+    }
+    console.log(ERROR_MESSAGES, template, ERROR_MESSAGES[template], message);
+    ERROR_ELEMENT.innerText = message.trimEnd();
+}
+
 /**
  * Yields pairs of (index, item) from an array.
  * @param {Array<T>} items An array of items
@@ -11,7 +70,6 @@ export function* enumerate(items) {
         i += 1;
     }
 }
-
 
 /**
  * Attempts to get an object from localStorage and parse it as JSON, falling back to a default value
