@@ -1,110 +1,351 @@
-{#- Welcome to the basic template. This template contains just enough code to render
-   posts to the screen and is a good starting point to make your own template. -#}
+{#- === INTRODUCTION ===
+   
+Welcome to the basic template. This template is intended to be a tutorial
+for how Cohoard works. Feel free to delete the text in this window if you are
+familiar with how to write a template.
 
-{#- First, note Cohoard templates use Tera.
-  Check out https://tera.netlify.app/docs/ for more info. -#}
+First, note that these templates are built using Tera, a templating engine. Tera
+can do a lot of things that this guide won't cover, so be sure check out the
+Tera docs for more info.
 
-{#- Markdown text is converted to certain tags. The styling rules for converted
-  Markdown text are as
-  follows:
-  markdown text            -> html tag
-  **bold**                 -> <strong>bold</strong>
-  *italic*                 -> <em>italic</em>
-  ~strikethru~             -> <del>strikethru</del>
-  <u>underlined</u>        -> <span class="cohoard-underline">underlined</span>
-  `inline code`            -> <span class="cohoard-code">inline code</span>
-  ```
-  code block               -> <span class="cohoard-codeblock">code block</span>
-  ```
-  ```rust
-  colorized code block     -> <span class="cohoard-codeblock language-rust">
-                                  colorized code block
-                              </span>
-  ```
+Tera docs: https://tera.netlify.app/docs/
 
-  Currently, Discord style __underlining__ is not yet supported, which is why you
-  must use <u> tags instead.
+As a basic overview of Tera however, here's quick crash course:
 
-  You might notice that underline, inline code, and code blocks are converted to
-  <span> tags. This is because Cohost does not render <u> tags and encases <code>
-  tags with pseudo-elements. Both of these mess up formatting by default, so we need
-  to manually style them. -#}
+Comments: written as "{ #" and "# }". These are comments, and aren't seen by
+Tera. (note: mentally remove the spaces from the quoted text above)
 
-{#- Note that any CSS inside of a style tag will be inlined. -#}
+Statements: written as "{%" and "%}". These typically are for control flow as
+well as assigning to variables.
+
+Expressions: written as {{" and "}}". Anything writting in an expression will be
+substituted by whatever the expression evaluates to.
+
+(note 2: you might see comments, statements, and expressions written with a
+dash, for example, the comments in this Template actually begin with "{ # -" and
+end with "- # }". These dashes are "whitespace control"--any comment, statement,
+or expression that has a dash at the beginning trims whitespace before it, and
+any with a dash at the end trims whitespace after it. It is useful if you don't
+want excess whitespace to show in the output.)
+
+As an example, if we had the following:
+
+```
+{% set username = "eggbug" %}
+<p>Hi, my name is {{ username }}!</p>
+```
+
+Then the output would be the following:
+```
+<p>Hi, my name is eggbug!</p>
+```
+
+A template will consist of HTML interspersed with Tera statements and expression
+blocks. The template is then ran through Tera, where the output is then dumped
+into the "HTML" output window and shown in the "Preview" window. 
+
+For a more complex example, here is the entirety of this template's HTML and
+Tera code below: -#}
+
+{#-config
+   [{
+      "name": "use_dark_theme",
+      "type": "checkbox",
+      "label": "Use Dark Theme"
+   }]
+config-#}
+
+{%- if use_dark_theme -%}
+   {%- set background_color = "black" -%}
+   {%- set text_color = "white" -%}
+{%- else -%}
+   {%- set background_color = "white" -%}
+   {%- set text_color = "black" -%}
+{%- endif -%}
+
 <style>
- .cohoard-underline { text-decoration: underline; }
+   .cohoard-underline { text-decoration: underline; }
 
- .cohoard-code {
-    font-family: monospace;
-    /* Avoid stripping white space */
-    white-space: pre-wrap;
- }
+   .cohoard-code {
+      font-family: monospace;
+      /* Avoid stripping white space */
+      white-space: pre-wrap;
+   }
 
- .cohoard-codeblock {
-    font-family: monospace;
-    /* Avoid stripping white space */
-    white-space: pre-wrap;
- }
+   .cohoard-codeblock {
+      font-family: monospace;
+      /* Avoid stripping white space */
+      white-space: pre-wrap;
+   }
 
- #post-wrapper {
-    padding: 16px;
-    /* Cohost adds padding around the post, which usually looks weird.
-       This negative margin undoes that padding. */
-    margin: -16px -12px;
- }
+   #post-wrapper {
+      /* Cohost adds padding around the post, which usually looks weird. This 
+         negative margin undoes that padding. */
+      margin: -16px -12px;
+      padding: 16px;
 
- .message-content {
-    white-space: break-spaces;
-    word-wrap: break-word;
- }
+      background: {{ background_color }};
+      color: {{ text_color }};
+   }
+
+   .message-content {
+      white-space: break-spaces;
+      word-wrap: break-word;
+   }
 </style>
 
-{#- The main post body begins below. Note that the id and class attributes aren't 
-   special--you can alter them freely. #-}
+<div id="post-wrapper">
+   {%- for postblock in posts -%}
+   <div class="post-block">
+      <h2>{{- postblock.user.name | default(value=postblock.user.key) -}}</h2>
+      {%- for message in postblock.messages -%}
+         <p class="message-content">{{ message | markdown | trim | safe }}</p>
+      {%- endfor -%}
+   </div>
+   {%- endfor -%}
+</div>
+
+{#- === USING TERA TO OUTPUT HTML ===
+   
+Wow! That was a lot! Let's take it piece by piece, starting with the last part.
+Here's the HTML part of the Template again:
+```
+<div id="post-wrapper">
+   {%- for postblock in posts -%}
+   <div class="post-block">
+      <h2>{{- postblock.user.name | default(value=postblock.user.key) -}}</h2>
+      {%- for message in postblock.messages -%}
+         <p class="message-content">{{ message | markdown | trim | safe }}</p>
+      {%- endfor -%}
+   </div>
+   {%- endfor -%}
+</div>
+```
+
+This is a bunch of HTML with Tera statements and expressions intersepersed
+throughout it. There's two for-loop statements and two expressions.
+
+The first for-loop, `{%- for postblock in posts -%}`, accesses a global variable
+called `posts`. `posts` is provided by Cohoard and is the interal representation
+of the Script window. It is an array of PostBlock structs. A PostBlock is an
+array of individual messages--usually these are messages which should appear
+"together" in some way. This can be used to more finely control how posts will
+look when rendered.
+
+For example, in the Discord template, we group all messages in the same 
+PostBlock under the same headline, while spacing messages within a PostBlock 
+slightly apart from each other. This mimics how  Discord typically renders 
+messages.
+
+Each PostBlock struct contains two fields:
+- messages - the list of messages this PostBlock contains. This is an array of
+            strings.
+- user     - the user posting the message.
+
+A user's fields are whatever the keys in the Config Table are, and typically
+contain information like the display name of the user, links to avatars, and
+other information that can be used to style the post. Note that trying to access
+a key that does not exist will result in an error.
+
+The line containing the `h2` tag after the for-loop demonstrates accessing some
+of the fields in `postblock.user`. Here's the line again:
+```
+<h2>{{- postblock.user.name | default(value=postblock.user.key) -}}</h2>
+```
+
+Here, we try to display the user's name, falling back to the key if that fails.
+The specific fields that a user will have depends on what is entered into the
+Config table. However, a user will always have a `key` field, which denotes the
+Script key the user is associated with. Common fields are typically things like
+"name", "color", or "handle", although a field of any name may be present.
+
+The inner for-loop renders the PostBlock's messages.
+```
+{%- for message in postblock.messages -%}
+   <p class="message-content">{{ message | markdown | trim | safe }}</p>
+{%- endfor -%}
+```
+
+This sends the message through three filters: markdown, trim, and safe.
+
+"markdown" is a filter provided by Cohoard. It converts Markdown into the HTML
+tags (see below for a table). This can be removed if you do not want text to be
+treated as Markdown, but note that Cohost does still attempt to style text
+containing Markdown, which could mess up formatting.
+
+Specifically, if there is a fully blank line after an HTML tag, Cohost to
+switches into "Markdown" mode, and stylizes any text as Markdown. Hence, this is
+why we use the whitespace control dashes in Tera blocks to minimize this.
+
+The trim filter will remove trailing and leading whitespace in the message.
+  
+Finally, the safe filter allows you to insert HTML tags directly into text.
+Without it, Tera will escape HTML tags in the script using &lt; and &gt; (This
+would also make it impossible to use <u> tags in the script, which would prevent
+the ability to do any underlined text).
+
+Effectively, the two for-loops end up copy-pasting a bunch of HTML with the
+Script's contents inserted within.
+
+For example, if we had passed in the following script to the template:
+```
+EGGBUG: I'm eggbug!
+EGGBUG: I'm purple!
+```
+
+We would have ended up the following output (inlined styles removed):
+
+```
+<div>
+   <div>
+      <h2>eggbug!</h2>
+      <p>I'm eggbug!</p>
+      <p>I'm purple!</p>
+   </div>
+</div>
+```
+-#}
+
+{#- === STYLING ===
+   
+You can use inline style attributes on the HTML, as well as using `style`
+blocks. You can use classes and ids on the HTML elements and style them in the
+style block like you would a normal webpage. Note that all `style` blocks are
+inlined in the HTML output, and the class and id tags are removed as well. Also
+note that Cohost will apply some of its own styles to the post. In particular,
+Cohost adds a padding around the post, which usually looks bad for for most
+templates. Hence, it may be useful to add the following to the outermost `div`:
+
+```
+#post-wrapper {
+   margin: -16px -12px;
+   padding: 16px;
+}
+```
+
+Cohost also messes with a few other tags. `u` tags are not rendered at all, and 
+`code` tags are encased with pseudo-elements. Hence, Cohoard converts these tags
+into `span` tags with special class names (see the conversion table below). -#}
+
+{#- === MARKDOWN CONVERSION TABLE ===
+   
+Markdown text is converted to certain tags. The styling rules for converted
+Markdown text are as follows:
+
+   **bold**                 -> <strong>bold</strong>
+   *italic*                 -> <em>italic</em>
+   ~~strikethru~~           -> <del>strikethru</del>
+   <u>underlined</u>        -> <span class="cohoard-underline">underlined</span>
+   `inline code`            -> <span class="cohoard-code">inline code</span>
+   ```
+   code block               -> <span class="cohoard-codeblock">code block</span>
+   ```
+   ```rust
+   colorized code block     -> <span class="cohoard-codeblock language-rust">
+                                 colorized code block
+                              </span>
+   ```
+
+Currently, Discord style __underlining__ is not yet supported, which is why you
+must use `u` tags instead. -#}
+
+{#- === THE TEMPLATE UI ===
+
+Lastly, we have the Template UI feature. Any comment which begins with "-config"
+and ends with "-config" is special. Inside of this config block, a JSON blob is
+used to describe what sorts of UI should appear alongside the template.
+
+The JSON blob is expected to be an array of JSON objects. Each JSON object must
+have the following fields:
+- name - determines the name of the global variable the UI will be bound to
+- type - a "type" attribute for the `input` element. Common values include
+         "text", "url", "checkbox", and "color". for a full list of valid
+         values, see the URL below:
+         https://developer.mozilla.org/en-US/docs/Learn/Forms/HTML5_input_types
+- label - the body of the `label` element. This can include arbitrary HTML
+inside of it, although it is typically just text. This is the user-facing
+description of the UI control.
+
+There are also two optional fields.
+- placeholder - a "placeholder" attribute for the `input` element
+- default - the initial value of the `input` element
+
+Here's the UI block from this template again.
+```
+[{
+   "name": "use_dark_theme",
+   "type": "checkbox",
+   "label": "Use Dark Theme"
+}]
+```
+
+Here, we create a checkbox labeled "Use Dark Theme" which is bound to the
+variable "use_dark_theme". When the checkbox is checked, "use_dark_theme" is
+true, and otherwise it is false. We then used this variable in the `style` block
+to determine what the background and text color should be. Below is how we ended
+up writing all that out:
+
+```
+{%- if use_dark_theme -%}
+   {%- set background_color = "black" -%}
+   {%- set text_color = "white" -%}
+{%- else -%}
+   {%- set background_color = "white" -%}
+   {%- set text_color = "black" -%}
+{%- endif -%}
+
+<style>
+   #post-wrapper {
+      background: {{ background_color }};
+      color: {{ text_color }};
+   }
+</style>
+``` -#}
+
+{#- === THE USERS VARIABLE === 
+Oh yeah, one last thing: There's an additional global variable that Cohost
+provides called the `users` variable. This is an array of all of the `users`
+declared in the Config Table. This is often more convient to iterate over when
+you need per-user styling. For example, in the Discord template, we used it to
+color the username and add the user's avatar. The example is shown below:
+
+```
+<style>
+{%- for user in users -%}
+   .{{user.key}}.headline-username {
+      color: {{ user.color | default(value=username_default_color) }};
+      font-size: 100%;
+   }
+
+   .{{user.key}}.avatar {
+      {% if user.avatar %}
+         background-image: url({{ user.avatar | safe }});
+      {% elif user.color %}
+         background: {{ user.color }};
+      {% else %}
+         background: {{ avatar_default_color }};
+      {% endif %}
+   }
+{%- endfor -%}
+</style>
 
 <div id="post-wrapper">
-
- {#- In Tera, we store the messages inside of a variable called `posts`. `posts` is 
-     an array of PostBlocks. A PostBlock is an array of individual messages--usually 
-     these are messages which should appear "together" in some way. This can be used 
-     to more finely control how posts will look when rendered. For example, in the
-     Discord template, we group
-     all messages in the same PostBlock under the same headline, while spacing
-     messages within a PostBlock slightly apart from each other. This mimics how 
-     Discord typically renders messages. -#}
-
- {%- for postblock in posts -%}
- <div class="post-block" >
-    {#- A PostBlock struct contains two fields:
-       - messages - the list of messages this PostBlock contains
-       - user     - the user posting the message.
-       A user's fields are whatever the keys in the Config Table are, and typically 
-       contain information like the display name of the user, links to avatars, and
-       other information that can be used to style the post. Note that try to access 
-       a key that does not exist will result in errors. -#}
-
-<h2>{% if postblock.user.key -%}
-      {{- postblock.user.key -}}
-   {%- else -%}
-      [key missing]
-   {%- endif -%}</h2>
-
-    {%- for message in postblock.messages %}
-    
-    {#- Here, we finally render our message, first passing it through some filters. 
-      The first filter converts Markdown into the HTML tags listed above. This can 
-      be removed if you do not want text to be treated as Markdown, but note that 
-      Cohost does still attempt to style text containing Markdown, which could mess 
-      up formatting.
-      
-      The trim filter will remove trailing and leading whitespace in the message.
-      
-      Finally, the safe filter allows you to insert HTML tags directly into text. 
-      Without it, Tera will escape HTML tags in the script using &lt; and &gt; 
-      (This would also make it impossible to use <u> tags in the script). -#}
-<p class="message-content">{{ message | markdown | trim | safe }}</p>
-
-    {%- endfor -%}
- </div>
- {%- endfor -%}
+  {%- for post in posts -%}
+  <div class="post-block">
+   <div class="{{post.user.key}} avatar"></div>
+   <div class="message-wrapper">
+     <div class="headline">
+      <span class="{{post.user.key}} headline-username">{{ post.user.name }}</span>
+      <span class="timestamp">{{ post.timestamp | default (value = "") }}</span>
+     </div>
+   </div>
+  </div>
+  {%- endfor -%}
 </div>
+```
+
+Essentially, we create a bunch of classes, each one named something like
+"EGGBUG" or "BUGEGG" and stylize each class individually. This allows us to
+simply write `<div class="{{post.user.key}} avatar">` for the avatar and 
+`<span class="{{post.user.key}} headline-username">` for the headline. This is 
+nicer than using a really gnarly-looking inline `style` attribute. -#}
