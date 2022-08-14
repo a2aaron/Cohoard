@@ -1,3 +1,4 @@
+import { ConfigTable } from "./config_table.js";
 
 /** @type {{[key: string]: {[key: string]: string | Error | null}}} */
 let ERROR_MESSAGES = {};
@@ -166,4 +167,65 @@ export function getTypedElementById(ty, id) {
         throw new Error(`Element with id ${id} is type ${element.constructor.name}, wanted ${ty}`);
     }
     return element;
+}
+
+/**
+ * Try to parse an error thrown from Tera into a more useful error.
+ * @param {Error} err
+ * @param {ConfigTable} config_table
+ * @returns {[Error, string | null]}
+ */
+export function try_parse_tera_error(err, config_table) {
+    let missing_var = parse_as_missing_variable(err.message);
+    let bad_column = null;
+    if (missing_var) {
+        const field = parse_as_missing_field(missing_var);
+        if (field) {
+            // Try to highlight the missing field in the config table.
+            if (config_table.has_column(field)) {
+                err = new Error(`Field "${field}" is missing from a row in the Config Table`, { cause: err });
+                bad_column = field;
+            } else {
+                err = new Error(`Couldn't find a field named "${field}" (Maybe you need to add it to the Config Table?)`, { cause: err });
+            }
+        } else {
+            err = new Error(`Invalid variable "${missing_var}"`, { cause: err });
+        }
+    }
+
+    return [err, bad_column];
+
+}
+
+/**
+ * Attempt to parse an error message as a Tera error messages. Tera error messages are of the format
+ * "Variable `variable_name` not found while rendering 'template_name'"
+ * This function attempts to extract `variable_name` from the message.
+ * @param {string} err_msg the error message
+ * @returns {string?} the missing variable
+ */
+function parse_as_missing_variable(err_msg) {
+    const regexp = /Variable `([^`]*)` not found in context while rendering /;
+    const matches = err_msg.match(regexp);
+    if (matches == null) {
+        return null;
+    } else {
+        return matches[1];
+    }
+}
+
+/**
+ * Attempts to determine if a Tera variable name represents a missing field. These are generally of
+ * the form "post.user.field_name", however, `post` could technically be any variable. This function
+ * attempts to exact `field_name` from the variable name.
+ * @param {string} tera_var_name
+ * @returns {string?} the field name
+ */
+function parse_as_missing_field(tera_var_name) {
+    const arr = tera_var_name.split(".");
+    if (arr.length == 3 && arr[1] == "user") {
+        return arr[2];
+    } else {
+        return null;
+    }
 }

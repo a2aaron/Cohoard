@@ -69,6 +69,17 @@ export class ConfigTable {
     }
 
     /**
+     *
+     * @param {string} key
+     * @returns {boolean}
+     */
+    has_column(key) {
+        const columns = get_columns(this.table);
+        const index = columns.findIndex((value) => { return value == key; });
+        return index != -1;
+    }
+
+    /**
      * Set a column of the table as red
      * @param {string} key the column whose key is `key` to set red
      * @returns {boolean} true if the column was found in the table and marked as red.
