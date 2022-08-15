@@ -213,7 +213,7 @@ export class TemplateControls {
      * @returns {Promise<TemplateControls>} 
      */
     static async mount(template_dropdown, template_area, edit_template_button, delete_template_button, rename_template_button, template_ui) {
-        let builtin_templates = [DISCORD_BUILTIN, TWITTER_BUILTIN, PESTERLOG_BUILTIN, FOOTBALL_BUILTIN];
+        let builtin_templates = [DISCORD_BUILTIN, TWITTER_BUILTIN, PESTERLOG_BUILTIN, FOOTBALL_BUILTIN, UNDERTALE_BUILTIN];
         let custom_templates = load_custom_templates();
         let template_controls = new TemplateControls(
             template_dropdown,
@@ -708,6 +708,7 @@ export const DISCORD_BUILTIN = await Template.builtin("Discord", "https://raw.gi
 export const TWITTER_BUILTIN = await Template.builtin("Twitter", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/twitter.html");
 export const FOOTBALL_BUILTIN = await Template.builtin("17776", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/17776.html");
 export const PESTERLOG_BUILTIN = await Template.builtin("Pesterlog", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/homestuck.html");
+export const UNDERTALE_BUILTIN = await Template.builtin("Undertale", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/undertale.html");
 
 
 export const BASIC_TEMPLATE = await get_template_from_url("https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/basic.html") ?? "Couldn't fetch template!";
