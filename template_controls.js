@@ -1,4 +1,5 @@
-import { h, localStorageOrDefault, enumerate, render_error_messages, set_error_message, unset_error_message } from "./util.js";
+import * as cohoard from "https://static.witchoflight.com/~a2aaron/cohoard/v0.5.0/cohoard.js";
+import { h, localStorageOrDefault, enumerate } from "./util.js";
 import { render } from "./index.js";
 
 
@@ -126,13 +127,7 @@ export class TemplateControls {
                 if (template == null) {
                     console.warn(`couldn't get template ${dropdown_value}`);
                 } else {
-                    let maybe_error = template.set_content(template_area.value);
-                    if (maybe_error != null) {
-                        console.error(maybe_error);
-                        set_error_message(maybe_error, "parse_ui_description", dropdown_value);
-                    } else {
-                        unset_error_message("parse_ui_description", dropdown_value);
-                    }
+                    template.set_content(template_area.value);
                 }
 
                 // We regenerate the UI, since the UI-config might have changed.
@@ -238,7 +233,7 @@ export class TemplateControls {
     add_new_preset() {
         let i = this.custom_templates.length;
 
-        let [new_template, maybe_error] = Template.custom("Custom Template " + i, BASIC_TEMPLATE);
+        let new_template = Template.custom("Custom Template " + i, BASIC_TEMPLATE);
         this.custom_templates.push(new_template);
 
         this.#renegerate_dropdown();
@@ -287,8 +282,6 @@ export class TemplateControls {
             this.delete_template_button.classList.remove("hidden");
             this.rename_template_button.classList.remove("hidden");
         }
-
-        render_error_messages(dropdown_name);
     }
 
     /**
@@ -388,10 +381,7 @@ function load_custom_templates() {
         // to explicitly construct Templates.
         let templates = [];
         for (let [i, template] of enumerate(stored_templates)) {
-            let [real_template, maybe_error] = Template.custom(template.displayed_name, template.content);
-            if (maybe_error) {
-                console.log(`todo: move this elsewhere`, maybe_error);
-            }
+            let real_template = Template.custom(template.displayed_name, template.content);
             templates.push(real_template);
         }
         return templates;
@@ -417,13 +407,30 @@ class Template {
      * @param {string} displayed_name the displayed name of the template
      * @param {boolean} is_builtin true if the template is builtin
      * @param {string} content the contents of the template (if not builtin)
-     * @param {UIElements} ui_elements the ui elements of the template
      */
-    constructor(displayed_name, content, is_builtin, ui_elements) {
+    constructor(displayed_name, content, is_builtin) {
         this.displayed_name = displayed_name;
         this.is_builtin = is_builtin;
         this.#content = content;
-        this.#ui_elements = ui_elements;
+        let [elements, errors] = parse_ui_description(content);
+        this.#ui_elements = elements;
+        this.ui_errors = errors;
+    }
+
+    /**
+     * @param {cohoard.Config} cohoard_config
+     * @param {string} script
+     * @returns {string | Error}
+     */
+    render(cohoard_config, script) {
+        let posts = cohoard.parse_posts(cohoard_config, script);
+
+        try {
+            return cohoard.render("template", this.get_content(), posts, cohoard_config, this.get_ui_values());
+        } catch (err) {
+            return /** @type {Error} */ (err);
+        }
+
     }
 
     /**
@@ -484,8 +491,7 @@ class Template {
         }
 
         this.#ui_elements = new_elements;
-
-        return maybe_error;
+        this.ui_errors = maybe_error;
     }
 
     /**
@@ -496,23 +502,17 @@ class Template {
      */
     static async builtin(displayed_name, url) {
         let content = await get_template_from_url(url) ?? "Couldn't fetch template!";
-        let [elements, maybe_error] = parse_ui_description(content);
-        if (maybe_error) {
-            console.error(`Builtin Template at ${url} has a UI Template failure!`, maybe_error);
-        }
-        return new Template(displayed_name, content, true, elements);
+        return new Template(displayed_name, content, true);
     }
 
     /**
      * Create a custom template with the given contents.
      * @param {string} displayed_name the displayed name of the template
      * @param {string} content the initial contents of the template
-     * @returns {[Template, Error | null]} 
+     * @returns {Template} 
      */
     static custom(displayed_name, content) {
-        let [elements, maybe_error] = parse_ui_description(content);
-        let template = new Template(displayed_name, content, false, elements);
-        return [template, maybe_error];
+        return new Template(displayed_name, content, false);
     }
 }
 
@@ -533,7 +533,7 @@ class Template {
  * config-#}
  * This format is, specifically, a JSON string containing an array of UIDescriptions.
  * @param {string} content 
- * @returns {[UIElements, Error | null]} A dictionary whose keys are each UIDescription's "name" field and
+ * @returns {[UIElements, Array<Error>]} A dictionary whose keys are each UIDescription's "name" field and
  * the values are the corresponding UIElement
  */
 function parse_ui_description(content) {
@@ -542,7 +542,7 @@ function parse_ui_description(content) {
     const matches = content.matchAll(regexp);
 
     let elements = /** @type {UIElements} */ ({});
-    let maybe_error = null;
+    let errors = [];
 
     for (const match of matches) {
         // Try to access the first capture group. Otherwise, skip this match because it's malformed.
@@ -558,13 +558,13 @@ function parse_ui_description(content) {
             json_arr = JSON.parse(json_text);
         } catch (err) {
             if (err instanceof SyntaxError) {
-                maybe_error = new Error(`Unable to parse config block ${json_text}`, { cause: err });
+                errors.push(new Error(`Unable to parse config block ${json_text}`, { cause: err }));
             }
             continue;
         }
 
         if (!(json_arr instanceof Array)) {
-            maybe_error = new Error(`Expected ${json_text} to be JSON blob containing an array. Got ${json_arr} instead.`);
+            errors.push(new Error(`Expected ${json_text} to be JSON blob containing an array. Got ${json_arr} instead.`));
             continue;
         }
 
@@ -573,12 +573,12 @@ function parse_ui_description(content) {
             if (is_ui_description(ui_desc)) {
                 elements[ui_desc.name] = new UIElement(ui_desc);
             } else {
-                maybe_error = new Error(`Expected ${ui_desc} to be a UIDescription!`);
+                errors.push(new Error(`Expected ${ui_desc} to be a UIDescription!`));
             }
         }
     }
 
-    return [elements, maybe_error];
+    return [elements, errors];
 }
 
 /**

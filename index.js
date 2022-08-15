@@ -2,7 +2,7 @@ import init, * as cohoard_module from "https://static.witchoflight.com/~a2aaron/
 
 import { ConfigTable } from "./config_table.js"
 import { TemplateControls, DISCORD_BUILTIN } from "./template_controls.js";
-import { getTypedElementById, localStorageOrDefault, render_error_messages, set_error_message, try_parse_tera_error, unset_error_message } from "./util.js";
+import { getTypedElementById, render_error_messages, try_parse_tera_error } from "./util.js";
 import { PRESETS } from "./presets.js"
 
 /** @type {typeof cohoard_module?} */
@@ -16,28 +16,24 @@ export function render() {
       return;
    }
 
-   let cohoard_config = config_table.cohoard_config;
-   let template_contents = template_controls.get_current_template().get_content();
-   let template_ui_values = template_controls.get_current_template().get_ui_values();
+   let html_output = template_controls.get_current_template().render(config_table.cohoard_config, script_textarea.value);
+   let errors = [];
 
-   try {
-      let posts = cohoard.parse_posts(cohoard_config, script_textarea.value);
-      let rendered = cohoard.render("template", template_contents, posts, cohoard_config, template_ui_values);
-      preview_area.innerHTML = rendered;
-      html_area.value = rendered;
-      unset_error_message("render", template_controls.get_current_dropdown());
-      config_table.unmark_errs();
-   } catch (err) {
-      let [the_err, bad_column] = try_parse_tera_error(/** @type {Error} */(err), config_table);
+   if (typeof (html_output) === "string") {
+      preview_area.innerHTML = html_output;
+      html_area.value = html_output;
+   } else {
+      config_table.unmark_errs(); let [err, bad_column] = try_parse_tera_error(html_output, config_table);
       if (bad_column) {
          config_table.unmark_errs();
          config_table.mark_err(bad_column);
       }
-      console.error("Failed to render template\n", the_err);
-      set_error_message(the_err, "render", template_controls.get_current_dropdown());
+      console.error("Failed to render template\n", err);
+      errors.push(err);
    }
 
-   render_error_messages(template_controls.get_current_dropdown());
+   errors = errors.concat(template_controls.get_current_template().ui_errors);
+   render_error_messages(...errors);
 }
 
 // The config object that the Cohoard Rust library uses.
