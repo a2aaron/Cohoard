@@ -256,17 +256,18 @@ and ends with "-config" is special. Inside of this config block, a JSON blob is
 used to describe what sorts of UI should appear alongside the template.
 
 The JSON blob is expected to be an array of JSON objects. Each JSON object must
-have the following fields:
+have the following field:
 - name - determines the name of the global variable the UI will be bound to
+
+There are also four optional fields.
 - type - a "type" attribute for the `input` element. Common values include
          "text", "url", "checkbox", and "color". for a full list of valid
          values, see the URL below:
          https://developer.mozilla.org/en-US/docs/Learn/Forms/HTML5_input_types
+         Defaults to "text" if not provided.
 - label - the body of the `label` element. This can include arbitrary HTML
-inside of it, although it is typically just text. This is the user-facing
-description of the UI control.
-
-There are also two optional fields.
+          inside of it, although it is typically just text. This is the
+          user-facing description of the UI control.
 - placeholder - a "placeholder" attribute for the `input` element
 - default - the initial value of the `input` element
 
