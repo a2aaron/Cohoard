@@ -59,24 +59,6 @@ function custom_i(i) {
  */
 
 /**
- * Returns true if `ui_desc` is a UIDescription.
- * @param {object} ui_desc
- * @returns {ui_desc is UIDescription}
- */
-function is_ui_description(ui_desc) {
-    if (Object.hasOwn(ui_desc, "name") &&
-        Object.hasOwn(ui_desc, "type") &&
-        Object.hasOwn(ui_desc, "label")) {
-        return ["text", "url", "time", "datetime", "email",
-            "checkbox", "radio", "color", "range", "file"]
-            // @ts-ignore
-            .includes(ui_desc.type);
-    }
-    return false;
-}
-
-
-/**
  * Manages the template preset UI
  */
 export class TemplateControls {
@@ -570,10 +552,12 @@ function parse_ui_description(content) {
 
         // Finally, parse the UI descriptions and add them to the dictionary.
         for (let ui_desc of json_arr) {
-            if (is_ui_description(ui_desc)) {
+            if (ui_desc.name) {
+                ui_desc.type = ui_desc.type ?? "text";
+                ui_desc.label = ui_desc.label ?? "";
                 elements[ui_desc.name] = new UIElement(ui_desc);
             } else {
-                errors.push(new Error(`Expected ${ui_desc} to be a UIDescription!`));
+                errors.push(new Error(`Expected ${JSON.stringify(ui_desc)} to have a name!`));
             }
         }
     }
