@@ -64,6 +64,8 @@ config-#}
     .avatar-image {
         max-width: 100%;
         max-height: 100%%;
+        /* Need to set margin in order to undo Cohost's automatic addition of margins to images. */
+        margin: 0;
     }
 
     {% for user in users %}
