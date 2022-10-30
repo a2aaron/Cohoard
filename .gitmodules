@@ -1,3 +1,6 @@
 [submodule "css-inline"]
 	path = css-inline
 	url = https://github.com/a2aaron/css-inline.git
+[submodule "tera"]
+	path = tera
+	url = https://github.com/a2aaron/tera.git
