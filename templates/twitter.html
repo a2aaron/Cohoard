@@ -1,0 +1,329 @@
+{#-config
+   [{
+      "name": "light_mode",
+      "type": "checkbox",
+      "label": "Use Light Mode"
+   }, {
+      "name": "whats_happening_avatar",
+      "type": "url",
+      "label": "\"What's Happening\" Avatar URL",
+      "placeholder": "url to an image",
+      "default": "https://static.witchoflight.com/~a2aaron/cohoard-avatars/eggbug-relaxed.png"
+   }]
+config-#}
+
+{#- Icon URLs -#}
+{% set sidebar_twitter = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/bird.png" %}
+{% set sidebar_home = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/home.png" %}
+{% set sidebar_search = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/search.png" %}
+{% set sidebar_notifications = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/notifications.png" %}
+{% set sidebar_more = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/more.png" %}
+{% set sidebar_new_post = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/new_post.png" %}
+
+{% set latest_tweets_icon = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/stars.png" %}
+
+{% set post_editor_image = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/artboard.png" %}
+{% set post_editor_gif = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/gif.png" %}
+{% set post_editor_smile = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/smile.png" %}
+
+{% set reply_chat = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/reply.png" %}
+{% set reply_like = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/like.png" %}
+{% set reply_rt = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/retweet.png" %}
+{% set reply_share = "https://static.witchoflight.com/~a2aaron/cohoard/templates/twitter/share.png" %}
+
+{% if light_mode %}
+    {% set background_color = "white" %}
+    {% set border_color = "#eff3f4" %}
+    {% set text_color = "#0f1419" %}
+    {% set handle_color = "#536471" %}
+    {% set reply_icon_color = "#536471" %}
+    {% set sidebar_icon_color = "#0f1419" %}
+{% else %}
+    {% set background_color = "black" %}
+    {% set border_color = "#333" %}
+    {% set text_color = "#d6d9db" %}
+    {% set handle_color = "#71767b" %}
+    {% set reply_icon_color = "#71767b" %}
+    {% set sidebar_icon_color = "#d6d9db" %}
+{% endif %}
+
+{% set twitter_blue = "#1d9bf0" %}
+<style>
+    #post-container {
+        display: grid;
+        grid-template-areas: 'sidebar tweets';
+        grid-template-columns: 68px 1fr;
+        width: calc(100% + 2em);
+        height: 500px;
+        margin: -1em;
+        background-color: {{ background_color }};
+        color: {{ text_color }};
+    }
+
+    /* Sidebar styling */
+
+    #sidebar {
+        grid-area: sidebar;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 16px 0;
+        border-right: 1px solid {{ border_color }};
+    }
+
+    .sidebar-icon {
+        width: 24px;
+        height: 24px;
+        display: inline-block;
+        margin: 0;
+        margin-bottom: 32px;
+        background: {{ sidebar_icon_color }};
+        mask-size: cover;
+        cursor: pointer;
+    }
+
+    #new-post-circle {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 52px;
+        height: 52px;
+        margin-top: auto;
+        background-color: {{ twitter_blue }};
+        border-radius: 9999px;
+        cursor: pointer;
+    }
+    
+    #new-post-icon {
+        width: 24px;
+        margin: 0;
+    }
+
+    /* Main-content styling */
+
+    #main {
+        display: flex;
+        flex-direction: column;
+        grid-area: tweets;
+        max-height: 500px;
+        padding: 16px 0 0 0;
+    }
+
+    /* Latest tweets styling */
+    
+    #latest-tweets-bar {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        padding: 0 16px;
+    }
+
+    #latest-tweets-text {
+        margin: 0;
+        margin-top: -5px;
+        color: {{ text_color }};
+    }
+
+    #latest-tweets-icon {
+        width: 24px;
+        height: 24px;
+        display: inline-block;
+        margin: 0;
+        background-color: {{ text_color }};
+        mask-size: cover;
+        cursor: pointer;
+    }
+
+    /* Post editor styling */
+
+    .post-editor-icon {
+        width: 20px;
+        margin-right: 8px;
+        cursor: pointer;
+    }
+    
+    /* Timeline styling */
+    #timeline {
+        position: relative;
+        overflow-y: scroll;
+        width: 100%;
+    }
+
+    /* "What's Happening" styling */
+
+    #whats-happening {
+        display: grid;
+        grid-template-areas: 'avatar input' 'avatar post';
+        grid-template-columns: 60px 1fr;
+        grid-template-rows: 1fr 48px;
+        padding: 0 16px 8px 16px;
+        border-bottom: 1px solid {{ border_color }};
+    }
+
+    #whats-happening-avatar-container {
+        grid-area: avatar;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        margin-right: 12px;
+    }
+
+    #whats-happening-text-container {
+        grid-area: input;
+        display: flex;
+    }
+
+    #whats-happening-text {
+        padding: 6px 12px;
+        font-size: 20px;
+        color: {{ handle_color }};
+    }
+
+    #post-editor-icons-container {
+        grid-area: post;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 12px;
+    }
+
+    #tweet-button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 36px;
+        margin-left: auto;
+        padding: 0 16px;
+        background-color: {{ twitter_blue }};
+        color: white;
+        border-radius: 9999px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    /* Tweet styling */
+    .tweet-container {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: flex-start;
+        width: 100%;
+        padding: 16px;
+        border-bottom: 1px solid {{ border_color }};
+    }
+
+    .tweet-text-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        margin-left: 22px;
+    }
+
+    .headline-username {
+        margin-right: 2px;
+        font-weight: bold;
+    }
+
+    .headline-handle {
+        color: {{ handle_color }};
+        cursor: pointer;
+    }
+
+    .tweet-content { margin: 0; }
+
+    .reply-icons-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 12px;
+    }
+
+    .reply-icon {
+        width: 22px;
+        height: 22px;
+        margin: 0;
+        display: inline-block;
+        background: {{ reply_icon_color }};
+        mask-size: cover;
+        cursor: pointer;
+    }
+
+    .avatar-image {
+        width: 48px;
+        margin: 0;
+        border-radius: 9999px;
+    }
+</style>
+
+<div id="post-container">
+    <div id="sidebar">
+        <div style="mask: url({{sidebar_twitter}}); background: {{ twitter_blue }}" class="sidebar-icon"></div>
+        <div style="mask: url({{sidebar_home}})" class="sidebar-icon"></div>
+        <div style="mask: url({{sidebar_search}})" class="sidebar-icon"></div>
+        <div style="mask: url({{sidebar_notifications}})" class="sidebar-icon"></div>
+        <div style="mask: url({{sidebar_more}})" class="sidebar-icon"></div>
+        <div id="new-post-circle">
+            <img src="{{sidebar_new_post}}" alt="new post" id="new-post-icon" />
+        </div>
+    </div>
+    <div id="main">
+        <div id="latest-tweets-bar">
+            <h2 id="latest-tweets-text">Latest Tweets</h2>
+            <div style="mask: url({{latest_tweets_icon}})" id="latest-tweets-icon"></div>
+        </div>
+        <div id="timeline">
+            <div id="whats-happening">
+                <div id="whats-happening-avatar-container">
+                    <img src="{{whats_happening_avatar}}" alt="it's eggbug!" class="avatar-image"/>
+                </div>
+                <div id="whats-happening-text-container">
+                    <span id="whats-happening-text">What's happening?</span>
+                </div>
+                <div id="post-editor-icons-container">
+                    <img src="{{post_editor_image}}" alt="image icon" class="post-editor-icon" />
+                    <img src="{{post_editor_gif}}" alt="gif icon" class="post-editor-icon" />
+                    <img src="{{post_editor_smile}}" alt="smile icon" class="post-editor-icon" />
+                    <div id="tweet-button">Tweet</div>
+                </div>
+            </div>
+            {%- for post in posts -%}
+            <div class="tweet-container">
+                {%- if post.user.avatar -%}
+                    {%- set user_handle_alt = "user avatar" -%}
+                    {%- if post.user.handle -%}
+                        {%- set user_handle_alt = post.user.handle ~ "'s avatar"-%}
+                    {%- endif -%}
+                    <img src="{{ post.user.avatar | safe }}" alt="{{ user_handle_alt }}" class="avatar-image"/>
+                {%- else -%}
+                    <img src="" alt="" class="avatar-image"/>
+                {%- endif -%}
+                <div class="tweet-text-container">
+                    <div>
+                        <span class="headline-username">{{ post.user.name }}</span>
+                        <span class="headline-handle">
+                            {%- if post.user.handle and post.timestamp -%}
+                                @{{ post.user.handle }} · {{ post.timestamp }}
+                            {%- elif post.user.handle -%}
+                                @{{ post.user.handle }}
+                            {%- elif post.timestamp -%}
+                                {{ post.timestamp }}
+                            {%- endif -%}
+                        </span>
+                    </div>
+                    {%- for message in post.messages -%}
+<p class="tweet-content">{{- message | markdown | trim | safe -}}</p>
+                    {%- endfor -%}
+                    <div class="reply-icons-container">
+                        <div style="mask: url({{reply_chat}})" class="reply-icon"></div>
+                        <div style="mask: url({{reply_like}})" class="reply-icon"></div>
+                        <div style="mask: url({{reply_rt}})" class="reply-icon"></div>
+                        <div style="mask: url({{reply_share}})" class="reply-icon"></div>
+                    </div>
+                </div>
+            </div>
+            {%- endfor -%}
+        </div>
+    </div>
+</div>

@@ -1,0 +1,20 @@
+JUICE: yeah
+TEN: Why
+JUICE: is there any explanation you would possibly find satisfactory
+TEN: No
+NINE: I think I'm fascinated by this game.
+JUICE: YES
+TEN: NO
+NINE: I really am. It's like, look at all the time it's taken to make this game what it is. People have spent forever arguing and negotiating. Wow, and look at those skyscrapers, I didn't even ask about those. The resources poured into this field are unbelievable.
+NINE: If they'd just worked together, think of the amazing game they could have made. They could have made something really cool. Like some kind of wild maze or whatever, I don't know. Something that was ten thousand feet tall.
+NINE: But they don't want that. Or maybe they do on some level, and they can't work together. It's hideous.
+JUICE2: yeah
+TEN2: Why
+JUICE2: is there any explanation you would possibly find satisfactory
+TEN2: No
+NINE2: I think I'm fascinated by this game.
+JUICE2: YES
+TEN2: NO
+NINE2: I really am. It's like, look at all the time it's taken to make this game what it is. People have spent forever arguing and negotiating. Wow, and look at those skyscrapers, I didn't even ask about those. The resources poured into this field are unbelievable.
+NINE2: If they'd just worked together, think of the amazing game they could have made. They could have made something really cool. Like some kind of wild maze or whatever, I don't know. Something that was ten thousand feet tall.
+NINE2: But they don't want that. Or maybe they do on some level, and they can't work together. It's hideous.

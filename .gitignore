@@ -2,9 +2,3 @@
 **/*.rs.bk
 choost.html
 choost.md
-
-src/
-wasm/
-readme-images/
-css-inline/
-tera/

@@ -1,0 +1,93 @@
+{#-config
+   [{
+      "name": "default_font",
+      "type": "text",
+      "label": "Default Font",
+      "default": "Comic Sans MS",
+      "placeholder": "a font family"
+   }, {
+      "name": "use_color",
+      "type": "checkbox",
+      "label": "Use custom <code>color</code>"
+   }, {
+      "name": "border_color",
+      "type": "color",
+      "label": "Dialog Box Border Color",
+      "default": "#FFFFFF"
+   }, {
+      "name": "background_color",
+      "type": "color",
+      "label": "Background Color",
+      "default": "#000000"
+   }, {
+      "name": "box_color",
+      "type": "color",
+      "label": "Dialog Box Background Color",
+      "default": "#000000"
+   }]
+config-#}
+
+<style> 
+    #post-wrapper {
+       padding: 16px;
+       /* Cohost adds padding around the post, which usually looks weird. This negative margin undoes
+          that padding. */
+       margin: -16px -12px;
+       background: {{ background_color }};
+    }
+
+    .dialog-box {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 15px;
+        background: {{ box_color }};
+        border: 5px solid {{ border_color }};
+    }
+ 
+    .message-content {
+        margin: 25px 25px 25px 0;
+        white-space: break-spaces;
+        word-wrap: break-word;
+        color: white;
+        font-size: 1.25em;
+        line-height: 2;
+        font-family: {{ default_font }};
+    }
+
+    .avatar-div {
+        margin: 35px 25px;
+        width: 100px;
+        height: 100px;
+        flex-shrink: 0;
+    }
+
+    .avatar-image {
+        max-width: 100%;
+        max-height: 100%%;
+        /* Need to set margin in order to undo Cohost's automatic addition of margins to images. */
+        margin: 0;
+    }
+
+    {% for user in users %}
+    .{{user.key}} {
+        {% if user.font %}
+            font-family: {{ user.font }};
+        {% endif %}
+
+        {% if user.color and use_color %}
+            color: {{ user.color }};
+        {% endif %}
+    }
+    {% endfor %}
+ </style>
+     
+ <div id="post-wrapper">
+    {%- for postblock in posts -%}
+    {%- for message in postblock.messages %}
+    <div class="dialog-box">
+        <div class="avatar-div"><img src="{{postblock.user.avatar | default(value="")}}" class="avatar-image"/></div>
+        <p class="message-content {{ postblock.user.key }}">{{ message | trim | safe }}</p>
+    </div>
+    {%- endfor -%}
+    {%- endfor -%}
+ </div>

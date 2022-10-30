@@ -1,0 +1,64 @@
+AARON: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas consectetur eros ut quam commodo, aliquam ornare turpis tristique. Donec faucibus enim lacus, ut porttitor leo pellentesque quis. Curabitur malesuada est urna, ut tincidunt lectus rhoncus a. Aliquam tempus sollicitudin tempus. Pellentesque sed nisi et est vestibulum facilisis. Morbi tincidunt diam turpis. Ut ut mi dui. 
+
+@ Today at Time
+AARON: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas consectetur eros ut quam commodo, aliquam ornare turpis tristique. Donec faucibus enim lacus, ut porttitor leo pellentesque quis. Curabitur malesuada est urna, ut tincidunt lectus rhoncus a. Aliquam tempus sollicitudin tempus. Pellentesque sed nisi et est vestibulum facilisis. Morbi tincidunt diam turpis. Ut ut mi dui. 
+
+@ Conversation
+AARON: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+CASSIE: Maecenas consectetur eros ut quam commodo, aliquam ornare turpis tristique.
+AARON: Donec faucibus enim lacus, ut porttitor leo pellentesque quis.
+AARON: Curabitur malesuada est urna, ut tincidunt lectus rhoncus a. Aliquam tempus sollicitudin tempus. 
+CASSIE: Pellentesque sed nisi et est vestibulum facilisis.
+CASSIE: Morbi tincidunt diam turpis. Ut ut mi dui. 
+@
+CASSIE: Pellentesque vitae lacus justo.
+CASSIE: Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+CASSIE: Phasellus vulputate placerat auctor.
+@ Multiline Message
+AARON: Lorem ipsum dolor sit amet,
+consectetur adipiscing elit. Maecenas consectetur eros ut quam commodo,
+aliquam ornare turpis tristique. Donec faucibus enim lacus,
+ut porttitor leo pellentesque quis. Curabitur malesuada est urna,
+ut tincidunt lectus rhoncus a. Aliquam tempus sollicitudin tempus. 
+Pellentesque sed nisi et est vestibulum facilisis. Morbi tincidunt diam turpis. Ut ut mi dui. 
+
+Lorem ipsum dolor sit amet,
+consectetur adipiscing elit. Maecenas consectetur eros ut quam commodo,
+aliquam ornare turpis tristique. Donec faucibus enim lacus,
+ut porttitor leo pellentesque quis. Curabitur malesuada est urna,
+ut tincidunt lectus rhoncus a. Aliquam tempus sollicitudin tempus. 
+Pellentesque sed nisi et est vestibulum facilisis. Morbi tincidunt diam turpis. Ut ut mi dui. 
+
+Lorem ipsum dolor sit amet,
+consectetur adipiscing elit. Maecenas consectetur eros ut quam commodo,
+aliquam ornare turpis tristique. Donec faucibus enim lacus,
+ut porttitor leo pellentesque quis. Curabitur malesuada est urna,
+ut tincidunt lectus rhoncus a. Aliquam tempus sollicitudin tempus. 
+Pellentesque sed nisi et est vestibulum facilisis. Morbi tincidunt diam turpis. Ut ut mi dui. 
+
+@ Markdown Formatting
+AARON: **Lorem ipsum dolor sit amet**, *consectetur adipiscing elit*. ~~Maecenas consectetur eros ut quam commodo~~, <u>aliquam ornare</u> `turpis tristique`.
+
+AARON: code block
+```
+Lorem ipsum dolor sit amet,
+consectetur adipiscing elit. Maecenas consectetur eros ut quam commodo, aliquam ornare turpis tristique. Donec faucibus enim lacus,
+ut porttitor leo pellentesque quis. Curabitur malesuada est urna,
+ut tincidunt lectus rhoncus a. Aliquam tempus sollicitudin tempus. 
+Pellentesque sed nisi et est vestibulum facilisis. Morbi tincidunt diam turpis. Ut ut mi dui. 
+```
+
+AARON: code block with lang
+```rust
+Lorem ipsum dolor sit amet,
+consectetur adipiscing elit. Maecenas consectetur eros ut quam commodo, aliquam ornare turpis tristique. Donec faucibus enim lacus,
+ut porttitor leo pellentesque quis. Curabitur malesuada est urna,
+ut tincidunt lectus rhoncus a. Aliquam tempus sollicitudin tempus. 
+Pellentesque sed nisi et est vestibulum facilisis. Morbi tincidunt diam turpis. Ut ut mi dui. 
+```
+
+@ Error Checking - Missing Keys
+NOKEY: Lorem ipsum dolor sit amet.
+NONAME: Lorem ipsum dolor sit amet.
+NOCOLOR: Lorem ipsum dolor sit amet.
+NOAVATAR: Lorem ipsum dolor sit amet.

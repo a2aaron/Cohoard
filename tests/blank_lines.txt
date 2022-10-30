@@ -1,0 +1,27 @@
+@ No Blank Lines
+AARON: line 1 (no blank lines)
+line 2 (no blank lines)
+line 3 (no blank lines)
+
+@ Single Messages
+AARON: line 1 (single messages)
+AARON: line 2 (single messages)
+AARON: line 3 (single messages)
+
+@ Blank Lines
+AARON: line 1 (blank lines)
+
+line 2 (blank lines)
+
+line 3 (blank lines)
+
+@ Blank Lines (with br tags)
+AARON: this test case uses br tags because we don't handle new lines correctly right now.
+AARON: the main issue is that the markdown parser wants to turn contigious newlines into p tags which also means it keeps eating newlines, which is kind of annoying
+AARON: the solution might be to instead write our own *inline* markdown parser, which only handles a small subset of markdown (rather than the like, 40 billion edge cases we'd have to handles)
+AARON: however that also sounds hard.
+
+@
+AARON: line 1 (br tag)<br>
+line 2 (br tag)<br>
+line 3 (br tag)

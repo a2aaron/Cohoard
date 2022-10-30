@@ -1,0 +1,31 @@
+[package]
+name = "cohoard_rs"
+version = "0.4.0"
+authors = ["Aaron Kofsky <aaronko@umich.edu>"]
+edition = "2021"
+description = "turn chatlogs into formatted posts for cohost"
+repository = "https://github.com/a2aaron/Cohoard"
+license = "MIT OR Apache-2.0"
+readme = "../README.md"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+clap                = { version = "3.2.8", features = ["derive", "std"]       , default-features = false}
+# pinned to "minimal" branch, https://github.com/a2aaron/css-inline/commit/7e4fdd2812c90a743a22343bb310cb77d7349542
+css-inline          = { git = "https://github.com/a2aaron/css-inline", rev = "7e4fdd2812c90a743a22343bb310cb77d7349542", default-features = false}
+# We use specifically version 0.8.1 of kuchiki because css-inline uses the same version. Hopefully
+# this means we won't need to compile two version of kuchiki + it's dependents into the crate.
+kuchiki             = { version = "0.8.1"                                     , default-features = false}
+pulldown-cmark      = { version = "0.9.1"                                     , default-features = false}
+serde               = { version = "1.0.137", features = ["derive"]            , default-features = false}
+serde_json          = "1.0.83"
+serde_yaml          = { version = "0.8.24"                                    , default-features = false}
+tera                = { version = "1.16.0"                                    , default-features = false} # note: tera needs no default features or else it won't compile
+
+[profile.release]
+lto = "fat"
+codegen-units = 1

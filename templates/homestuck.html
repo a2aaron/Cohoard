@@ -1,0 +1,107 @@
+{#-config
+   [{
+      "name": "prefer_short_handle",
+      "type": "checkbox",
+      "label": "Prefer <code>short_handle</code>",
+      "default": "true"
+   }]
+config-#}
+
+<style>
+   .cohoard-underline { text-decoration: underline; }
+
+   .cohoard-code { 
+      font-family: monospace;
+      /* Avoid stripping white space */
+      white-space: pre-wrap;
+   }
+
+   .cohoard-codeblock {
+      font-family: monospace;
+      /* Avoid stripping white space */
+      white-space: pre-wrap;
+   }
+
+   #container {
+       /* Cohost adds padding around the post, which usually looks weird. This negative margin undoes
+       that padding. */
+       margin: -16px -12px;
+       background: #c6c6c6;
+       line-height: 1.35;
+    }
+    
+    #container-inner {
+        max-width: 650px;
+        padding: 16px;
+        margin: 0 auto;
+        background: #efefef;
+   }
+
+   #border {
+       border: 1px dashed gray;
+       padding: 1px;
+       margin: 15px;
+       min-height: 26px;
+       overflow: hidden;
+   }
+   summary {
+       font-size: 0;
+       height: 24px;
+       margin-bottom: -24px;
+       position: relative;
+   }
+   .center { 
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        text-align: center;
+   }
+   #chat {
+       font-family: "courier-std", courier, monospace;
+       font-weight: bold;
+       padding: 15px;
+       font-size: 14px;
+   }
+   .button {
+        width: fit-content;
+        height: 22px;
+        padding: 1px 4px;
+        border: 1px solid rgb(143, 143, 156);
+        border-radius: 4px;
+        background-color: rgb(233, 233, 237);
+        font-family: -apple-system, sans-serif;
+        font-size: 13.3333px;
+        user-select: none;
+        pointer-events: none;
+        line-height: 18px;
+    }
+   .full { width: 100%; background: #efefef; }
+   .on-top { position: relative; z-index: 1; pointer-events: none; }
+</style>
+
+<div id="container">
+<div id="container-inner">
+<div id="border">
+<details open>
+<summary class="center full"><div class="button">Show Pesterlog</div></summary>
+<div class="center full on-top"><div class="button">Hide Pesterlog</div></div>
+<div id="chat">
+
+{%- for postblock in posts -%}
+    {%- for message in postblock.messages -%}
+        {%- if postblock.user.short_handle and prefer_short_handle -%}
+            {%- set handle = postblock.user.short_handle -%}
+        {%- elif postblock.user.handle -%}
+            {%- set handle = postblock.user.handle -%}
+        {%- else -%}
+            {%- set handle = postblock.user.key -%}
+        {%- endif -%}
+        <div class="message" style="color: {{ postblock.user.color | default(value="black") }}">{{ handle }}: {{ message | markdown | trim | safe }}</div>
+    {%- endfor -%}
+{%- endfor -%}
+
+</div>
+</details>
+</div>
+</div>
+</div>

@@ -1,0 +1,40 @@
+name: Publish New Cohoard Version
+
+on: [workflow_dispatch]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./wasm
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download and Set Up
+        run: |
+          rustup default nightly
+          curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+      - name: Print Info
+        run: pwd && ls && rustup show
+      - name: Build and Pack
+        run: |
+          wasm-pack build --target web --release
+      - name: Pre-Publish
+        run: |
+          cd pkg
+          rm .gitignore
+          pwd
+          ls
+          echo "Publishing cohoard package to ~a2aaron/cohoard/"
+      - uses: BetaHuhn/do-spaces-action@v2
+        with:
+          access_key: ${{ secrets.DIGITAL_OCEAN_ACCESS_KEY }}
+          secret_key: ${{ secrets.DIGITAL_OCEAN_ACCESS_SECRET }}
+          space_name: ${{ secrets.DIGITAL_OCEAN_SPACE_NAME }}
+          space_region: ${{ secrets.DIGITAL_OCEAN_SPACE_REGION }}
+          source: ./wasm/pkg
+          out_dir: ~a2aaron/cohoard/
+          versioning: ./wasm/pkg
