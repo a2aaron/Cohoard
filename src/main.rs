@@ -37,6 +37,14 @@ fn main() -> Result<(), Box<dyn Error>> {
     };
 
     let posts = cohoard::parse_posts(&config, input);
+    for post in &posts {
+        match post {
+            cohoard::ChatlogBlock::Timestamp { message } => println!("TIMESTAMP: {}", message),
+            cohoard::ChatlogBlock::Post { user: _, message } => {
+                println!("POST: {}", message)
+            }
+        }
+    }
 
     let template_contents = std::fs::read_to_string(&args.template)?;
     let html = cohoard::render(
