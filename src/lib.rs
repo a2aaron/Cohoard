@@ -44,13 +44,18 @@ pub enum ChatlogBlock {
 pub fn parse_posts(config: &Config, input: String) -> Vec<ChatlogBlock> {
     let mut posts = vec![];
 
-    let mut name = String::new();
-    let mut message = String::new();
+    let mut prev_post = None;
 
     for line in input.lines() {
         if line.trim().is_empty() {
             continue;
         } else if line.starts_with("@") {
+            // If there is a message already being constructed, finish it, then go on with the rest of the timestamp
+            if let Some((user, message)) = prev_post {
+                posts.push(ChatlogBlock::Post { user, message });
+                prev_post = None;
+            }
+
             // Lines starting with @ are timestamp messages
             // These have the format "@ Today at 4:13 PM" and update the timestamp
             // (The timestamp is actually freeform text, allowing for Goofs)
@@ -58,39 +63,37 @@ pub fn parse_posts(config: &Config, input: String) -> Vec<ChatlogBlock> {
             posts.push(ChatlogBlock::Timestamp { message });
         } else {
             match line.split_once(": ") {
-                Some((maybe_next_name, maybe_message)) => {
-                    // Check if this is a line that looks like it starts with a name
-                    // Ex: "AARON: bee removal"
-                    // if it is, treat it as a new message. Otherwise, treat it
-                    // as a multiline message.
-                    // Note that multiline messages have slightly closer spacing
-                    // compared to lines across different messages
-                    if maybe_next_name.chars().all(|x| x.is_alphanumeric()) {
-                        let user = get_user(config, &name);
-                        let post = ChatlogBlock::Post { user, message };
-                        posts.push(post);
-
-                        name = maybe_next_name.into();
-                        message = maybe_message.to_string();
-                    } else {
-                        message += line.into();
+                // Check if this is a line that looks like it starts with a name
+                // Ex: "AARON: bee removal"
+                // if it is, treat it as a new message. Otherwise, treat it
+                // as a multiline message.
+                // Note that multiline messages have slightly closer spacing
+                // compared to lines across different messages
+                Some((name, message)) if name.chars().all(|x| x.is_alphanumeric()) => {
+                    if let Some((user, message)) = prev_post {
+                        posts.push(ChatlogBlock::Post { user, message });
                     }
+
+                    let user = get_user(config, &name);
+                    // Need to re-add new line explicitly, since `input.lines()` strips the newline.
+                    prev_post = Some((user, format!("{}\n", message)))
                 }
-                None => {
-                    message += "\n";
-                    message += line;
+                _ => {
+                    if let Some((_, message)) = &mut prev_post {
+                        message.push_str(line);
+                        // Same deal, need to explicitly re-add new line
+                        message.push('\n');
+                    }
                 }
             };
         }
     }
 
-    if !message.is_empty() {
-        let user = get_user(config, &name);
-        let post = ChatlogBlock::Post { user, message };
-        posts.push(post);
+    if let Some((user, message)) = prev_post {
+        posts.push(ChatlogBlock::Post { user, message });
     }
 
-    fn get_user(config: &Config, name: &String) -> User {
+    fn get_user(config: &Config, name: &str) -> User {
         config.people.get(name).cloned().unwrap_or({
             User {
                 fields: [
