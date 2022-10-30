@@ -1,51 +1,54 @@
 people:
-- key: AARON
-  name: Aaron
-  color: "#FF8200"
-  avatar: https://i.imgur.com/daOAthA.png
-  handle: a2aaron
-  # my friends are IN the config!
-- key: CASSIE
-  name: Cassie
-  color: "#69C97A"
-  avatar: https://cdn.discordapp.com/attachments/637721012418510849/992630255665823744/cassie.webp
-  handle: porglezomp
-# 17776 defaults
-- key: JUICE
-  name: Juice
-  color: "#ffea02"
-  padding_left: "20%"
-- key: NINE
-  name: Nine
-  color: "#ff6767"
-  padding_left: "10%"
-- key: TEN
-  name: Ten
-  color: "#92ff92"
-  padding_left: "0%"
-# 20020 defaults
-- key: JUICE2
-  name: Juice
-  color: "#000000"
-  background_color: "#ffea02"
-  padding_left: "20%"
-- key: NINE2
-  name: Nine
-  color: "#000000"
-  background_color: "#ff6767"
-  padding_left: "10%"
-- key: TEN2
-  name: Ten
-  color: "#000000"
-  background_color: "#92ff92"
-  padding_left: "0%"
-# for testing
-- key: NONAME
-  color: red
-  avatar: https://i.imgur.com/BBaogem.png
-- key: NOAVATAR
-  name: No Avatar
-  color: blue
-- key: NOCOLOR
-  name: No Color
-  avatar: https://i.imgur.com/BBaogem.png
+  - key: AARON
+    name: Aaron
+    color: "#FF8200"
+    avatar: https://i.imgur.com/daOAthA.png
+    handle: a2aaron
+    # my friends are IN the config!
+  - key: CASSIE
+    name: Cassie
+    color: "#69C97A"
+    avatar: https://cdn.discordapp.com/attachments/637721012418510849/992630255665823744/cassie.webp
+    handle: porglezomp
+  # 17776 defaults
+  - key: JUICE
+    name: Juice
+    color: "#ffea02"
+    padding_left: "20%"
+    avatar: https://static.witchoflight.com/~a2aaron/cohoard-avatars/17776-juice.jpg
+  - key: NINE
+    name: Nine
+    color: "#ff6767"
+    padding_left: "10%"
+    avatar: https://static.witchoflight.com/~a2aaron/cohoard-avatars/17776-nine.jpg
+  - key: TEN
+    name: Ten
+    color: "#92ff92"
+    padding_left: "0%"
+    avatar: https://static.witchoflight.com/~a2aaron/cohoard-avatars/17776-ten.jpg
+  # 20020 defaults
+  - key: JUICE2
+    name: Juice
+    color: "#000000"
+    background_color: "#ffea02"
+    padding_left: "20%"
+  - key: NINE2
+    name: Nine
+    color: "#000000"
+    background_color: "#ff6767"
+    padding_left: "10%"
+  - key: TEN2
+    name: Ten
+    color: "#000000"
+    background_color: "#92ff92"
+    padding_left: "0%"
+  # for testing
+  - key: NONAME
+    color: red
+    avatar: https://i.imgur.com/BBaogem.png
+  - key: NOAVATAR
+    name: No Avatar
+    color: blue
+  - key: NOCOLOR
+    name: No Color
+    avatar: https://i.imgur.com/BBaogem.png
