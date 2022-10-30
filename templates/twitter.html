@@ -257,6 +257,9 @@ config-#}
     }
 </style>
 
+{#- Most recent timestamp setting. If not set, this is equal to empty string -#}
+{%- set timestamp = "" -%}
+
 <div id="post-container">
     <div id="sidebar">
         <div style="mask: url({{sidebar_twitter}}); background: {{ twitter_blue }}" class="sidebar-icon"></div>
@@ -289,6 +292,10 @@ config-#}
                 </div>
             </div>
             {%- for post in posts -%}
+            {%- if post.type == "timestamp" -%}
+                {%- set_global timestamp = post.message -%}
+                {%- continue -%}
+            {%- endif -%}
             <div class="tweet-container">
                 {%- if post.user.avatar -%}
                     {%- set user_handle_alt = "user avatar" -%}
@@ -303,18 +310,16 @@ config-#}
                     <div>
                         <span class="headline-username">{{ post.user.name }}</span>
                         <span class="headline-handle">
-                            {%- if post.user.handle and post.timestamp -%}
-                                @{{ post.user.handle }} · {{ post.timestamp }}
+                            {%- if post.user.handle and timestamp != "" -%}
+                                @{{ post.user.handle }} · {{ timestamp }}
                             {%- elif post.user.handle -%}
                                 @{{ post.user.handle }}
-                            {%- elif post.timestamp -%}
-                                {{ post.timestamp }}
+                            {%- elif timestamp != "" -%}
+                                {{ timestamp }}
                             {%- endif -%}
                         </span>
                     </div>
-                    {%- for message in post.messages -%}
-<p class="tweet-content">{{- message | markdown | trim | safe -}}</p>
-                    {%- endfor -%}
+                    <p class="tweet-content">{{- post.message | markdown | trim | safe -}}</p>
                     <div class="reply-icons-container">
                         <div style="mask: url({{reply_chat}})" class="reply-icon"></div>
                         <div style="mask: url({{reply_like}})" class="reply-icon"></div>
