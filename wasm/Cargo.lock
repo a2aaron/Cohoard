@@ -115,7 +115,7 @@ dependencies = [
 
 [[package]]
 name = "cohoard"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "cohoard_rs",
  "js-sys",
@@ -126,7 +126,7 @@ dependencies = [
 
 [[package]]
 name = "cohoard_rs"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "clap",
  "css-inline",

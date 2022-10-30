@@ -1,6 +1,6 @@
 [package]
 name = "cohoard_rs"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["Aaron Kofsky <aaronko@umich.edu>"]
 edition = "2021"
 description = "turn chatlogs into formatted posts for cohost"

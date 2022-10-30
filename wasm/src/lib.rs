@@ -8,13 +8,13 @@ use cohoard_rs as cohoard;
 pub struct Config(JsValue);
 
 #[wasm_bindgen]
-pub struct PostBlockArray(JsValue);
+pub struct ChatlogBlockArray(JsValue);
 
 #[wasm_bindgen]
-pub fn parse_posts(config: &Config, input: String) -> Result<PostBlockArray, JsError> {
+pub fn parse_posts(config: &Config, input: String) -> Result<ChatlogBlockArray, JsError> {
     let config = config.0.into_serde()?;
     let posts = cohoard::parse_posts(&config, input);
-    Ok(PostBlockArray(JsValue::from_serde(&posts)?))
+    Ok(ChatlogBlockArray(JsValue::from_serde(&posts)?))
 }
 
 fn get_full_msg(mut err: &dyn Error) -> String {
@@ -30,7 +30,7 @@ fn get_full_msg(mut err: &dyn Error) -> String {
 pub fn render(
     template_name: &str,
     template: &str,
-    posts: &PostBlockArray,
+    posts: &ChatlogBlockArray,
     config: &Config,
     additional_variables: &JsValue,
 ) -> Result<String, JsError> {
