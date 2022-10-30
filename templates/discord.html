@@ -158,6 +158,14 @@ config-#}
 {%- endfor -%}
 </style>
 
+{#- Split the posts stream into chunks of contigious posters. In other words, this transforms the 
+   posts, an array of both timestamps and posts, into an array of arrays, where each sub-array is
+   of length 3 and contains [timestamp, user, array of messages]. The array of messages will all be
+   sent by the same person and contain the same timestamps. This is used to determine when to print
+   out a new headline containing the username/avatar/timestamp of a message, and mimics how Discord
+   does it (namely, it prints the headline whenever the timestamp of a message is different from the
+   previous message, or if the poster of the message is different from the poster of the previous
+   message. -#}
 {%- set postblocks = [] -%}
 {%- set this_postblock = [] -%}
 {%- set this_timestamp = "" -%}
@@ -165,29 +173,40 @@ config-#}
 {%- for post in posts -%}
    {%- set try_make_postblock = false -%}
    {%- if post.type == "timestamp" -%}
-      {# <pre>TIMESTAMP: {{this_timestamp}} -> {{ post.message }}</pre> #}
+      {#- If there is some previous post, then the timestamp changing requires us to issue a new
+          headline, so we push the posts we already have -#}
       {%- if this_user != "" -%}
+         {#- For some reason, tera doesn't like nested array literals, so i need to make a temp 
+             variable here. I need a nested array because concat will concat the array elements together
+             if the with argument is an array (in other words, [1, 2, 3] concated with [4, 5, 6] is 
+             [1, 2, 3, 4, 5, 6], not [1, 2, 3, [4, 5, 6]]). However, this isn't what I want--I want
+             an array of arrays, so to get around this, we have it concat an array containing a single
+             array, which gives us what we want. -#}
          {%- set temp = [this_timestamp, this_user, this_postblock]-%}    
          {%- set_global postblocks = postblocks | concat(with=[temp]) -%}
          {%- set_global this_postblock = [] -%}
+         {%- set_global this_user = "" -%}
       {%- endif -%}
+      {#- Update timestamp value. -#}
       {%- set_global this_timestamp = post.message -%}
    {%- else -%}
-      {# <pre>POST: {{ post.user.key ~ ", " ~ post.message ~ ", " ~ this_timestamp }}</pre> #}
+      {#- If the speaker changed, issue a new headline. -#}
       {%- if this_user != "" and this_user.key != post.user.key -%}
          {%- set temp = [this_timestamp, this_user, this_postblock]-%}    
          {%- set_global postblocks = postblocks | concat(with=[temp]) -%}
          {%- set_global this_postblock = [] -%}
+         {%- set_global this_user = "" -%}
       {%- endif -%}
       {%- set_global this_postblock = this_postblock | concat(with=post.message) -%}
       {%- set_global this_user = post.user -%}
    {%- endif -%}
 {%- endfor -%}
 
-{%- set temp = [this_timestamp, this_user, this_postblock]-%}    
-{%- set postblocks = postblocks | concat(with=[temp]) -%}
-{# <pre>{{__tera_context}}</pre> #}
-
+{#- Finally, issue one last postblock, to account for the last set of messages, if there are any -#}
+{%- if this_user != "" -%}
+   {%- set temp = [this_timestamp, this_user, this_postblock]-%}    
+   {%- set postblocks = postblocks | concat(with=[temp]) -%}
+{%- endif -%}
 {#- The div for the background and global font styling. -#}
 <div id="post-wrapper">
 {%- for postblock in postblocks -%}
