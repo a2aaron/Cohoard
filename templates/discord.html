@@ -11,6 +11,7 @@
    }]
 config-#}
 
+{#- Set color based on current theme, as chosen by the UI -#}
 {%- if light_mode -%}
    {%- set background_color = "#ffffff" -%}
    {%- set username_default_color = "#060607" -%}
@@ -167,8 +168,13 @@ config-#}
    previous message, or if the poster of the message is different from the poster of the previous
    message. -#}
 {%- set postblocks = [] -%}
-{%- set this_postblock = [] -%}
+{#- Most recent set of messages. This is cleared whenever a new headline is issued -#}
+{%- set this_messages = [] -%}
+{#- Most recent timestamp -#}
 {%- set this_timestamp = "" -%}
+{#- Most recent user who posted. The value of an empty string means "no most recent user" and is 
+    set to the empty string whenever a new headlien is issued (Tera doesn't seem to have null, so 
+    this is the next best option) -#}
 {%- set this_user = "" -%}
 {%- for post in posts -%}
    {%- set try_make_postblock = false -%}
@@ -182,9 +188,9 @@ config-#}
              [1, 2, 3, 4, 5, 6], not [1, 2, 3, [4, 5, 6]]). However, this isn't what I want--I want
              an array of arrays, so to get around this, we have it concat an array containing a single
              array, which gives us what we want. -#}
-         {%- set temp = [this_timestamp, this_user, this_postblock]-%}    
+         {%- set temp = [this_timestamp, this_user, this_messages]-%}    
          {%- set_global postblocks = postblocks | concat(with=[temp]) -%}
-         {%- set_global this_postblock = [] -%}
+         {%- set_global this_messages = [] -%}
          {%- set_global this_user = "" -%}
       {%- endif -%}
       {#- Update timestamp value. -#}
@@ -192,19 +198,19 @@ config-#}
    {%- else -%}
       {#- If the speaker changed, issue a new headline. -#}
       {%- if this_user != "" and this_user.key != post.user.key -%}
-         {%- set temp = [this_timestamp, this_user, this_postblock]-%}    
+         {%- set temp = [this_timestamp, this_user, this_messages]-%}    
          {%- set_global postblocks = postblocks | concat(with=[temp]) -%}
-         {%- set_global this_postblock = [] -%}
+         {%- set_global this_messages = [] -%}
          {%- set_global this_user = "" -%}
       {%- endif -%}
-      {%- set_global this_postblock = this_postblock | concat(with=post.message) -%}
+      {%- set_global this_messages = this_messages | concat(with=post.message) -%}
       {%- set_global this_user = post.user -%}
    {%- endif -%}
 {%- endfor -%}
 
 {#- Finally, issue one last postblock, to account for the last set of messages, if there are any -#}
 {%- if this_user != "" -%}
-   {%- set temp = [this_timestamp, this_user, this_postblock]-%}    
+   {%- set temp = [this_timestamp, this_user, this_messages]-%}    
    {%- set postblocks = postblocks | concat(with=[temp]) -%}
 {%- endif -%}
 {#- The div for the background and global font styling. -#}
