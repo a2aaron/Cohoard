@@ -686,11 +686,11 @@ async function get_template_from_url(url) {
     return text;
 }
 
-export const DISCORD_BUILTIN = await Template.builtin("Discord", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/discord.html");
-export const TWITTER_BUILTIN = await Template.builtin("Twitter", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/twitter.html");
-export const FOOTBALL_BUILTIN = await Template.builtin("17776", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/17776.html");
-export const PESTERLOG_BUILTIN = await Template.builtin("Pesterlog", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/homestuck.html");
-export const UNDERTALE_BUILTIN = await Template.builtin("Undertale", "https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/undertale.html");
+export const DISCORD_BUILTIN = await Template.builtin("Discord", "https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/discord.html");
+export const TWITTER_BUILTIN = await Template.builtin("Twitter", "https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/twitter.html");
+export const FOOTBALL_BUILTIN = await Template.builtin("17776", "https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/17776.html");
+export const PESTERLOG_BUILTIN = await Template.builtin("Pesterlog", "https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/homestuck.html");
+export const UNDERTALE_BUILTIN = await Template.builtin("Undertale", "https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/undertale.html");
 
 
-export const BASIC_TEMPLATE = await get_template_from_url("https://raw.githubusercontent.com/a2aaron/Cohoard/canon/templates/basic.html") ?? "Couldn't fetch template!";
+export const BASIC_TEMPLATE = await get_template_from_url("https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/basic.html") ?? "Couldn't fetch template!";
