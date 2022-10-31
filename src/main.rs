@@ -39,8 +39,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     let posts = cohoard::parse_posts(&config, input.clone());
     for post in &posts {
         match post {
-            cohoard::ChatlogBlock::Timestamp { message } => println!("TIMESTAMP: {}", message),
-            cohoard::ChatlogBlock::Post { user: _, message } => {
+            cohoard::ChatlogElement::Timestamp { message } => println!("TIMESTAMP: {}", message),
+            cohoard::ChatlogElement::Post { user: _, message } => {
                 println!("POST: {}", message)
             }
         }

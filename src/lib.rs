@@ -20,7 +20,7 @@ pub struct User {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
 #[serde(rename_all = "lowercase")]
-pub enum ChatlogBlock {
+pub enum ChatlogElement {
     Timestamp { message: String },
     Post { user: User, message: String },
 }
@@ -41,7 +41,7 @@ pub enum ChatlogBlock {
 /// @ Tomorrow on Wednesday
 /// C: The timestamp is freeform and can be any text.
 /// ```
-pub fn parse_posts(config: &Config, input: String) -> Vec<ChatlogBlock> {
+pub fn parse_posts(config: &Config, input: String) -> Vec<ChatlogElement> {
     let mut posts = vec![];
 
     let mut prev_post = None;
@@ -52,7 +52,7 @@ pub fn parse_posts(config: &Config, input: String) -> Vec<ChatlogBlock> {
         } else if line.starts_with("@") {
             // If there is a message already being constructed, finish it, then go on with the rest of the timestamp
             if let Some((user, message)) = prev_post {
-                posts.push(ChatlogBlock::Post { user, message });
+                posts.push(ChatlogElement::Post { user, message });
                 prev_post = None;
             }
 
@@ -60,7 +60,7 @@ pub fn parse_posts(config: &Config, input: String) -> Vec<ChatlogBlock> {
             // These have the format "@ Today at 4:13 PM" and update the timestamp
             // (The timestamp is actually freeform text, allowing for Goofs)
             let message = line[1..].trim().to_string();
-            posts.push(ChatlogBlock::Timestamp { message });
+            posts.push(ChatlogElement::Timestamp { message });
         } else {
             match line.split_once(": ") {
                 // Check if this is a line that looks like it starts with a name
@@ -71,7 +71,7 @@ pub fn parse_posts(config: &Config, input: String) -> Vec<ChatlogBlock> {
                 // compared to lines across different messages
                 Some((name, message)) if name.chars().all(|x| x.is_alphanumeric()) => {
                     if let Some((user, message)) = prev_post {
-                        posts.push(ChatlogBlock::Post { user, message });
+                        posts.push(ChatlogElement::Post { user, message });
                     }
 
                     let user = get_user(config, &name);
@@ -90,7 +90,7 @@ pub fn parse_posts(config: &Config, input: String) -> Vec<ChatlogBlock> {
     }
 
     if let Some((user, message)) = prev_post {
-        posts.push(ChatlogBlock::Post { user, message });
+        posts.push(ChatlogElement::Post { user, message });
     }
 
     fn get_user(config: &Config, name: &str) -> User {
