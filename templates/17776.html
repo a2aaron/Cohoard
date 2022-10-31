@@ -59,13 +59,9 @@ config-#}
 <div id="post-wrapper">
    
 
-{%- for postblock in posts -%}
-<div class="post-block">
-
-{%- for message in postblock.messages %}
-<p class="message-content {{ postblock.user.key }}"><span class="highlight">{{ message | markdown | trim | safe }}</span></p>
-
-{%- endfor -%}
-</div>
+{%- for post in posts -%}
+   {%- if post.type == "post" -%}
+      <p class="message-content {{ post.user.key }}"><span class="highlight">{{ post.message | markdown | trim | safe }}</span></p>
+   {%- endif -%}
 {%- endfor -%}
 </div>
