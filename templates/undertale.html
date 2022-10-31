@@ -82,11 +82,11 @@ config-#}
  </style>
      
  <div id="post-wrapper">
-    {%- for post in posts -%}
-    {%- if post.type == "post" %}
+    {%- for ele in ELEMENTS -%}
+    {%- if ele.type == "post" %}
     <div class="dialog-box">
-        <div class="avatar-div"><img src="{{post.user.avatar | default(value="")}}" class="avatar-image"/></div>
-        <p class="message-content {{ post.user.key }}">{{ post.message | trim | safe }}</p>
+        <div class="avatar-div"><img src="{{ele.user.avatar | default(value="")}}" class="avatar-image"/></div>
+        <p class="message-content {{ ele.user.key }}">{{ ele.message | trim | safe }}</p>
     </div>
     {%- endif -%}
     {%- endfor -%}

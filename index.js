@@ -133,8 +133,7 @@ function render_examples() {
 
    let cohoard_config = cohoard.load_config(config_json);
 
-   let posts = cohoard.parse_posts(cohoard_config, discord_example_script.innerText);
-   let rendered = cohoard.render("template", DISCORD_BUILTIN.get_content(), posts, cohoard_config, {});
+   let rendered = cohoard.render("template", DISCORD_BUILTIN.get_content(), discord_example_script.innerText, cohoard_config, {});
    discord_example_div.innerHTML = rendered;
    // Remove the negative margin on the rendered post.
    // @ts-ignore

@@ -36,7 +36,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         string
     };
 
-    let posts = cohoard::parse_posts(&config, input);
+    let posts = cohoard::parse_posts(&config, input.clone());
     for post in &posts {
         match post {
             cohoard::ChatlogBlock::Timestamp { message } => println!("TIMESTAMP: {}", message),
@@ -50,7 +50,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let html = cohoard::render(
         args.template.to_str().unwrap_or("template"),
         &template_contents,
-        &posts,
+        &input,
         &config,
         std::iter::empty(),
     )?;

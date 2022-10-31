@@ -405,10 +405,8 @@ class Template {
      * @returns {string | Error}
      */
     render(cohoard_config, script) {
-        let posts = cohoard.parse_posts(cohoard_config, script);
-
         try {
-            return cohoard.render("template", this.get_content(), posts, cohoard_config, this.get_ui_values());
+            return cohoard.render("template", this.get_content(), script, cohoard_config, this.get_ui_values());
         } catch (err) {
             return /** @type {Error} */ (err);
         }

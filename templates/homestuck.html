@@ -92,18 +92,18 @@ config-#}
 <div class="center full on-top"><div class="button">Hide Pesterlog</div></div>
 <div id="chat">
 
-{%- for post in posts -%}
-    {%- if post.type == "post" -%}
-        {%- if post.user.short_handle and prefer_short_handle -%}
-            {%- set handle = post.user.short_handle -%}
-        {%- elif post.user.handle -%}
-            {%- set handle = post.user.handle -%}
+{%- for ele in ELEMENTS -%}
+    {%- if ele.type == "post" -%}
+        {%- if ele.user.short_handle and prefer_short_handle -%}
+            {%- set handle = ele.user.short_handle -%}
+        {%- elif ele.user.handle -%}
+            {%- set handle = ele.user.handle -%}
         {%- else -%}
-            {%- set handle = post.user.key -%}
+            {%- set handle = ele.user.key -%}
         {%- endif -%}
-        <div class="message" style="color: {{ post.user.color | default(value="black") }}">{{ handle }}: {{ post.message | markdown | trim | safe }}</div>
+        <div class="message" style="color: {{ ele.user.color | default(value="black") }}">{{ handle }}: {{ ele.message | markdown | trim | safe }}</div>
     {%- else -%}
-        <div class="message" style="color: {{ timestamp_color | default(value="black") }}">{{ post.message | markdown | trim | safe }}</div>
+        <div class="message" style="color: {{ timestamp_color | default(value="black") }}">{{ ele.message | markdown | trim | safe }}</div>
     {%- endif -%}
 {%- endfor -%}
 

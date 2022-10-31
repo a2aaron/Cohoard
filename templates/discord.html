@@ -176,9 +176,9 @@ config-#}
     set to the empty string whenever a new headlien is issued (Tera doesn't seem to have null, so 
     this is the next best option) -#}
 {%- set this_user = "" -%}
-{%- for post in posts -%}
+{%- for ele in ELEMENTS -%}
    {%- set try_make_postblock = false -%}
-   {%- if post.type == "timestamp" -%}
+   {%- if ele.type == "timestamp" -%}
       {#- If there is some previous post, then the timestamp changing requires us to issue a new
           headline, so we push the posts we already have -#}
       {%- if this_user != "" -%}
@@ -194,17 +194,17 @@ config-#}
          {%- set_global this_user = "" -%}
       {%- endif -%}
       {#- Update timestamp value. -#}
-      {%- set_global this_timestamp = post.message -%}
+      {%- set_global this_timestamp = ele.message -%}
    {%- else -%}
       {#- If the speaker changed, issue a new headline. -#}
-      {%- if this_user != "" and this_user.key != post.user.key -%}
+      {%- if this_user != "" and this_user.key != ele.user.key -%}
          {%- set temp = [this_timestamp, this_user, this_messages]-%}    
          {%- set_global postblocks = postblocks | concat(with=[temp]) -%}
          {%- set_global this_messages = [] -%}
          {%- set_global this_user = "" -%}
       {%- endif -%}
-      {%- set_global this_messages = this_messages | concat(with=post.message) -%}
-      {%- set_global this_user = post.user -%}
+      {%- set_global this_messages = this_messages | concat(with=ele.message) -%}
+      {%- set_global this_user = ele.user -%}
    {%- endif -%}
 {%- endfor -%}
 

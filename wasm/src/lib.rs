@@ -10,13 +10,6 @@ pub struct Config(JsValue);
 #[wasm_bindgen]
 pub struct ChatlogBlockArray(JsValue);
 
-#[wasm_bindgen]
-pub fn parse_posts(config: &Config, input: String) -> Result<ChatlogBlockArray, JsError> {
-    let config = config.0.into_serde()?;
-    let posts = cohoard::parse_posts(&config, input);
-    Ok(ChatlogBlockArray(JsValue::from_serde(&posts)?))
-}
-
 fn get_full_msg(mut err: &dyn Error) -> String {
     let mut messages = vec![err.to_string()];
     while let Some(new_err) = err.source() {
@@ -30,11 +23,10 @@ fn get_full_msg(mut err: &dyn Error) -> String {
 pub fn render(
     template_name: &str,
     template: &str,
-    posts: &ChatlogBlockArray,
+    chatlog: &str,
     config: &Config,
     additional_variables: &JsValue,
 ) -> Result<String, JsError> {
-    let posts = posts.0.into_serde::<Vec<_>>()?;
     let config = config.0.into_serde()?;
 
     let additional_variables =
@@ -43,7 +35,7 @@ pub fn render(
     cohoard::render(
         template_name,
         template,
-        &posts,
+        chatlog,
         &config,
         additional_variables.into_iter(),
     )

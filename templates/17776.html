@@ -59,9 +59,9 @@ config-#}
 <div id="post-wrapper">
    
 
-{%- for post in posts -%}
-   {%- if post.type == "post" -%}
-      <p class="message-content {{ post.user.key }}"><span class="highlight">{{ post.message | markdown | trim | safe }}</span></p>
+{%- for ele in ELEMENTS -%}
+   {%- if ele.type == "post" -%}
+      <p class="message-content {{ ele.user.key }}"><span class="highlight">{{ ele.message | markdown | trim | safe }}</span></p>
    {%- endif -%}
 {%- endfor -%}
 </div>
