@@ -13,7 +13,7 @@ name = "cohoard"
 crate-type = ["cdylib"]
 
 [dependencies.cohoard_rs]
-path = ".."
+path = "../cohoard_rs"
 version = "*"
 
 [dependencies]
