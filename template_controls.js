@@ -1,4 +1,4 @@
-import * as cohoard from "https://static.witchoflight.com/~a2aaron/cohoard/v0.5.0/cohoard.js";
+import * as cohoard from "https://static.witchoflight.com/~a2aaron/cohoard/v0.6.0/cohoard.js";
 import { h, localStorageOrDefault, enumerate } from "./util.js";
 import { render } from "./index.js";
 
