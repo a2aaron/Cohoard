@@ -1,0 +1,8 @@
+# Jekyll configuration file for Github.io deployment
+
+# Exclude non-website folders and files.
+exclude:
+  - cohoard_rs/
+  - templates/
+  - .github/
+  - CHANGELOG.md
