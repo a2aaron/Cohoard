@@ -94,14 +94,19 @@ config-#}
    }
 </style>
 
+{%- set timestamp = "" -%}
 <div id="post-wrapper">
-   {%- for postblock in posts -%}
-   <div class="post-block">
-      <h2>{{- postblock.user.name | default(value=postblock.user.key) -}}</h2>
-      {%- for message in postblock.messages -%}
-         <p class="message-content">{{ message | markdown | trim | safe }}</p>
-      {%- endfor -%}
-   </div>
+   {%- for post in posts -%}
+      {%- if post.type == "post" -%}
+         <h2>Posted by: "{{ post.user.name | default(value=post.user.key) }}"
+            {%- if timestamp != "" %}
+               at {{timestamp}}
+            {%- endif -%}
+         </h2>
+         <p class="message-content">{{ post.message | markdown | trim | safe }}</p>
+      {%- elif post.type == "timestamp" -%}
+         {%- set_global timestamp = post.message -%}
+      {%- endif -%}
    {%- endfor -%}
 </div>
 
@@ -110,60 +115,97 @@ config-#}
 Wow! That was a lot! Let's take it piece by piece, starting with the last part.
 Here's the HTML part of the Template again:
 ```
+{%- set timestamp = "" -%}
 <div id="post-wrapper">
-   {%- for postblock in posts -%}
-   <div class="post-block">
-      <h2>{{- postblock.user.name | default(value=postblock.user.key) -}}</h2>
-      {%- for message in postblock.messages -%}
-         <p class="message-content">{{ message | markdown | trim | safe }}</p>
-      {%- endfor -%}
-   </div>
+   {%- for post in posts -%}
+      {%- if post.type == "post" -%}
+         {%- if timestamp != "" %}
+            <h2>Posted by: "{{ post.user.name | default(value=post.user.key) }}" at {{timestamp}}</h2>
+         {%- else -%}
+            <h2>Posted by: "{{ post.user.name | default(value=post.user.key) }}"</h2>
+         {%- endif -%}
+         <p class="message-content">{{ post.message | markdown | trim | safe }}</p>
+      {%- elif post.type == "timestamp" -%}
+         {%- set_global timestamp = post.message -%}
+      {%- endif -%}
    {%- endfor -%}
 </div>
 ```
 
 This is a bunch of HTML with Tera statements and expressions intersepersed
-throughout it. There's two for-loop statements and two expressions.
+throughout it.
 
-The first for-loop, `{%- for postblock in posts -%}`, accesses a global variable
+The very first line, `{%- set timestamp = "" -%}`, creates a global variable
+called `timestamp` and sets it to the empty string. This will be used later
+to display a timestamp on the messages.
+
+The first for-loop, `{%- for post in posts -%}`, accesses a global variable
 called `posts`. `posts` is provided by Cohoard and is the interal representation
-of the Script window. It is an array of PostBlock structs. A PostBlock is an
-array of individual messages--usually these are messages which should appear
-"together" in some way. This can be used to more finely control how posts will
-look when rendered.
+of the Script Window. It is an array of Chatlog messages. 
 
-For example, in the Discord template, we group all messages in the same 
-PostBlock under the same headline, while spacing messages within a PostBlock 
-slightly apart from each other. This mimics how  Discord typically renders 
-messages.
+Each Chatlog messages can be of one of two types: a Post or a Timestamp. Every Chatlog
+message is guarenteed to have the follow field:
+- type - the type of message this Chatlog is. equal to either "post" or "timestamp"
 
-Each PostBlock struct contains two fields:
-- messages - the list of messages this PostBlock contains. This is an array of
-            strings.
-- user     - the user posting the message.
+If the type is equal to "post", then there are two additional fields:
+- user    - the user posting the message.
+- message - the contents of the message. Note that this is allowed to contain newlines.
+
+If the type is equal to "timestamp", then there is only one field:
+- message - the contents of the message. this is typically some date or time, but is 
+            techincally allowed to be freeform text.
+
+In the Script Window, Timestamp messages are any message that starts with an "@" symbol.
+Otherwise, they're Post messages, and have an ALLCAPS name indicating the user who typed
+the message.
 
 A user's fields are whatever the keys in the Config Table are, and typically
 contain information like the display name of the user, links to avatars, and
 other information that can be used to style the post. Note that trying to access
 a key that does not exist will result in an error.
 
-The line containing the `h2` tag after the for-loop demonstrates accessing some
-of the fields in `postblock.user`. Here's the line again:
+We can see how to check what type of message a post is. In the script, we check the
+"type" field to see what sort of post the message is.
 ```
-<h2>{{- postblock.user.name | default(value=postblock.user.key) -}}</h2>
+{%- if post.type == "post" -%}
+   [and then we do some stuff if the chatlog is a normal post]
+{%- elif post.type == "timestamp" -%}
+   [and then we do some other stuff if the chatlog is a timestamp]
+{%- endif -%} 
+    ^^^^^ note that you must end any if statements with an "endif"
 ```
 
-Here, we try to display the user's name, falling back to the key if that fails.
-The specific fields that a user will have depends on what is entered into the
-Config table. However, a user will always have a `key` field, which denotes the
+In the `if` block of the code, we know that we are dealing with regular Posts. Let's
+take a look at this block now:
+```
+{%- if timestamp != "" %}
+   <h2>Posted by: "{{ post.user.name | default(value=post.user.key) }}" at {{timestamp}}</h2>
+{%- else -%}
+   <h2>Posted by: "{{ post.user.name | default(value=post.user.key) }}"</h2>
+{%- endif -%}
+<p class="message-content">{{ post.message | markdown | trim | safe }}</p>
+```
+
+Here, we first check the `timestamp` variable we defined above--if it's not the empty
+string, we render a header containing the name of the user who made the post, as well
+as a timestamp. Otherwise, we simply just render the name of the user, and skip the
+timestamp entirely.
+
+Here's the line where we access the name of the user:
+```
+{{- post.user.name | default(value=post.user.key) -}}
+```
+
+This demonstrates using the "default" filter, which lets us fall back to a different
+value if the user doesn't happen to have a name. In this case, we use the user's `key`
+if it fails. The specific fields that a user will have depends on what is entered into
+the Config table. However, a user will always have a `key` field, which denotes the
 Script key the user is associated with. Common fields are typically things like
 "name", "color", or "handle", although a field of any name may be present.
 
-The inner for-loop renders the PostBlock's messages.
+The last line renders the Post's message.
 ```
-{%- for message in postblock.messages -%}
-   <p class="message-content">{{ message | markdown | trim | safe }}</p>
-{%- endfor -%}
+<p class="message-content">{{ message | markdown | trim | safe }}</p>
 ```
 
 This sends the message through three filters: markdown, trim, and safe.
@@ -184,12 +226,22 @@ Without it, Tera will escape HTML tags in the script using &lt; and &gt; (This
 would also make it impossible to use <u> tags in the script, which would prevent
 the ability to do any underlined text).
 
-Effectively, the two for-loops end up copy-pasting a bunch of HTML with the
-Script's contents inserted within.
+In the "timestamp" portion, we have much less code, just the following line:
+```
+{%- set_global timestamp = post.message -%}
+```
+This sets the global variable `timestamp` that we defined earlier. Note that we
+have to use `set_global` here, because we are in a `for` loop and wish to refer
+to `timestamp`, which is a global variable defined outside of the for loop.
 
-For example, if we had passed in the following script to the template:
+Other templates might use the timestamp messages in different ways--for example,
+the Pesterlog template simply displays the timestamp messages inline. Other
+templates, like the 17776 one, might ignore the timestamp completely.
+
+As an example, if we had passed in the following script to the template:
 ```
 EGGBUG: I'm eggbug!
+@ Monday, 3 AM
 EGGBUG: I'm purple!
 ```
 
@@ -197,11 +249,10 @@ We would have ended up the following output (inlined styles removed):
 
 ```
 <div>
-   <div>
-      <h2>eggbug!</h2>
-      <p>I'm eggbug!</p>
-      <p>I'm purple!</p>
-   </div>
+   <h2>Posted by: "egg bug!"</h2>
+   <p>I'm eggbug!</p>
+   <h2>Posted by: "egg bug!" at Monday, 3 AM</h2>
+   <p>I'm purple!</p>
 </div>
 ```
 -#}
