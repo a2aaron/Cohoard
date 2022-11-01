@@ -19,6 +19,8 @@ config-#}
    {%- set text_color = "#2e3338" -%}
    {%- set code_background_color = "#f2f3f5" -%}
    {%- set code_border_color = "#e3e5e8" -%}
+   {%- set mention_background_color = "rgba(88, 101, 242, 0.3)" %}
+   {%- set mention_text_color = "rgb(222, 224, 252)" %}
 {%- else -%}
    {%- set background_color = "#36393E" -%}
    {%- set username_default_color = "#ffffff" -%}
@@ -26,6 +28,8 @@ config-#}
    {%- set text_color = "#DCDDDE" -%}
    {%- set code_background_color = "#2f3136" -%}
    {%- set code_border_color = "#202225" -%}
+   {%- set mention_background_color = "rgba(88, 101, 242, 0.3)" %}
+   {%- set mention_text_color = "rgb(222, 224, 252)" %}
 {%- endif -%}
 
 {#- The styling rules for converted Markdown text. -#}
@@ -141,6 +145,18 @@ config-#}
 
    a { color: rgb(0, 175, 244); }
 
+   /* at-macros for @everyone ping highlighting */
+   .at-macro {
+      border-radius: 3px;
+      padding: 0 2px;
+      background: {{ mention_background_color }};
+      color: {{mention_text_color}};
+   }
+</style>
+
+
+<style>
+   /* Headline specific styling, done for each user in the template. */
 {%- for user in users -%}
    .{{user.key}}.headline-username {
       color: {{ user.color | default(value=username_default_color) }};
