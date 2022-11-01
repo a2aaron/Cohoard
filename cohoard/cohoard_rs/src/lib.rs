@@ -305,7 +305,7 @@ fn inline_style_tags(html: &str) -> Result<String, InlineError> {
 // containing a span surrounding the expanded macro text.
 fn convert_at_macros(config: &Config, message: &str) -> String {
     lazy_static! {
-        static ref RE: Regex = Regex::new(r"@(?P<key>[A-Z]+)\.(?P<field>\S+)").unwrap();
+        static ref RE: Regex = Regex::new(r"@(?P<key>[A-Z]+)\.(?P<field>[[:alnum:]_]+)").unwrap();
     }
 
     RE.replace_all(message, |captures: &Captures| {
