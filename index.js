@@ -1,4 +1,4 @@
-import init, * as cohoard_module from "https://static.witchoflight.com/~a2aaron/cohoard/v0.6.0/cohoard.js";
+import init, * as cohoard_module from "https://static.witchoflight.com/~a2aaron/cohoard/v0.7.0/cohoard.js";
 
 import { ConfigTable } from "./config_table.js"
 import { TemplateControls, DISCORD_BUILTIN } from "./template_controls.js";
