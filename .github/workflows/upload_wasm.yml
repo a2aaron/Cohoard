@@ -37,4 +37,4 @@ jobs:
           space_region: ${{ secrets.DIGITAL_OCEAN_SPACE_REGION }}
           source: ./cohoard/wasm/pkg
           out_dir: ~a2aaron/cohoard/
-          versioning: ./wasm/pkg
+          versioning: ./cohoard/wasm/pkg
