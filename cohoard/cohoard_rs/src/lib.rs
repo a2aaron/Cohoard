@@ -4,7 +4,9 @@ use std::{collections::HashMap, error::Error};
 
 use css_inline::{CSSInliner, InlineError};
 use kuchiki::{traits::TendrilSink, NodeRef};
+use lazy_static::lazy_static;
 use pulldown_cmark::html;
+use regex::{Captures, Regex};
 use serde::{Deserialize, Serialize};
 use tera::{Context, Tera};
 
@@ -30,7 +32,7 @@ pub enum ChatlogElement {
 /// The `input` is a chatlog of messages, formatted in play-script style.
 /// For example:
 ///
-/// ```
+/// ```no_compile
 /// A: Here's a series of messages as sent by A
 /// A: Hello!
 /// A: Hi!
@@ -44,7 +46,7 @@ pub enum ChatlogElement {
 pub fn parse_posts(config: &Config, input: String) -> Vec<ChatlogElement> {
     let mut posts = vec![];
 
-    let mut prev_post = None;
+    let mut prev_post: Option<(User, String)> = None;
 
     for line in input.lines() {
         if line.trim().is_empty() {
@@ -52,6 +54,7 @@ pub fn parse_posts(config: &Config, input: String) -> Vec<ChatlogElement> {
         } else if line.starts_with("@") {
             // If there is a message already being constructed, finish it, then go on with the rest of the timestamp
             if let Some((user, message)) = prev_post {
+                let message = convert_at_macros(config, &message);
                 posts.push(ChatlogElement::Post { user, message });
                 prev_post = None;
             }
@@ -60,6 +63,7 @@ pub fn parse_posts(config: &Config, input: String) -> Vec<ChatlogElement> {
             // These have the format "@ Today at 4:13 PM" and update the timestamp
             // (The timestamp is actually freeform text, allowing for Goofs)
             let message = line[1..].trim().to_string();
+            let message = convert_at_macros(config, &message);
             posts.push(ChatlogElement::Timestamp { message });
         } else {
             match line.split_once(": ") {
@@ -71,6 +75,7 @@ pub fn parse_posts(config: &Config, input: String) -> Vec<ChatlogElement> {
                 // compared to lines across different messages
                 Some((name, message)) if name.chars().all(|x| x.is_alphanumeric()) => {
                     if let Some((user, message)) = prev_post {
+                        let message = convert_at_macros(config, &message);
                         posts.push(ChatlogElement::Post { user, message });
                     }
 
@@ -90,6 +95,7 @@ pub fn parse_posts(config: &Config, input: String) -> Vec<ChatlogElement> {
     }
 
     if let Some((user, message)) = prev_post {
+        let message = convert_at_macros(config, &message);
         posts.push(ChatlogElement::Post { user, message });
     }
 
@@ -295,6 +301,31 @@ fn inline_style_tags(html: &str) -> Result<String, InlineError> {
     inliner.inline(html)
 }
 
+// Convert a string-like tera::Value containing an at-macro into HTML
+// containing a span surrounding the expanded macro text.
+fn convert_at_macros(config: &Config, message: &str) -> String {
+    lazy_static! {
+        static ref RE: Regex = Regex::new(r"@(?P<key>[A-Z]+)\.(?P<field>\S+)").unwrap();
+    }
+
+    RE.replace_all(message, |captures: &Captures| {
+        let key = &captures[1];
+        let field = &captures[2];
+        let text = match config.people.get(key) {
+            Some(user) => match user.fields.get(field) {
+                Some(field_value) => field_value.clone(),
+                None => format!("!!No field {} on key {}!!", field, key),
+            },
+            None => format!("!!No key {}!!", key),
+        };
+        format!(
+            "<span class=\"at-macro at-macro-{} at-macro-{}-{}\">{}</span>",
+            key, key, field, text
+        )
+    })
+    .to_string()
+}
+
 // Convert a string-like tera::Value containing Markdown syntax into
 // HTML containing tags that correctly render the syntax.
 fn markdown_to_html(
@@ -349,4 +380,18 @@ fn markdown_to_html(
         .replace("</code>", "</span>");
 
     Ok(tera::Value::String(html))
+}
+
+#[test]
+fn test_at_macro() {
+    let config = r##"people:
+    - key: JUICE
+      name: Juice
+    - key: TEN
+      handle: Ten
+  "##;
+    let config = config::load_config(config).unwrap();
+    let message = "@JUICE.name started pestering @TEN.handle";
+    let expected = "<span class=\"at-macro at-macro-JUICE at-macro-JUICE-name\">Juice</span> started pestering <span class=\"at-macro at-macro-TEN at-macro-TEN-handle\">Ten</span>";
+    assert_eq!(convert_at_macros(&config, message), expected);
 }

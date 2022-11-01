@@ -115,7 +115,7 @@ dependencies = [
 
 [[package]]
 name = "cohoard"
-version = "0.6.0"
+version = "0.7.0"
 dependencies = [
  "cohoard_rs",
  "js-sys",
@@ -126,12 +126,14 @@ dependencies = [
 
 [[package]]
 name = "cohoard_rs"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "clap",
  "css-inline",
  "kuchiki",
+ "lazy_static",
  "pulldown-cmark",
+ "regex",
  "serde",
  "serde_json",
  "serde_yaml",

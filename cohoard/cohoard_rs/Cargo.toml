@@ -1,6 +1,6 @@
 [package]
 name = "cohoard_rs"
-version = "0.4.0"
+version = "0.5.0"
 authors = ["Aaron Kofsky <aaronko@umich.edu>"]
 edition = "2021"
 description = "turn chatlogs into formatted posts for cohost"
@@ -20,7 +20,9 @@ css-inline          = { git = "https://github.com/a2aaron/css-inline", rev = "7e
 # We use specifically version 0.8.1 of kuchiki because css-inline uses the same version. Hopefully
 # this means we won't need to compile two version of kuchiki + it's dependents into the crate.
 kuchiki             = { version = "0.8.1"                                     , default-features = false}
+lazy_static = "1.4.0"
 pulldown-cmark      = { version = "0.9.1"                                     , default-features = false}
+regex = "1.6.0"
 serde               = { version = "1.0.137", features = ["derive"]            , default-features = false}
 serde_json          = "1.0.83"
 serde_yaml          = { version = "0.8.24"                                    , default-features = false}
