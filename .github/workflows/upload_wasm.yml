@@ -35,6 +35,6 @@ jobs:
           secret_key: ${{ secrets.DIGITAL_OCEAN_ACCESS_SECRET }}
           space_name: ${{ secrets.DIGITAL_OCEAN_SPACE_NAME }}
           space_region: ${{ secrets.DIGITAL_OCEAN_SPACE_REGION }}
-          source: ./wasm/pkg
+          source: ./cohoard/wasm/pkg
           out_dir: ~a2aaron/cohoard/
           versioning: ./wasm/pkg
