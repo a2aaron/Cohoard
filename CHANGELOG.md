@@ -4,6 +4,18 @@ which cause custom templates to break in some way. This document will also try t
 to breakage.
 
 # October 31st, 2022
+Added "at-macros". An at-macro is written as @KEY.field and can be placed anywhere within a Post or
+Timestamp message. These expand to the value of the given field on the given key. For 
+example, if you had a message such as `EGGBUG: Hello, @BUGEGG.name!`, then the macro gets
+expanded to `EGGBUG: Hello, Bugegg!`, assuming that `BUGEGG` is a key in the Config table
+that has a field called `name` and whose value is `Bugegg`.
+
+Note that an at-macro only attempts to expand if it does find a valid key and field, and
+the field consists only of alphanumeric characters (and underscore).
+
+Almost all templates will not have to change in order to accomodate this.
+
+# October 31st, 2022
 The `posts` global variable in templates is now depreciated in favor of using `ELEMENTS`. These two variables both give
 the semantics contents of the script window, but in slightly different ways. Specifically:
 
