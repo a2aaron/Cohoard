@@ -311,17 +311,16 @@ fn convert_at_macros(config: &Config, message: &str) -> String {
     RE.replace_all(message, |captures: &Captures| {
         let key = &captures[1];
         let field = &captures[2];
-        let text = match config.people.get(key) {
-            Some(user) => match user.fields.get(field) {
-                Some(field_value) => field_value.clone(),
-                None => format!("!!No field {} on key {}!!", field, key),
-            },
-            None => format!("!!No key {}!!", key),
-        };
-        format!(
-            "<span class=\"at-macro at-macro-{} at-macro-{}-{}\">{}</span>",
-            key, key, field, text
-        )
+        if let Some(user) = config.people.get(key) {
+            if let Some(field_value) = user.fields.get(field) {
+                return format!(
+                    "<span class=\"at-macro at-macro-{} at-macro-{}-{}\">{}</span>",
+                    key, key, field, field_value
+                );
+            }
+        }
+
+        captures[0].to_string()
     })
     .to_string()
 }
