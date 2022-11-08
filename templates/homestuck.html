@@ -9,6 +9,16 @@
       "type": "color",
       "label": "Timestamp text color",
       "default": "black"
+   }, {
+      "name": "open_chatlog_text",
+      "type": "text",
+      "label": "\"Show Pesterlog\" Text",
+      "default": "Show Pesterlog"
+   }, {
+      "name": "close_chatlog_text",
+      "type": "text",
+      "label": "\"Hide Pesterlog\" Text",
+      "default": "Hide Pesterlog"
    }]
 config-#}
 
@@ -88,8 +98,8 @@ config-#}
 <div id="container-inner">
 <div id="border">
 <details open>
-<summary class="center full"><div class="button">Show Pesterlog</div></summary>
-<div class="center full on-top"><div class="button">Hide Pesterlog</div></div>
+<summary class="center full"><div class="button">{{ open_chatlog_text }}</div></summary>
+<div class="center full on-top"><div class="button">{{ close_chatlog_text }}</div></div>
 <div id="chat">
 
 {%- for ele in ELEMENTS -%}
