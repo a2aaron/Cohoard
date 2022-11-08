@@ -195,7 +195,7 @@ export class TemplateControls {
      * @returns {Promise<TemplateControls>} 
      */
     static async mount(template_dropdown, template_area, edit_template_button, delete_template_button, rename_template_button, template_ui) {
-        let builtin_templates = [DISCORD_BUILTIN, TWITTER_BUILTIN, PESTERLOG_BUILTIN, FOOTBALL_BUILTIN, UNDERTALE_BUILTIN];
+        let builtin_templates = [DISCORD_BUILTIN, TWITTER_BUILTIN, HOMESTUCK_BUILTIN, FOOTBALL_BUILTIN, UNDERTALE_BUILTIN];
         let custom_templates = load_custom_templates();
         let template_controls = new TemplateControls(
             template_dropdown,
@@ -689,7 +689,7 @@ async function get_template_from_url(url) {
 export const DISCORD_BUILTIN = await Template.builtin("Discord", "https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/discord.html");
 export const TWITTER_BUILTIN = await Template.builtin("Twitter", "https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/twitter.html");
 export const FOOTBALL_BUILTIN = await Template.builtin("17776", "https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/17776.html");
-export const PESTERLOG_BUILTIN = await Template.builtin("Pesterlog", "https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/homestuck.html");
+export const HOMESTUCK_BUILTIN = await Template.builtin("MSPA", "https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/homestuck.html");
 export const UNDERTALE_BUILTIN = await Template.builtin("Undertale", "https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/undertale.html");
 
 
