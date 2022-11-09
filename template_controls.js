@@ -252,10 +252,11 @@ export class TemplateControls {
             template = this.builtin_templates[0];
         }
 
-        this.template_area.readOnly = template.is_builtin;
+        const is_builtin = template.builtin_slug != null;
+        this.template_area.readOnly = is_builtin;
         this.template_area.value = template.get_content();
 
-        if (template.is_builtin) {
+        if (is_builtin) {
             this.edit_template_button.innerText = "View Template";
             this.delete_template_button.classList.add("hidden");
             this.rename_template_button.classList.add("hidden");
@@ -387,12 +388,13 @@ class Template {
 
     /**
      * @param {string} displayed_name the displayed name of the template
-     * @param {boolean} is_builtin true if the template is builtin
-     * @param {string} content the contents of the template (if not builtin)
+     * @param {string?} builtin_slug if present, then this template is a builtin, and the slug is
+     * a unique internal name for the template. otherwise this is null
+     * @param {string} content the contents of the template
      */
-    constructor(displayed_name, content, is_builtin) {
+    constructor(displayed_name, content, builtin_slug) {
         this.displayed_name = displayed_name;
-        this.is_builtin = is_builtin;
+        this.builtin_slug = builtin_slug;
         this.#content = content;
         let [elements, errors] = parse_ui_description(content);
         this.#ui_elements = elements;
@@ -477,11 +479,12 @@ class Template {
      * Create a builtin template. The contents are fetched from the given URL.
      * @param {string} displayed_name the displayed name of the template
      * @param {string} url the url to get the template from
+     * @param {string} slug a unique internal name for the builtin template
      * @returns {Promise<Template>}
      */
-    static async builtin(displayed_name, url) {
+    static async builtin(displayed_name, url, slug) {
         let content = await get_template_from_url(url) ?? "Couldn't fetch template!";
-        return new Template(displayed_name, content, true);
+        return new Template(displayed_name, content, slug);
     }
 
     /**
@@ -491,7 +494,7 @@ class Template {
      * @returns {Template} 
      */
     static custom(displayed_name, content) {
-        return new Template(displayed_name, content, false);
+        return new Template(displayed_name, content, null);
     }
 }
 
@@ -685,11 +688,11 @@ async function get_template_from_url(url) {
     return text;
 }
 
-export const DISCORD_BUILTIN = await Template.builtin("Discord", "https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/discord.html");
-export const TWITTER_BUILTIN = await Template.builtin("Twitter", "https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/twitter.html");
-export const FOOTBALL_BUILTIN = await Template.builtin("17776", "https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/17776.html");
-export const HOMESTUCK_BUILTIN = await Template.builtin("MSPA", "https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/homestuck.html");
-export const UNDERTALE_BUILTIN = await Template.builtin("Undertale", "https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/undertale.html");
+export const DISCORD_BUILTIN = await Template.builtin("Discord", "https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/discord.html", "discord");
+export const TWITTER_BUILTIN = await Template.builtin("Twitter", "https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/twitter.html", "twitter");
+export const FOOTBALL_BUILTIN = await Template.builtin("17776", "https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/17776.html", "17776");
+export const HOMESTUCK_BUILTIN = await Template.builtin("MSPA", "https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/homestuck.html", "homestuck");
+export const UNDERTALE_BUILTIN = await Template.builtin("Undertale", "https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/undertale.html", "undertale");
 
 
 export const BASIC_TEMPLATE = await get_template_from_url("https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/basic.html") ?? "Couldn't fetch template!";
