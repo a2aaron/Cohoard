@@ -195,7 +195,7 @@ export class TemplateControls {
      * @returns {Promise<TemplateControls>} 
      */
     static async mount(template_dropdown, template_area, edit_template_button, delete_template_button, rename_template_button, template_ui) {
-        let builtin_templates = [DISCORD_BUILTIN, TWITTER_BUILTIN, HOMESTUCK_BUILTIN, FOOTBALL_BUILTIN, UNDERTALE_BUILTIN];
+        let builtin_templates = load_builtin_templates();
         let custom_templates = load_custom_templates();
         let template_controls = new TemplateControls(
             template_dropdown,
@@ -374,8 +374,13 @@ function load_custom_templates() {
         // The objects from localStorage are just bare objects--not actually the class, so we need
         // to explicitly construct Templates.
         let templates = [];
-        for (let [i, template] of enumerate(stored_templates)) {
-            let real_template = Template.custom(template.displayed_name, template.content);
+        for (let [i, stored] of enumerate(stored_templates)) {
+            let real_template = Template.custom(stored.displayed_name, stored.content);
+            // Try to set the UI values, if possible. This field may not exist for people who haven't
+            // visited the site before the site started storing this data.
+            if (stored.ui_values) {
+                real_template.set_ui_values(stored.ui_values);
+            }
             templates.push(real_template);
         }
         return templates;
@@ -383,6 +388,29 @@ function load_custom_templates() {
         console.warn("Couldn't load saved templates! Reason: ", err);
         return [];
     }
+}
+
+/**
+ * Load builtin templates from localStorage. Note that this only sets the builtin template's UI
+ * values, and doesn't actually care about content.
+ * @returns {Array<Template>} the saved builtin templates
+ */
+function load_builtin_templates() {
+    let builtins = [DISCORD_BUILTIN, TWITTER_BUILTIN, HOMESTUCK_BUILTIN, FOOTBALL_BUILTIN, UNDERTALE_BUILTIN];
+    let stored_values = localStorageOrDefault("builtinTemplates", []);
+    if (!(Array.isArray(stored_values))) {
+        console.warn("stored builtin template data wasn't an array!", stored_values);
+        stored_values = [];
+    }
+
+    for (let builtin of builtins) {
+        let stored_value = stored_values.find((/** @type {{ slug: string }} */ stored) => stored.slug == builtin.builtin_slug);
+        if (stored_value) {
+            let ui_values = /** @type {{UIValues}} */ stored_value.ui_values;
+            builtin.set_ui_values(ui_values);
+        }
+    }
+    return builtins;
 }
 
 /** 
@@ -447,7 +475,8 @@ class Template {
     /**
      * Returns the current values of the UIs. The keys of the returned object correspond to the 
      * variable name the value is for.
-     * @returns {{[key: string]: string | boolean}}
+     * @returns {UIValues}
+     * @typedef {{[key: string]: string | boolean}} UIValues
      */
     get_ui_values() {
         let values = /** @type {{[key: string]: string | boolean}} */ ({});
@@ -455,6 +484,21 @@ class Template {
             values[name] = element.get_value();
         }
         return values;
+    }
+
+    /**
+     * Set the UI values given by `values`. The keys of the passed dictionary should correspond to
+     * the variable names of which the UI element it matches. If `values` contains extraneous UI values
+     * then those values are ignored. If `values` is missing UI values that the template has, then
+     * those UI values will not be set.
+     * @param {UIValues} values 
+     */
+    set_ui_values(values) {
+        for (const [name, element] of Object.entries(this.#ui_elements)) {
+            if (values.hasOwnProperty(name)) {
+                element.set_value(values[name]);
+            }
+        }
     }
 
     /**
