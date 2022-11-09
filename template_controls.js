@@ -455,7 +455,6 @@ class Template {
     /**
      * Set the template's contents. This also parses for UI configs and will re-generate the existing
      * ui_elements (so subseqeuent calls to `get_ui_elements` will no longer point to the same nodes).
-     * TODO: Doing this also clobbers the currently selected values for the UI elements, which we should avoid doing.
      * @param {string} new_content 
      */
     set_content(new_content) {
