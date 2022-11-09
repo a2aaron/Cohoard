@@ -168,13 +168,13 @@ export class TemplateControls {
                 }
 
                 this.#renegerate_dropdown();
-                save_custom_templates(this.custom_templates);
+                save_templates(this.custom_templates, this.builtin_templates);
             }
         });
 
         // Event listener to save custom templates when leaving the page + every 5 seconds.
-        window.addEventListener("beforeunload", () => save_custom_templates(this.custom_templates));
-        window.setInterval(() => save_custom_templates(this.custom_templates), 5000);
+        window.addEventListener("beforeunload", () => save_templates(this.custom_templates, this.builtin_templates));
+        window.setInterval(() => save_templates(this.custom_templates, this.builtin_templates), 5000);
 
         // Set up the dropdown nodes.
         this.#renegerate_dropdown();
@@ -335,17 +335,28 @@ export class TemplateControls {
 }
 
 /**
- * Save the custom templates to localStorage.
- * @param {Array<Template>} templates the templates to save
+ * Save all templates (custom and builtin) to localStorage.
+ * @param {Array<Template>} custom_templates the custom templates to save. The template content and UI values are saved.
+ * @param {Array<Template>} builtin_templates the builtin templates to save. The template content is not saved, but the UI values are
  */
-function save_custom_templates(templates) {
-    let saved_templates = templates.map((template) => {
+function save_templates(custom_templates, builtin_templates) {
+    let saved_custom = custom_templates.map((template) => {
         return {
             content: template.get_content(),
             displayed_name: template.displayed_name,
+            ui_values: template.get_ui_values(),
         }
     })
-    localStorage.setItem("customTemplates", JSON.stringify(saved_templates));
+    localStorage.setItem("customTemplates", JSON.stringify(saved_custom));
+
+    let saved_builtin = builtin_templates.map((template) => {
+        return {
+            ui_values: template.get_ui_values(),
+            slug: template.builtin_slug
+        }
+    })
+    localStorage.setItem("builtinTemplates", JSON.stringify(saved_builtin));
+
 }
 
 /**
