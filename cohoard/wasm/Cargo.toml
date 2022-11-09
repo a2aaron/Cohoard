@@ -26,10 +26,24 @@ js-sys = "0.3.59"
 opt-level = "z"
 lto = "fat"
 codegen-units = 1
+# These options don't seem to reduce file size any amount.
 # panic = "abort"
-# debug = true
 # split-debuginfo = "packed"
 # strip = "debuginfo"
 
 [package.metadata.wasm-pack.profile.release]
 wasm-opt = ['-Oz']
+
+[profile.dev]
+opt-level = "z"
+lto = "fat"
+codegen-units = 1
+debug = true
+
+[package.metadata.wasm-pack.profile.dev.wasm-bindgen]
+# enable debug info in the generated binary
+# note that this isn't possible to enable this option in release mode
+# specifically: you can't run wasm-opt and dwarf-debug-info at the same
+# time. however, if we want debug symbols and a decent amount of optimization
+# then enabling (rustc) optimizations will get us close to release mode.
+dwarf-debug-info = true
