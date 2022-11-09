@@ -23,8 +23,12 @@
 config-#}
 
 <style>
-    /* Make link tags inherit the color of the speaker they come from. */
-    a { color: inherit; }
+    a {
+        /* Make link tags inherit the style of the surrounding text they come from. */
+        color: inherit;
+        /* Cohost will set a tag font weights by default, so we need it to not override. */
+        font-weight: inherit;
+    }
 
    .cohoard-underline { text-decoration: underline; }
 
