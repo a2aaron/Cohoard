@@ -27,10 +27,10 @@ pub fn render(
     config: &Config,
     additional_variables: &JsValue,
 ) -> Result<String, JsError> {
-    let config = config.0.into_serde()?;
+    let config = serde_wasm_bindgen::from_value(config.0.clone())?;
 
-    let additional_variables =
-        additional_variables.into_serde::<HashMap<String, serde_json::Value>>()?;
+    let additional_variables: HashMap<String, serde_json::Value> =
+        serde_wasm_bindgen::from_value(additional_variables.into())?;
 
     cohoard::render(
         template_name,
@@ -55,5 +55,7 @@ pub fn render(
 pub fn load_config(config: &str) -> Result<Config, JsError> {
     let config = cohoard::config::load_config(config)
         .map_err(|err| JsError::new(&get_full_msg(err.as_ref())))?;
-    Ok(Config(JsValue::from_serde(&config)?))
+
+    let config = serde_wasm_bindgen::to_value(&config)?;
+    Ok(Config(config))
 }
