@@ -64,6 +64,10 @@ main {
     align-items: center;
 }
 
+#discord-example-script {
+    white-space: pre-wrap;
+}
+
 #error-msg {
     position: fixed;
     color: red;
