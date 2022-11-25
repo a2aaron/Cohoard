@@ -36,6 +36,7 @@ main {
 
 #config-wrapper {
     overflow-x: auto;
+    max-width: 98vh;
 }
 
 #config-wrapper input {
