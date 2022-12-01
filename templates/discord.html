@@ -152,6 +152,17 @@ config-#}
       background: {{ mention_background_color }};
       color: {{mention_text_color}};
    }
+
+   /* styling for the bot tag */
+   .bot-tag {
+      padding: 2px 4.4px;
+      margin-left: 6px;
+      border-radius: 3px;
+      background: #5865f2;
+      color: white;
+      font-size: 9px;
+      vertical-align: top;
+   }
 </style>
 
 
@@ -247,6 +258,9 @@ config-#}
          {#- Post headline. This is the username + timestamp. -#}
          <div class="headline">
             <span class="{{user.key}} headline-username">{{ user.name }}</span>
+            {%- if user.bot_tag -%}
+            <span class="bot-tag">{{ user.bot_tag }}</span>
+            {%- endif -%}
             <span class="timestamp">{{ timestamp }}</span>
          </div>
          {#- Message Contents (multiple messages are collapsed into a single post body) -#}
