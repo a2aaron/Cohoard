@@ -202,8 +202,11 @@ EGGBUG: yeah! and now this message will appear in its own PostBlock</pre>
         prefer using the <code>short_handle</code> and will fall back to <code>handle</code> and finally
         <code>key</code> if not provided.
       </li>
-      <li><strong><code>color</code></strong> - The color of the user. This is the color the chat message will be
-        rendered in. If not provided, defaults to black.</li>
+      <li><strong><code>color</code></strong> - The color of the user's messages. This is the color
+        the chat message will be rendered in. If not provided, defaults to black.</li>
+      <li><strong><code>handle_color</code></strong> - The color of the handle. This is useful if a 
+        character's handle color is not the same as their message colors. For example, some characters
+        in <i>Godfeels</i> do this. If not provided, then the handle will be the same color as <code>color</code>.</li>
     </ul>
     <h4>17776 Template</h4>
     <ul>
