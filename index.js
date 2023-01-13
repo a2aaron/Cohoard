@@ -2,7 +2,7 @@ import init, * as cohoard_module from "https://static.witchoflight.com/~a2aaron/
 
 import { ConfigTable } from "./config_table.js"
 import { TemplateControls, DISCORD_BUILTIN } from "./template_controls.js";
-import { getTypedElementById, render_error_messages, try_parse_tera_error } from "./util.js";
+import { getTypedElementById, localStorageOrDefault, render_error_messages, try_parse_tera_error } from "./util.js";
 import { PRESETS } from "./presets.js"
 
 /** @type {typeof cohoard_module?} */
@@ -64,6 +64,12 @@ let template_controls = await TemplateControls.mount(template_dropdown, template
 let preview_button = getTypedElementById(HTMLButtonElement, "preview-btn");
 let html_button = getTypedElementById(HTMLButtonElement, "html-btn");
 
+let import_export_textarea = getTypedElementById(HTMLTextAreaElement, "import-export-textarea");
+import_export_textarea.value = "";
+
+let export_button = getTypedElementById(HTMLButtonElement, "export-button");
+let import_button = getTypedElementById(HTMLButtonElement, "import-button");
+
 // Set up event listeners.
 
 script_textarea.addEventListener("input", () => {
@@ -115,6 +121,58 @@ add_person_dropdown.addEventListener("input", () => {
 
    add_person_dropdown.value = "add-row";
    render();
+})
+
+export_button.addEventListener("click", () => {
+   let localStorageJSON = {
+      configTableCols: localStorageOrDefault("configTableCols", []),
+      configTableBody: localStorageOrDefault("configTableBody", []),
+      customTemplates: localStorageOrDefault("customTemplates", []),
+      builtinTemplates: localStorageOrDefault("builtinTemplates", []),
+   }
+
+   let localStorageString = JSON.stringify(localStorageJSON, null, 2);
+   import_export_textarea.value = localStorageString;
+});
+
+import_button.addEventListener("click", () => {
+   let do_overwrite = confirm("Are you sure you want to import? This will overwrite your existing templates and Config Table!");
+   if (!do_overwrite) {
+      return;
+   }
+
+   try {
+      let object = JSON.parse(import_export_textarea.value);
+      console.log(object);
+
+      if (object.configTableCols && object.configTableBody) {
+         let configTableCols = object.configTableCols;
+         localStorage.setItem("configTableCols", JSON.stringify(configTableCols));
+
+         let configTableBody = object.configTableBody;
+         localStorage.setItem("configTableBody", JSON.stringify(configTableBody));
+
+         config_table.set_table(object.configTableCols, object.configTableBody);
+      }
+
+      if (object.customTemplates) {
+         let customTemplates = object.customTemplates;
+         localStorage.setItem("customTemplates", JSON.stringify(customTemplates));
+      }
+
+      if (object.builtinTemplates) {
+         let builtinTemplates = object.builtinTemplates;
+         localStorage.setItem("builtinTemplates", JSON.stringify(builtinTemplates));
+      }
+
+      template_controls.reload_templates_from_localStorage();
+      render();
+   } catch (err) {
+      console.warn("Couldn't import JSON data:", err)
+      //@ts-ignore
+      render_error_messages(err);
+   }
+
 })
 
 // Render the examples in the quick start guide

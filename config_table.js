@@ -53,6 +53,16 @@ export class ConfigTable {
         return table;
     }
 
+    /**
+     * Set the config table with the given columns and body.
+     * @param {string[]} cols 
+     * @param {string[][]} body 
+     */
+    set_table(cols, body) {
+        this.table = make_table_node(cols, body);
+        this.element.replaceChildren(this.table);
+    }
+
     /** Save the table to localStorage */
     save_table() {
         let [cols, body] = array_from_table(this.table);

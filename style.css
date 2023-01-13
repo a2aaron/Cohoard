@@ -88,6 +88,14 @@ main {
     animation: fadein 1s linear, spin 2s ease infinite;
 }
 
+#import-export-details {
+    padding-top:10px
+}
+
+#import-export-textarea {
+    height: 500px
+}
+
 @keyframes fadein {
     0% { opacity: 0; }
     50% { opacity: 0; }

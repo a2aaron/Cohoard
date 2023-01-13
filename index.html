@@ -147,6 +147,33 @@ EGGBUG: when you're happy with how everything looks, click the "HTML" button abo
       </f-col>
     </main>
   </f-col>
+  <details id="import-export-details"><summary>Import / Export Cohoard Data</summary>
+    <p>You can import and export custom templates and Config Table values from here. Data is exported as a big JSON
+      string. The saved format here may change in the future, although I will try to make this as backwards compatible as possible.
+      <strong>Please note that importing overwrites your current saved templates and Config Table values!</strong></p>
+    <p>A brief summary of the JSON data is follows, in case you want to edit it in a text editor:</p>
+    <ul>
+      <li><strong><code>configTableCols</code></strong> - An array containing the headers for the Config Table. In other
+        words: The first row of the Config Table. Note: This may include columns with blank headers, which is normal
+        (the Config Table may have an empty column header with data in the body).</li>
+      <li><strong><code>configTableBody</code></strong> -  An array of arrays containing the bodies for the Config Table.
+        In other words: All the rows of the Config Table except for the first one. These match the order of the column
+        headers. Blank values here are normal if not all the values in the Config Table are filled in.</li>
+      <li><strong><code>customTemplates</code></strong> -  An array containing JSON objects that contain the data for the
+        custom templates. This JSON object contains three keys: <code>content</code>, which is a string containing the
+        contents of the template (likely to be very long!), <code>displayed_name</code>, which is the name of the custom 
+        template in the dropdown, and <code>ui_values</code>, which is the saved UI values for the template (if not
+        included, template falls back to whatever default it has).</li>
+      <li><strong><code>builtinTemplates</code></strong> -  An array containing JSON objects that contain the data for
+        the builtin template. This only stores the saved UI values for the template (and if not included, template falls
+        back to whatever default it has.</li>
+    </ul>
+    <textarea id="import-export-textarea"></textarea>
+    <f-row class="gap-1">
+      <button id="export-button">Export</button>
+      <button id="import-button">Import</button>
+    </f-row>
+  </details>
   <pre id="error-msg"></pre>
 
   <div id="instructions">

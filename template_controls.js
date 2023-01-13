@@ -222,6 +222,14 @@ export class TemplateControls {
         this.set_current_template(custom_i(i));
     }
 
+    reload_templates_from_localStorage() {
+        this.builtin_templates = load_builtin_templates();
+        this.custom_templates = load_custom_templates();
+        this.#regenerate_ui();
+        this.#renegerate_dropdown();
+        this.set_current_template("builtin-0");
+    }
+
     /**
      * Returns the template that has the name `dropdown_name`.
      * @param {DropdownName} dropdown_name the name of the template used by the dropdown selector
@@ -322,7 +330,7 @@ export class TemplateControls {
     }
 
     /**
-     * Regenerate the UI HTML elements. 
+     * Regenerate the template's UI HTML elements. 
      */
     #regenerate_ui() {
         const ui_elements = this.get_current_template().get_ui_elements();

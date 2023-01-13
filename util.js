@@ -59,12 +59,13 @@ export function* enumerate(items) {
 export function localStorageOrDefault(key, fallback) {
     let obj = localStorage.getItem(key);
     if (obj == null) {
+        console.warn(`${key} not present in localStorage! using fallback instead...`);
         return fallback;
     }
     try {
         return JSON.parse(obj);
     } catch (err) {
-        console.warn(err);
+        console.warn(`Could not parse ${key} JSON:`, err, obj);
         return fallback;
     }
 }
