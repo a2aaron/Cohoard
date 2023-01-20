@@ -404,7 +404,7 @@ function load_custom_templates() {
  * @returns {Array<Template>} the saved builtin templates
  */
 function load_builtin_templates() {
-    let builtins = [DISCORD_BUILTIN, TWITTER_BUILTIN, HOMESTUCK_BUILTIN, FOOTBALL_BUILTIN, UNDERTALE_BUILTIN];
+    let builtins = [DISCORD_BUILTIN, TWITTER_BUILTIN, HOMESTUCK_BUILTIN, FOOTBALL_BUILTIN, UNDERTALE_BUILTIN, WIKIPEDIA_BUILTIN];
     let stored_values = localStorageOrDefault("builtinTemplates", []);
     if (!(Array.isArray(stored_values))) {
         console.warn("stored builtin template data wasn't an array!", stored_values);
@@ -756,6 +756,6 @@ export const TWITTER_BUILTIN = await Template.builtin("Twitter", "https://raw.gi
 export const FOOTBALL_BUILTIN = await Template.builtin("17776", "https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/17776.html", "17776");
 export const HOMESTUCK_BUILTIN = await Template.builtin("MSPA", "https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/homestuck.html", "homestuck");
 export const UNDERTALE_BUILTIN = await Template.builtin("Undertale", "https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/undertale.html", "undertale");
-
+export const WIKIPEDIA_BUILTIN = await Template.builtin("Wikipedia", "https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/wikipedia.html", "wikipedia");
 
 export const BASIC_TEMPLATE = await get_template_from_url("https://raw.githubusercontent.com/a2aaron/Cohoard/gh-pages/templates/basic.html") ?? "Couldn't fetch template!";
