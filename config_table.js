@@ -16,17 +16,19 @@ export class ConfigTable {
     constructor(element, columns, body) {
         this.element = element;
         this.table = make_table_node(columns, body);
-        element.appendChild(this.table);
+        element.replaceChildren(this.table);
 
-        this.element.addEventListener("input", () => {
+        this.window_event_listener = () => this.save_table();
+        this.element_event_listener = () => {
             this.#check_bottom_row();
             this.#check_right_column();
 
             render();
             this.save_table()
-        });
+        };
 
-        window.addEventListener("beforeunload", () => this.save_table());
+        this.element.addEventListener("input", this.element_event_listener);
+        window.addEventListener("beforeunload", this.window_event_listener);
     }
 
     /**
