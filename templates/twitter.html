@@ -321,7 +321,7 @@ config-#}
                             {%- endif -%}
                         </span>
                     </div>
-                    <p class="tweet-content">{{- ele.message | markdown | trim | safe -}}</p>
+                    <div class="tweet-content">{{- ele.message | markdown | trim | safe -}}</div>
                     <div class="reply-icons-container">
                         <div style="mask: url({{reply_chat}})" class="reply-icon"></div>
                         <div style="mask: url({{reply_like}})" class="reply-icon"></div>
