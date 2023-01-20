@@ -301,6 +301,8 @@ config-#}
                     {%- set user_handle_alt = "user avatar" -%}
                     {%- if ele.user.handle -%}
                         {%- set user_handle_alt = ele.user.handle ~ "'s avatar"-%}
+                    {%- elif ele.user.name -%}
+                        {%- set user_handle_alt = ele.user.name ~ "'s avatar"-%}
                     {%- endif -%}
                     <img src="{{ ele.user.avatar | safe }}" alt="{{ user_handle_alt }}" class="avatar-image"/>
                 {%- else -%}
