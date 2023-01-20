@@ -280,7 +280,8 @@ config-#}
          If you want to type HTML tags (that aren't inside code
          blocks), you can escape it with &lt;. -#}
          {%- for message in messages -%}
-            <p class="message-content">{{- message | markdown | trim | safe }}</p>
+            {#- use div instead of p here to avoid a linebreak in media embeds. -#}
+            <div class="message-content">{{- message | markdown | trim | safe }}</div>
          {%- endfor -%}
       </div>         {#- end message-wrapper div -#}
    </div>         {#- end post-block div i-#}
