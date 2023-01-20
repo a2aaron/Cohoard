@@ -163,6 +163,15 @@ config-#}
       font-size: 9px;
       vertical-align: top;
    }
+
+   /* hidden, for the text only. Used to add some whitespace */
+   .alt-only {
+       display: hidden;
+       width: 0;
+       height: 0;
+       display: inline-block;
+       overflow: hidden;
+   }
 </style>
 
 
@@ -260,13 +269,9 @@ config-#}
          <div class="headline">
             <span class="{{user.key}} headline-username">{{ user.name }}</span>
             {%- if user.bot_tag -%}
-            {#- invisible space for media embeds -#}
-            <span style="display:inline-block;width:0"> </span>
-            <span class="bot-tag">{{ user.bot_tag }}</span>
+            <span class="alt-only"> [</span><span class="bot-tag">{{ user.bot_tag }}</span><span class="alt-only">]</span>
             {%- endif -%}
-            {#- invisible space for media embeds-#}
-            <span style="display:inline-block;width:0"> </span>
-            <span class="timestamp">{{ timestamp }}</span>
+            <span class="alt-only"> &mdash; </span><span class="timestamp">{{ timestamp }}</span>
          </div>
          {#- Message Contents (multiple messages are collapsed into a single post body) -#}
          {#- "safe" keyword is required here, because messages will
@@ -283,6 +288,8 @@ config-#}
             {#- use div instead of p here to avoid a linebreak in media embeds. -#}
             <div class="message-content">{{- message | markdown | trim | safe }}</div>
          {%- endfor -%}
+         {#- this inserts a line break for discord media embed. -#}
+         <div class="alt-only" style="display:block"></div>
       </div>         {#- end message-wrapper div -#}
    </div>         {#- end post-block div i-#}
    {%- endfor -%} {#- end postblock for -#}
