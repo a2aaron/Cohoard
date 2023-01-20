@@ -1,0 +1,111 @@
+{#-config
+   [{
+      "name": "light_mode",
+      "type": "checkbox",
+      "label": "Use Light Mode"
+   }, {
+      "name": "chatgpt_logo",
+      "type": "url",
+      "label": "ChatGPT Logo URL",
+      "placeholder": "url to an image",
+      "default": "https://static.witchoflight.com/~a2aaron/cohoard-avatars/chatgpt-logo.png"
+   }]
+config-#}
+
+{%- if light_mode -%}
+   {%- set background_color_1 = "white" -%}
+   {%- set background_color_2 = "rgb(247, 247, 248, 1)" -%}
+   {%- set text_color_1 = "rgb(52, 53, 65)" -%}
+   {%- set text_color_2 = "rgb(55, 65, 81)" -%}
+   {%- set border_color = "rgba(0, 0, 0, .1)"-%}
+{%- else -%}
+    {%- set background_color_1 = "rgb(52, 53, 65)" -%}
+    {%- set background_color_2 = "rgb(68, 70, 84)" -%}
+    {%- set text_color_1 = "rgb(236, 236, 241)" -%}
+    {%- set text_color_2 = "rgb(209, 213, 219)" -%}
+    {%- set border_color = "rgba(32,33,35,.5);" %}
+{%- endif -%}
+
+<style>
+    .cohoard-underline { text-decoration: underline; }
+
+    .cohoard-code {
+        font-family: monospace;
+        /* Avoid stripping white space */
+        white-space: pre-wrap;
+    }
+
+    .cohoard-codeblock {
+        font-family: monospace;
+        /* Avoid stripping white space */
+        white-space: pre-wrap;
+    }
+
+    #post-wrapper {
+        /* Cohost adds padding around the post, which usually looks weird. This 
+            negative margin undoes that padding. */
+        margin: -16px -12px;
+        padding: 16px;
+
+        font-family: ui-sans-serif, system-ui, sans-serif, Helvetica Neue;
+    }
+
+    .message-container {
+        display: flex;
+        width: 100%;
+        max-width: 48rem;
+        gap: 1.5rem;
+        padding: 1.5rem 1rem;
+        line-height: 1.5rem;
+        border-bottom: 1px solid;
+        border-color:   rgba(0, 0, 0, .1);
+        border-color: {{ border_color }};
+    }
+
+    .message-1 {
+        background-color: {{ background_color_1 }};
+        color: {{ text_color_1 }};
+    }
+
+    .message-2 {
+        background-color: {{ background_color_2 }};
+        color: {{ text_color_2 }};
+    }
+
+    .avatar-image {
+        border-radius: .125rem;
+        margin: 0;
+        width: 30px;
+        height: 30px;
+    }
+</style>
+
+{% set i = 0 %}
+<div id="post-wrapper">
+    {%- for ele in ELEMENTS -%}
+        {%- if ele.type == "post" -%}
+            {%- set msg_style = "message-1" -%}
+
+            {%- set avatar_url = chatgpt_logo -%}
+            {%- set avatar_alt = "ChatGPT" -%}
+
+            {%- if ele.user.avatar -%}
+                {%- set avatar_url = ele.user.avatar -%}
+                {%- if ele.user.handle -%}
+                    {%- set avatar_alt = ele.user.handle -%}
+                {%- elif ele.user.name -%}
+                    {%- set avatar_alt = ele.user.name -%}
+                {%- endif -%}
+            {%- endif -%}
+
+            {%- if i % 2 == 1 -%}
+                {%- set msg_style = "message-2" -%}
+            {%- endif -%}
+    <div class="message-container {{msg_style}}">
+        <img src="{{ avatar_url | safe }}" alt="{{ avatar_alt }}" class="avatar-image"/>                
+        <div class="message-content">{{- ele.message | markdown -}}</div>
+    </div>
+            {%- set_global i = i + 1 -%}
+        {%- endif -%}
+    {%- endfor -%}
+</div>
