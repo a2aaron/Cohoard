@@ -267,6 +267,7 @@ config-#}
       <div class="message-wrapper">
          {#- Post headline. This is the username + timestamp. -#}
          <div class="headline">
+            {#- this comment exists to eat some whitespace between the div and span -#}
             <span class="{{user.key}} headline-username">{{ user.name }}</span>
             {%- if user.bot_tag -%}
             <span class="alt-only"> [</span><span class="bot-tag">{{ user.bot_tag }}</span><span class="alt-only">]</span>
