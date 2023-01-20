@@ -260,8 +260,12 @@ config-#}
          <div class="headline">
             <span class="{{user.key}} headline-username">{{ user.name }}</span>
             {%- if user.bot_tag -%}
+            {#- invisible space for media embeds -#}
+            <span style="display:inline-block;width:0"> </span>
             <span class="bot-tag">{{ user.bot_tag }}</span>
             {%- endif -%}
+            {#- invisible space for media embeds-#}
+            <span style="display:inline-block;width:0"> </span>
             <span class="timestamp">{{ timestamp }}</span>
          </div>
          {#- Message Contents (multiple messages are collapsed into a single post body) -#}
