@@ -164,8 +164,14 @@ config-#}
       vertical-align: top;
    }
 
-   /* hidden, for the text only. Used to add some whitespace */
-   /* it seems that, on safari, white-space is not copied if it is hidden and in a span? */
+   /* alt-only means the text is hidden but should appear in copy/paste or media embeds. 
+    * This is used to add some whitespace and also to make BOT tags be enclosed in brackets.
+    * It seems that, on safari, you can select size 0 text, but not invisible text.
+    * Firefox seems to allow selecting both. Hence, for text in spans which should not appear
+    * but need to appear, we use font-size: 0 instead. Also note that height: 0 and inline-block
+    * are required to force the text to have zero size in the layout (otherwise the text will affect
+    * the height of the div it's in, messing up layout.)
+    */
    .alt-only { font-size: 0; height: 0; display: inline-block; }
    div.alt-only { width: 0; height: 0; overflow: hidden; }
 </style>
