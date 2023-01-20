@@ -1,6 +1,7 @@
 {
-    "name": "",
-    "short_name": "",
+    "name": "Cohoard - Format Chatlogs for Cohost",
+    "short_name": "Cohoard",
+    "description": "Format Chatlogs for Cohost.",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
