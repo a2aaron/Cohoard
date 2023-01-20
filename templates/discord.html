@@ -165,13 +165,9 @@ config-#}
    }
 
    /* hidden, for the text only. Used to add some whitespace */
-   .alt-only {
-       display: hidden;
-       width: 0;
-       height: 0;
-       display: inline-block;
-       overflow: hidden;
-   }
+   /* it seems that, on safari, white-space is not copied if it is hidden and in a span? */
+   .alt-only { font-size: 0; height: 0; display: inline-block; }
+   div.alt-only { width: 0; height: 0; overflow: hidden; }
 </style>
 
 
