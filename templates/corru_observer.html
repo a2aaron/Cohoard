@@ -1,5 +1,10 @@
 {#-config
    [{
+      "name": "enable_barcode",
+      "type": "checkbox",
+      "label": "Enable barcodes? (May be laggy)",
+      "default": "true"
+   }, {
       "name": "info",
       "type": "none",
       "label": "Sprites ripped with permission from <a href=\"https://corru.observer\">corru.observer</a>",
@@ -176,20 +181,24 @@ config-#}
             <img src="{{ user_avatar | safe }}" alt="{{ user_handle_alt }}" class="avatar-image"/>
             <div class="outer-barcode-wrapper">
                <div class="inner-barcode-wrapper">
-                  {%- for character in username -%}
-                     {%- for bar_char in barcode_chars -%}
-                        {%- if bar_char == character -%}
-                           {%- set barcode = barcode_map[loop.index0] -%}
-                           {%- for width in barcode -%}
-                              {%- set bar_color = text_color -%}
-                              {%- if loop.index0 % 2 == 1 -%}
-                                 {%- set bar_color = bg_color -%}
-                              {%- endif -%}
-                              <div class="barcode barcode-{{width}}" style="background-color: {{bar_color}}"></div>
-                           {%- endfor -%}
-                        {%- endif -%}
+                  {%- if enable_barcode -%}
+                     {%- for character in username -%}
+                        {%- for bar_char in barcode_chars -%}
+                           {%- if bar_char == character -%}
+                              {%- set barcode = barcode_map[loop.index0] -%}
+                              {%- for width in barcode -%}
+                                 {%- set bar_color = text_color -%}
+                                 {%- if loop.index0 % 2 == 1 -%}
+                                    {%- set bar_color = bg_color -%}
+                                 {%- endif -%}
+                                 <div class="barcode barcode-{{width}}" style="background-color: {{bar_color}}"></div>
+                              {%- endfor -%}
+                           {%- endif -%}
+                        {%- endfor -%}
                      {%- endfor -%}
-                  {%- endfor -%}
+                  {%- else -%}
+                     <div class="barcode barcode-1" style="background-color: {{text_color}}"></div>
+                  {%- endif -%}
                </div>
                <h2>{{- username -}}</h2>
             </div>
@@ -201,20 +210,24 @@ config-#}
             <img src="{{ user_avatar | safe }}" alt="{{ user_handle_alt }}" class="avatar-image"/>
             <div class="outer-barcode-wrapper vert-center">
                <div class="inner-barcode-wrapper">
-                  {%- for character in ele.message -%}
-                     {%- for bar_char in barcode_chars -%}
-                        {%- if bar_char == character -%}
-                           {%- set barcode = barcode_map[loop.index0] -%}
-                           {%- for width in barcode -%}
-                              {%- set bar_color = text_color -%}
-                              {%- if loop.index0 % 2 == 1 -%}
-                                 {%- set bar_color = bg_color -%}
-                              {%- endif -%}
-                              <div class="barcode barcode-{{width}}" style="background-color: {{bar_color}}"></div>
-                           {%- endfor -%}
-                        {%- endif -%}
+                  {%- if enable_barcode -%}
+                     {%- for character in ele.message -%}
+                        {%- for bar_char in barcode_chars -%}
+                           {%- if bar_char == character -%}
+                              {%- set barcode = barcode_map[loop.index0] -%}
+                              {%- for width in barcode -%}
+                                 {%- set bar_color = text_color -%}
+                                 {%- if loop.index0 % 2 == 1 -%}
+                                    {%- set bar_color = bg_color -%}
+                                 {%- endif -%}
+                                 <div class="barcode barcode-{{width}}" style="background-color: {{bar_color}}"></div>
+                              {%- endfor -%}
+                           {%- endif -%}
+                        {%- endfor -%}
                      {%- endfor -%}
-                  {%- endfor -%}
+                  {%- else -%}
+                     <div class="barcode barcode-1" style="background-color: {{text_color}}"></div>
+                  {%- endif -%}
                </div>
                <div class="message-content">{{ ele.message | markdown | trim | safe }}</div>
             </div>
