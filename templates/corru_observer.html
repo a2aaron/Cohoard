@@ -171,6 +171,7 @@ config-#}
          {%- if ele.user.name -%}
             {%- set username = "!!__" ~ ele.user.name ~ "__!!" -%}
          {%- endif -%}
+         {%- set username = username | upper -%}
 
          {%- set text_color = ele.user.color | default(value="white") -%}
          {%- set bg_color = ele.user.background_color | default(value="black") -%}
