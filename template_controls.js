@@ -51,7 +51,7 @@ function custom_i(i) {
  * @typedef {{
  *      name: string,
  *      type: "text" | "url" | "time" | "datetime" | "email" |
- *              "checkbox" | "radio" | "color" | "range" | "file",
+ *              "checkbox" | "radio" | "color" | "range" | "file"
  *      label: string,
  *      default?: string,
  *      placeholder?: string,
@@ -655,6 +655,7 @@ class UIElement {
 
         //@ts-ignore
         this.#input_element = h("input", { type: ui_description.type, id: label });
+
         if (ui_description.default) {
             if (ui_description.type == "checkbox") {
                 this.#input_element.checked = ui_description.default === "true";
