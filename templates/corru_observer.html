@@ -161,11 +161,7 @@ config-#}
             {%- endif -%}
          {%- endif -%}
 
-
-         {%- set headline = true -%}
-         {%- if ele.user.style -%}
-            {%- set headline = ele.user.style != "noheadline" -%}
-         {%- endif -%}
+         {%- set style = ele.user.style | default(value = "normal") -%}
 
          {%- set username = "!!__" ~ ele.user.key ~ "__!!" -%}
          {%- if ele.user.name -%}
@@ -176,7 +172,7 @@ config-#}
          {%- set text_color = ele.user.color | default(value="white") -%}
          {%- set bg_color = ele.user.background_color | default(value="black") -%}
 
-         {%- if headline -%}
+         {%- if style == "normal" -%}
          <div class="corru-msg {{ele.user.key}} yes-headline">
             <img src="{{ user_avatar | safe }}" alt="{{ user_handle_alt }}" class="avatar-image"/>
             <div class="outer-barcode-wrapper">
@@ -205,7 +201,7 @@ config-#}
             <div class="line"></div>
             <div class="message-content">{{ ele.message | markdown | trim | safe }}</div>
          </div>
-         {%- else -%}
+         {%- elif style == "noheadline" -%}
          <div class="corru-msg {{ele.user.key}} no-headline">
             <img src="{{ user_avatar | safe }}" alt="{{ user_handle_alt }}" class="avatar-image"/>
             <div class="outer-barcode-wrapper vert-center">
@@ -229,6 +225,13 @@ config-#}
                      <div class="barcode barcode-1" style="background-color: {{text_color}}"></div>
                   {%- endif -%}
                </div>
+               <div class="message-content">{{ ele.message | markdown | trim | safe }}</div>
+            </div>
+         </div>
+         {%- elif style == "messageonly" -%}
+         <div class="corru-msg {{ele.user.key}} no-headline">
+            <img src="{{ user_avatar | safe }}" alt="{{ user_handle_alt }}" class="avatar-image"/>
+            <div class="outer-barcode-wrapper vert-center">
                <div class="message-content">{{ ele.message | markdown | trim | safe }}</div>
             </div>
          </div>
