@@ -15,6 +15,82 @@ export const PRESETS = {
         avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/bugegg.png",
         handle: "bugegg"
     },
+    // CORRU.OBSERVER
+    "corru-interloper": {
+        key: "INTERLOPER",
+        name: "INTERLOPER",
+        avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/corru-interloper.png",
+        color: "black",
+        background_color: "white",
+        style: "noheadline",
+    },
+    "corru-moth": {
+        key: "MOTH",
+        name: "Moth",
+        avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/corru-moth.png",
+        color: "#00ffff",
+    },
+    "corru-funfriend": {
+        key: "FUNFRIEND",
+        name: "Funfriend",
+        avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/corru-funfriend.png",
+        color: "#ff00ff",
+    },
+    "corru-akitzet": {
+        key: "AKITZET",
+        name: "Akitzet",
+        avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/corru-akitzet.png",
+        color: "#ff00ff",
+    },
+    "corru-bozko": {
+        key: "BOZKO",
+        name: "Bozko",
+        avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/corru-bozko.png",
+        color: "#ff00ff",
+    },
+    "corru-cavik": {
+        key: "CAVIK",
+        name: "Cavik",
+        avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/corru-cavik.png",
+        color: "#ff00ff",
+    },
+    "corru-gakvu": {
+        key: "GAKVU",
+        name: "Gakvu",
+        avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/corru-gakvu.png",
+        color: "#ff00ff",
+    },
+    "corru-kazki": {
+        key: "KAZKI",
+        name: "Kazki",
+        avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/corru-kazki.png",
+        color: "#ff00ff",
+    },
+    "corru-tozik": {
+        key: "TOZIK",
+        name: "Tozik",
+        avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/corru-tozik.png",
+        color: "#ff00ff",
+    },
+    "corru-movefriend": {
+        key: "MOVEFRIEND",
+        name: "Movefriend",
+        avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/corru-movefriend.png",
+        color: "#ff00ff",
+    },
+    "corru-barfriend": {
+        key: "BARFRIEND",
+        name: "Barfriend",
+        avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/corru-barfriend.png",
+        color: "#ff00ff",
+    },
+    "corru-mindspike": {
+        key: "MINDSPIKE",
+        name: "Mindspike",
+        avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/corru-mindspike.png",
+        color: "#ffff00",
+        style: "noheadline",
+    },
     // 17776
     "17776-juice": {
         key: "JUICE",
