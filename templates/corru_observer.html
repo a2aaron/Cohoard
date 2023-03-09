@@ -1,3 +1,12 @@
+{#-config
+   [{
+      "name": "info",
+      "type": "none",
+      "label": "Sprites ripped with permission from <a href=\"https://corru.observer\">corru.observer</a>",
+      "placeholder": "this box doesn't do anything"
+   }]
+config-#}
+
 <style>
    .cohoard-underline { text-decoration: underline; }
 
@@ -40,15 +49,23 @@
       padding-right: 0;
       margin-bottom: 0.75rem;
       line-height: 1.25em;
-      font-size: 0.75rem;
+      font-size: 0.65rem;
+   }
+   
+   .corru-msg.yes-headline {
       display: flow-root;
+   }
+
+   .corru-msg.no-headline {
+      display: flex;
+      align-items: center;
    }
 
    .corru-msg img {
       width: 3.5rem;
       height: 3.5rem;
+      margin: 0;
       margin-right: 0.5rem;
-
       line-height: 1.25em;
       float: left;
       
@@ -62,20 +79,25 @@
       line-height: 1em;
       margin-top: 0;
       white-space: nowrap;
-      letter-spacing: 4px;
-   }
-   .headline-wrapper {
-      display: inline-block;
+      color: inherit;
    }
 
-   .barcode-wrapper {
-      height: 10px;
+   /* The div containing both the barcode divs and the message text */
+   .outer-barcode-wrapper {
+      /* Ensures that the outer wrapper width is only as long as the message text */
+      display: inline-block;
+      letter-spacing: 6px;
+   }
+
+   /* The div containing just the barcode divs */
+   .inner-barcode-wrapper {
+      height: 15px;
       display: flex;
       flex-direction: row;
       flex-wrap: nowrap;
    }
    .barcode {
-      height: 10px;
+      height: 15px;
       float: left;
       display: table-cell;
    }
@@ -89,12 +111,17 @@
       border-bottom: 1px solid;
       margin-bottom: 0.35em;
    }
+
+   .vert-center {
+      height: auto;
+   }
 </style>
 
 <style>
    {%- for user in users -%}
    .{{user.key}}.corru-msg {
       color: {{ user.color | default(value="white") }};
+      background-color: {{ user.background_color | default(value="black") }};
       border-color: {{ user.color | default(value="white") }};
    }
 
@@ -112,7 +139,6 @@
       (need to have spacing between each style rule) */
 </style>
 
-
 {%- set barcode_chars = [" ", "!", '"', "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":", ";", "<", "=", ">", "?", "@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "[", "\\", "]", "^", "_", "`", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "|", "}", "~",] -%}
 {%- set barcode_map =   ["212222", "222122", "222221", "121223", "121322", "131222", "122213", "122312", "132212", "221213", "221312", "231212", "112232", "122132", "122231", "113222", "123122", "123221", "223211", "221132", "221231", "213212", "223112", "312131", "311222", "321122", "321221", "312212", "322112", "322211", "212123", "212321", "232121", "111323", "131123", "131321", "112313", "132113", "132311", "211313", "231113", "231311", "112133", "112331", "132131", "113123", "113321", "133121", "313121", "211331", "231131", "213113", "213311", "213131", "311123", "311321", "331121", "312113", "312311", "332111", "314111", "221411", "431111", "111224", "111422", "121124", "121421", "141122", "141221", "112214", "112412", "122114", "122411", "142112", "142211", "241211", "221114", "413111", "241112", "134111", "111242", "121142", "121241", "114212", "124112", "124211", "411212", "421112", "421211", "212141", "214121", "412121", "111143", "111341", "131141"] -%}
 
@@ -120,32 +146,46 @@
    {%- for ele in ELEMENTS -%}
       {%- if ele.type == "post" -%}
          {%- set user_avatar = "" -%}
-         {%- set user_handle_alt = "user avatar"-%}
+         {%- set user_handle_alt = ""-%}
+
          {%- if ele.user.avatar -%}
             {%- set user_avatar = ele.user.avatar -%}
+            {%- if ele.user.handle -%}
+               {%- set user_handle_alt = ele.user.handle ~ "'s avatar"-%}
+            {%- elif ele.user.name -%}
+               {%- set user_handle_alt = ele.user.name ~ "'s avatar"-%}
+            {%- endif -%}
          {%- endif -%}
 
-         {%- if ele.user.handle -%}
-            {%- set user_handle_alt = ele.user.handle ~ "'s avatar"-%}
-         {%- elif ele.user.name -%}
-            {%- set user_handle_alt = ele.user.name ~ "'s avatar"-%}
+
+         {%- set headline = true -%}
+         {%- if ele.user.style -%}
+            {%- set headline = ele.user.style != "noheadline" -%}
          {%- endif -%}
 
-         <div class="corru-msg {{ele.user.key}}">
+         {%- set username = "!!__" ~ ele.user.key ~ "__!!" -%}
+         {%- if ele.user.name -%}
+            {%- set username = "!!__" ~ ele.user.name ~ "__!!" -%}
+         {%- endif -%}
+
+         {%- set text_color = ele.user.color | default(value="white") -%}
+         {%- set bg_color = ele.user.background_color | default(value="black") -%}
+
+         {%- if headline -%}
+         <div class="corru-msg {{ele.user.key}} yes-headline">
             <img src="{{ user_avatar | safe }}" alt="{{ user_handle_alt }}" class="avatar-image"/>
-            <div class="headline-wrapper">
-               <div class="barcode-wrapper">
-                  {%- set username = "!!__" ~ ele.user.name ~ "__!!" -%}
+            <div class="outer-barcode-wrapper">
+               <div class="inner-barcode-wrapper">
                   {%- for character in username -%}
                      {%- for bar_char in barcode_chars -%}
                         {%- if bar_char == character -%}
                            {%- set barcode = barcode_map[loop.index0] -%}
                            {%- for width in barcode -%}
-                              {%- set bg_color = ele.user.color | default(value="white") -%}
+                              {%- set bar_color = text_color -%}
                               {%- if loop.index0 % 2 == 1 -%}
-                                 {%- set bg_color = "black" -%}
+                                 {%- set bar_color = bg_color -%}
                               {%- endif -%}
-                              <div class="barcode barcode-{{width}}" style="background-color: {{bg_color}}"></div>
+                              <div class="barcode barcode-{{width}}" style="background-color: {{bar_color}}"></div>
                            {%- endfor -%}
                         {%- endif -%}
                      {%- endfor -%}
@@ -156,6 +196,30 @@
             <div class="line"></div>
             <div class="message-content">{{ ele.message | markdown | trim | safe }}</div>
          </div>
+         {%- else -%}
+         <div class="corru-msg {{ele.user.key}} no-headline">
+            <img src="{{ user_avatar | safe }}" alt="{{ user_handle_alt }}" class="avatar-image"/>
+            <div class="outer-barcode-wrapper vert-center">
+               <div class="inner-barcode-wrapper">
+                  {%- for character in ele.message -%}
+                     {%- for bar_char in barcode_chars -%}
+                        {%- if bar_char == character -%}
+                           {%- set barcode = barcode_map[loop.index0] -%}
+                           {%- for width in barcode -%}
+                              {%- set bar_color = text_color -%}
+                              {%- if loop.index0 % 2 == 1 -%}
+                                 {%- set bar_color = bg_color -%}
+                              {%- endif -%}
+                              <div class="barcode barcode-{{width}}" style="background-color: {{bar_color}}"></div>
+                           {%- endfor -%}
+                        {%- endif -%}
+                     {%- endfor -%}
+                  {%- endfor -%}
+               </div>
+               <div class="message-content">{{ ele.message | markdown | trim | safe }}</div>
+            </div>
+         </div>
+         {%- endif %}
       {%- endif -%}
    {%- endfor -%}
 </div>
