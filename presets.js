@@ -103,6 +103,32 @@ export const PRESETS = {
         color: "#ffff00",
         style: "noheadline",
     },
+    "corru-velzie": {
+        key: "VELZIE",
+        name: "Velzie",
+        avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/corru-velzie.png",
+        avatar_background: "white",
+        color: "black",
+        background_color: "white",
+        border_radius: "100%",
+        style: "messageonly",
+    },
+    "corru-god": {
+        key: "GOD",
+        name: "God",
+        avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/corru-god.png",
+        avatar_background: "white",
+        color: "#ff00ff",
+        border_radius: "100%",
+    },
+    "corru-bstrd": {
+        key: "BSTRD",
+        name: "BSTRD",
+        avatar: "https://static.witchoflight.com/~a2aaron/cohoard-avatars/corru-bstrd.png",
+        avatar_background: "black",
+        color: "#ff0066",
+        border_radius: "100%",
+    },
     // 17776
     "17776-juice": {
         key: "JUICE",
